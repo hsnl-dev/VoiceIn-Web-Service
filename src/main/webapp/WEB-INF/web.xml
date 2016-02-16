@@ -35,7 +35,7 @@
 
     <filter-mapping>
         <filter-name>JerseyApplication</filter-name>
-        <url-pattern>/jersey/*</url-pattern>
+        <url-pattern>/api/*</url-pattern>
     </filter-mapping>
 
 </web-app>

@@ -12,6 +12,6 @@ public class JerseyApplication extends ResourceConfig {
         // property(JspMvcFeature.TEMPLATE_BASE_PATH, "/WEB-INF/classes");
         register(JspMvcFeature.class);
         register(JacksonFeature.class);
-        register(JerseyResource.class);
+        register(APIServiceV1.class);
     }
 }
