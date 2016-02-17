@@ -28,7 +28,7 @@
             <param-name>jersey.config.server.provider.classnames</param-name>
             -->
             <param-name>javax.ws.rs.Application</param-name>
-            <param-value>gae.jersey.jackson.objectify.JerseyApplication</param-value>
+            <param-value>tw.kits.voicein.JerseyApplication</param-value>
         </init-param>
 
     </filter>
