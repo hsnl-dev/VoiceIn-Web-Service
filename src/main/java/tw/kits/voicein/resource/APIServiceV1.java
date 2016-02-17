@@ -1,4 +1,4 @@
-package tw.kits.voicein;
+package tw.kits.voicein.resource;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
