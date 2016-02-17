@@ -13,6 +13,12 @@ Build
 ```sh
 mvn clean install
 ```
+Run
+==
+Use google dev server
+```sh
+mvn appengine:devserver
+```
 
 Deploy
 ==
