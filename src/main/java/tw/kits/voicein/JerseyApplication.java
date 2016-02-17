@@ -1,4 +1,4 @@
-package gae.jersey.jackson.objectify;
+package tw.kits.voicein;
 
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -12,6 +12,7 @@ public class JerseyApplication extends ResourceConfig {
         // property(JspMvcFeature.TEMPLATE_BASE_PATH, "/WEB-INF/classes");
         register(JspMvcFeature.class);
         register(JacksonFeature.class);
-        register(APIServiceV1.class);
+        packages("tw.kits.voicein");
+    
     }
 }

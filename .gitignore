@@ -1,4 +1,6 @@
 .idea/
+.settings/
+*.class
 eclipse-launch-profiles/
 lib/
 target/
