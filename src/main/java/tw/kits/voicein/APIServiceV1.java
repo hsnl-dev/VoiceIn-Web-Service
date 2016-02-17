@@ -1,4 +1,4 @@
-package gae.jersey.jackson.objectify;
+package tw.kits.voicein;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
