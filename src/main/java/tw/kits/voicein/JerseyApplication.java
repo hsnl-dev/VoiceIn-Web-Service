@@ -15,8 +15,7 @@ public class JerseyApplication extends ResourceConfig {
         register(JspMvcFeature.class);
         register(JacksonFeature.class);
         property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true);
-        packages("tw.kits.voicein.resource");
-        
+        packages("tw.kits.voicein.resource.ApiV1");
     
     }
 }

@@ -1,4 +1,4 @@
-package tw.kits.voicein.resource;
+package tw.kits.voicein.resource.ApiV1;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
