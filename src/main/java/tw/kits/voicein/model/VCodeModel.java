@@ -4,28 +4,33 @@ import java.util.Date;
 import java.util.UUID;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Reference;
 
 @Entity("code")
 public class VCodeModel {
     @Id 
-    private UUID vcodeId;
+    private String vcodeId;
+    @Reference
+    private User user;
     private String code;
     private Date createAt;
     private int expiredTime;
-    private String phoneNumber;
+    
     public VCodeModel(){};
-    public VCodeModel(UUID vcodeId, String code, Date createAt, int expiredTime, String phoneNumber) {
-        this.vcodeId = vcodeId;
+
+    public VCodeModel(User userUuid, String code, Date createAt, int expiredTime) {
+        this.vcodeId = UUID.randomUUID().toString();
+        this.user = userUuid;
         this.code = code;
         this.createAt = createAt;
         this.expiredTime = expiredTime;
-        this.phoneNumber = phoneNumber;
     }
-    public UUID getVcodeId() {
+  
+    public String getVcodeId() {
         return vcodeId;
     }
 
-    public void setVcodeId(UUID vcodeId) {
+    public void setVcodeId(String vcodeId) {
         this.vcodeId = vcodeId;
     }
 
@@ -53,18 +58,20 @@ public class VCodeModel {
         this.expiredTime = expiredTime;
     }
 
+
+
     /**
-     * @return the phoneNumber
+     * @return the userUuid
      */
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public User getUser() {
+        return user;
     }
 
     /**
-     * @param phoneNumber the phoneNumber to set
+     * @param userUuid the userUuid to set
      */
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+    public void setUser(User user) {
+        this.user = user;
     }
     
 }
