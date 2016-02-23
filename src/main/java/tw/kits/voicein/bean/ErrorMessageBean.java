@@ -1,4 +1,3 @@
-
 package tw.kits.voicein.bean;
 
 public class ErrorMessageBean {

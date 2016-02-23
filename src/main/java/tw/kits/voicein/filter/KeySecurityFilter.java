@@ -2,6 +2,8 @@ package tw.kits.voicein.filter;
 
 import java.io.IOException;
 import java.util.logging.Logger;
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
@@ -12,6 +14,7 @@ import tw.kits.voicein.bean.ErrorMessageBean;
 
 @Provider
 @PreMatching
+@Priority(Priorities.AUTHORIZATION)
 public class KeySecurityFilter implements ContainerRequestFilter{
     private final static Logger log = Logger.getLogger("tw.kits.voicein.filter.KeySecurityFilter");
     @Override
