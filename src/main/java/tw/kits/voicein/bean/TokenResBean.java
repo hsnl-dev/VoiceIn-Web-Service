@@ -1,7 +1,14 @@
 package tw.kits.voicein.bean;
 
 
-public class TokenBean {
+public class TokenResBean {
+
+    public TokenResBean(String token) {
+        this.token = token;
+    }
+    public TokenResBean() {
+      
+    }
    private String token; 
 
 

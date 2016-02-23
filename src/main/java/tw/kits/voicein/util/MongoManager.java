@@ -8,8 +8,8 @@ import org.mongodb.morphia.Morphia;
 
 public class MongoManager {
     private static MongoManager instance;
-    public final static String DB_NAME = "users";
-    public final static String DB_URI = "mongodb://hsnl:hsnl33564@ds011158.mongolab.com:11158/";
+    public final static String DB_NAME = "voicein";
+    public final static String DB_URI = "mongodb://hsnl-dev:hsnl33564hsnl33564@ds013908.mongolab.com:13908/voicein";
     public final static String MAPPING_PACKAGE = "tw.kits.voicein.model";
     private final Morphia morphia = new Morphia();
 
