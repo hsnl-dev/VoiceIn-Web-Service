@@ -8,19 +8,24 @@ import org.mongodb.morphia.annotations.Id;
 @Entity("token")
 public class TokenModel {
     @Id 
-    private UUID tokenId;
-
-    public TokenModel(UUID tokenId, Date createdAt, int expire) {
+    private String tokenId;
+    private Date createdAt;
+    private int expire;
+    public TokenModel(String tokenId, Date createdAt, int expire) {
         this.tokenId = tokenId;
         this.createdAt = createdAt;
         this.expire = expire;
     }
-
-    public UUID getTokenId() {
+    public TokenModel(int expire) {
+        this.tokenId = UUID.randomUUID().toString();
+        this.createdAt = new Date();
+        this.expire = expire;
+    }
+    public String getTokenId() {
         return tokenId;
     }
 
-    public void setTokenId(UUID tokenId) {
+    public void setTokenId(String tokenId) {
         this.tokenId = tokenId;
     }
 
@@ -39,8 +44,7 @@ public class TokenModel {
     public void setExpire(int expire) {
         this.expire = expire;
     }
-    private Date createdAt;
-    private int expire;
+   
     
     
 }

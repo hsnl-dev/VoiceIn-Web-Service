@@ -19,6 +19,9 @@ public class KeySecurityFilter implements ContainerRequestFilter{
     private final static Logger log = Logger.getLogger("tw.kits.voicein.filter.KeySecurityFilter");
     @Override
     public void filter(ContainerRequestContext crc) throws IOException {
+        if("\\".equals(crc.getUriInfo().getPath())){
+            return;
+        }
         if ( crc.getRequest().getMethod().equals( "OPTIONS" ) ) {
             crc.abortWith( Response.status( Response.Status.OK ).build() );
 
