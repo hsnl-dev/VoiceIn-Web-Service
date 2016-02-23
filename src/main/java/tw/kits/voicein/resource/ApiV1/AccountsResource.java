@@ -93,7 +93,7 @@ public class AccountsResource {
     }
     
     /**
-     *
+     * Call
      * @param uuid
      * @return response
      */
@@ -106,6 +106,11 @@ public class AccountsResource {
         return Response.status(Status.OK).build();
     }
     
+    /**
+     * This API allows user to get their contact list.
+     * @param uuid
+     * @return
+     */
     @GET
     @Path("/accounts/{uuid}/contacts")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -114,6 +119,11 @@ public class AccountsResource {
         return new Contact();
     }
     
+    /**
+     * This API allows user to add a contact.
+     * @param uuid
+     * @return
+     */
     @POST
     @Path("/accounts/{uuid}/contacts")
     @Consumes(MediaType.APPLICATION_JSON)
