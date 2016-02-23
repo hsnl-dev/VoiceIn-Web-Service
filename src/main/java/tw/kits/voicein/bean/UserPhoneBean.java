@@ -1,4 +1,3 @@
-
 package tw.kits.voicein.bean;
 
 import javax.validation.constraints.NotNull;
