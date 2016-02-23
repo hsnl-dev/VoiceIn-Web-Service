@@ -1,6 +1,5 @@
 package tw.kits.voicein.resource.ApiV1;
 
-import java.util.List;
 import java.util.logging.*;
 
 import javax.ws.rs.*;
@@ -10,7 +9,6 @@ import tw.kits.voicein.models.User;
 import tw.kits.voicein.util.MongoManager;
 import org.mongodb.morphia.Datastore;
 import javax.ws.rs.core.Response.Status;
-import org.mongodb.morphia.query.Query;
 
 /**
  *
@@ -20,7 +18,24 @@ import org.mongodb.morphia.query.Query;
 public class AccountsResource {
     static final Logger LOGGER = Logger.getLogger("AccountsDebugLogging");
     ConsoleHandler consoleHandler = new ConsoleHandler();
-          
+    
+    @DELETE 
+    @Path("/accounts/{uuid}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteUserAccount(@PathParam("uuid") String uuid) {
+        MongoManager mongoManager = MongoManager.getInstatnce();
+        Datastore dsObj = mongoManager.getDs();
+        dsObj.delete(User.class, uuid);
+        
+        LOGGER.setLevel(Level.ALL);
+        consoleHandler.setLevel(Level.CONFIG);
+        
+        LOGGER.addHandler(consoleHandler);        
+        LOGGER.log(Level.CONFIG, "[Config] Delete user u{0}", uuid);
+        
+        return Response.status(Status.OK).build();
+    }
+    
     @PUT
     @Path("/accounts/{uuid}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -36,7 +51,7 @@ public class AccountsResource {
         consoleHandler.setLevel(Level.ALL);
         
         LOGGER.addHandler(consoleHandler);        
-        LOGGER.log(Level.CONFIG, "[Config] u{0}", u);
+        LOGGER.log(Level.CONFIG, "[Config] Update user u{0}", u);
                 
         return Response.status(Status.OK).build();
     }    
@@ -59,7 +74,7 @@ public class AccountsResource {
         consoleHandler.setLevel(Level.CONFIG);
         
         LOGGER.addHandler(consoleHandler);        
-        LOGGER.log(Level.CONFIG, "[Config] uuid u{0}", uuid);
+        LOGGER.log(Level.CONFIG, "[Config] Get user u{0}", uuid);
         
         return user;
     }

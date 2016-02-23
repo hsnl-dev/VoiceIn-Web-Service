@@ -29,6 +29,7 @@
 	</prerequisites>
 
 	<dependencies>
+            
 		<!-- Compile/runtime dependencies -->
 		<dependency>
 			<groupId>com.google.appengine</groupId>
@@ -46,6 +47,7 @@
 			<artifactId>jstl</artifactId>
 			<version>1.2</version>
 		</dependency>
+
 		<!-- Jersey dependencies -->
 		<dependency>
 			<groupId>org.glassfish.jersey</groupId>
@@ -70,6 +72,7 @@
 			<artifactId>jersey-mvc-jsp</artifactId>
 			<version>${jersey.version}</version>
 		</dependency>
+
 		<!-- Jackson dependencies -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -98,7 +101,6 @@
 			<artifactId>objectify</artifactId>
 			<version>${objectify.version}</version>
 		</dependency>
-
                 <!-- Mongo DB dependencies -->
                 <dependency>
                     <groupId>org.mongodb</groupId>
@@ -110,8 +112,12 @@
                     <artifactId>morphia</artifactId>
                     <version>1.0.0-rc0</version>
                 </dependency>
-
-                <!-- Test Dependencies -->
+                <dependency>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                    <version>3.4</version>
+                </dependency>
+		<!-- Test Dependencies -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
