@@ -1,5 +1,6 @@
 package tw.kits.voicein.resource.ApiV1;
 
+import java.util.List;
 import java.util.logging.*;
 
 import javax.ws.rs.*;
@@ -115,20 +116,38 @@ public class AccountsResource {
     @Path("/accounts/{uuid}/contacts")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Contact getContactListOfAnUser(@PathParam("uuid") String uuid) {
-        return new Contact();
+    public List<Contact> getContactListOfAnUser(@PathParam("uuid") String uuid) {
+        MongoManager mongoManager = MongoManager.getInstatnce();
+        Datastore dsObj = mongoManager.getDs();
+        User user = dsObj.get(User.class, uuid);
+        
+        List<Contact> queryResult = dsObj.find(Contact.class).field("user").equal(user).asList();
+        
+        LOGGER.setLevel(Level.ALL);
+        consoleHandler.setLevel(Level.CONFIG);
+        LOGGER.addHandler(consoleHandler);        
+        LOGGER.log(Level.CONFIG, "[Config] contact length {0}", queryResult.size());
+        
+        return queryResult;
     }
     
     /**
      * This API allows user to add a contact.
      * @param uuid
+     * @param contact
      * @return
      */
     @POST
     @Path("/accounts/{uuid}/contacts")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createNewContactofAnUser(@PathParam("uuid") String uuid) {
+    public Response createNewContactofAnUser(@PathParam("uuid") String uuid, Contact contact) {
+        MongoManager mongoManager = MongoManager.getInstatnce();
+        Datastore dsObj = mongoManager.getDs();
+        User refUser = dsObj.get(User.class, uuid);
+        contact.setUser(refUser);
+        
+        dsObj.save(contact);
         return Response.ok().build();
     }
     
