@@ -29,6 +29,7 @@
 	</prerequisites>
 
 	<dependencies>
+            
 		<!-- Compile/runtime dependencies -->
 		<dependency>
 			<groupId>com.google.appengine</groupId>
@@ -100,7 +101,22 @@
 			<artifactId>objectify</artifactId>
 			<version>${objectify.version}</version>
 		</dependency>
-
+                <!-- Mongo DB dependencies -->
+                <dependency>
+                    <groupId>org.mongodb</groupId>
+                    <artifactId>mongodb-driver</artifactId>
+                    <version>3.2.2</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.mongodb.morphia</groupId>
+                    <artifactId>morphia</artifactId>
+                    <version>1.0.0-rc0</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                    <version>3.4</version>
+                </dependency>
 		<!-- Test Dependencies -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -218,6 +234,7 @@
 					<set_default>true</set_default>
 				</configuration>
 			</plugin>
+                        
 		</plugins>
 	</build>
 </project>
