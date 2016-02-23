@@ -1,34 +1,25 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package tw.kits.voicein.bean;
 
 import javax.validation.constraints.NotNull;
 
-/**
- *
- * @author Henry
- */
 public class UserAuthBean {
     @NotNull
-    private String userName;
+    private String userUuid;
     @NotNull
     private String password;
 
     /**
-     * @return the userName
+     * @return the userUuid
      */
-    public String getUserName() {
-        return userName;
+    public String getUserUuid() {
+        return userUuid;
     }
 
     /**
-     * @param userName the userName to set
+     * @param userUuid the userUuid to set
      */
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUserUuid(String userUuid) {
+        this.userUuid = userUuid;
     }
 
     /**
@@ -44,5 +35,7 @@ public class UserAuthBean {
     public void setPassword(String password) {
         this.password = password;
     }
+
+   
     
 }

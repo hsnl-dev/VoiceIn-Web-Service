@@ -4,6 +4,7 @@ package tw.kits.voicein.bean;
 public class TokenBean {
    private String token; 
 
+
     public String getToken() {
         return token;
     }
