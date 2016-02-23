@@ -1,4 +1,6 @@
-package tw.kits.voicein.models;
+package tw.kits.voicein.model;
+
+
 
 import org.mongodb.morphia.annotations.*;
 /**
