@@ -1,5 +1,6 @@
 package tw.kits.voicein.resource.ApiV1;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.*;
 
@@ -13,6 +14,7 @@ import org.bson.types.ObjectId;
 
 import tw.kits.voicein.model.User;
 import tw.kits.voicein.model.Contact;
+import tw.kits.voicein.util.Http;
 
 /**
  * Accounts Resource
@@ -98,8 +100,15 @@ public class AccountsResource {
     @Path("/accounts/{uuid}/calls")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response makePhoneCall(@PathParam("uuid") String uuid) {
-        //TODO Call the phone API.
+    public Response makePhoneCall(@PathParam("uuid") String uuid) throws IOException {
+        String endPoint = "https://ts.kits.tw/projectLYS/v0/Call/test01/generalCallRequest/";
+        String caller = "0988779570";
+        String callee = "0975531859";
+        String payload = "{\"caller\":\"%s\",\"callee\":\"%s\",\"check\":false}";
+        
+        Http http = new Http();
+        System.out.println(payload);
+        System.out.println(http.post(endPoint, String.format(payload, caller, callee)));
         return Response.status(Status.OK).build();
     }
     
