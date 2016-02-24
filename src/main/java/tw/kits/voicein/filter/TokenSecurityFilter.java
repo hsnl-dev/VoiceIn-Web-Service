@@ -23,15 +23,16 @@ import tw.kits.voicein.util.TokenRequired;
  */
 @TokenRequired
 @Provider
-@Priority(90000000)
+@Priority(Priorities.HEADER_DECORATOR)
 public class TokenSecurityFilter implements ContainerRequestFilter{
 
     @Override
     public void filter(ContainerRequestContext crc) throws IOException {
         String token = crc.getHeaderString("token");
         Datastore ds = MongoManager.getInstatnce().getDs();
-        final TokenModel tm = ds.get(TokenModel.class,token);
-        if (tm==null){
+        final TokenModel tm = ds.get(TokenModel.class, token);
+        
+        if (tm == null) {
             
             ErrorMessageBean errMsg = new ErrorMessageBean();
             errMsg.setErrorReason("Your code is not correct");
@@ -42,7 +43,8 @@ public class TokenSecurityFilter implements ContainerRequestFilter{
                             .build()
             );
         }
-        crc.setSecurityContext(new  SecurityContext() {
+        
+        crc.setSecurityContext(new SecurityContext() {
             @Override
             public Principal getUserPrincipal() {
                 return new Principal() {
@@ -69,7 +71,5 @@ public class TokenSecurityFilter implements ContainerRequestFilter{
             }
         });
         
-    }
-    
-
+    }   
 }

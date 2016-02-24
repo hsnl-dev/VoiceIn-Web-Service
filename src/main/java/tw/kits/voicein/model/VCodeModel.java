@@ -16,7 +16,8 @@ public class VCodeModel {
     private Date createAt;
     private int expiredTime;
     
-    public VCodeModel(){};
+    public VCodeModel() {
+    };
 
     public VCodeModel(User userUuid, String code, Date createAt, int expiredTime) {
         this.vcodeId = UUID.randomUUID().toString();
@@ -58,8 +59,6 @@ public class VCodeModel {
         this.expiredTime = expiredTime;
     }
 
-
-
     /**
      * @return the userUuid
      */
@@ -68,7 +67,7 @@ public class VCodeModel {
     }
 
     /**
-     * @param userUuid the userUuid to set
+     * @param user
      */
     public void setUser(User user) {
         this.user = user;
