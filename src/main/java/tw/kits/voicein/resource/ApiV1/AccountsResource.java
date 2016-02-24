@@ -19,10 +19,12 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import tw.kits.voicein.util.MongoManager;
 import org.mongodb.morphia.Datastore;
 import org.bson.types.ObjectId;
+import tw.kits.voicein.bean.AccountCallBean;
 
 import tw.kits.voicein.model.User;
 import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.util.Http;
+import tw.kits.voicein.util.Parameter;
 
 /**
  * Accounts Resource
@@ -94,8 +96,7 @@ public class AccountsResource {
     @Path("/accounts/{uuid}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-
-    public User getUserAccount(@PathParam("uuid") String uuid) {
+    public Response getUserAccount(@PathParam("uuid") String uuid) {
         User user = dsObj.get(User.class, uuid);
 
         LOGGER.setLevel(Level.ALL);
@@ -105,23 +106,25 @@ public class AccountsResource {
 
         LOGGER.log(Level.CONFIG, "[Config] Get user u{0}", uuid);
 
-        return user;
+        return Response.ok().entity(user).build();
     }
 
     /**
      * Call
      *
      * @param uuid
+     * @param callBean
      * @return response
+     * @throws java.io.IOException
      */
     @POST
     @Path("/accounts/{uuid}/calls")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response makePhoneCall(@PathParam("uuid") String uuid) throws IOException {
-        String endPoint = "https://ts.kits.tw/projectLYS/v0/Call/test01/generalCallRequest/";
-        String caller = "0988779570";
-        String callee = "0975531859";
+    public Response makePhoneCall(@PathParam("uuid") String uuid, AccountCallBean callBean) throws IOException {
+        String endPoint = Parameter.API_ROOT + Parameter.API_VER + "Call/test01/generalCallRequest/";
+        String caller = callBean.getCaller();
+        String callee = callBean.getCallee();
         String payload = "{\"caller\":\"%s\",\"callee\":\"%s\",\"check\":false}";
         
         Http http = new Http();
@@ -140,7 +143,7 @@ public class AccountsResource {
     @Path("/accounts/{uuid}/contacts")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Contact> getContactListOfAnUser(@PathParam("uuid") String uuid) {
+    public Response getContactListOfAnUser(@PathParam("uuid") String uuid) {
         User user = dsObj.get(User.class, uuid);
 
         List<Contact> queryResult = dsObj.find(Contact.class).field("user").equal(user).asList();
@@ -150,7 +153,7 @@ public class AccountsResource {
         LOGGER.addHandler(consoleHandler);
         LOGGER.log(Level.CONFIG, "[Config] contact length {0}", queryResult.size());
 
-        return queryResult;
+        return Response.ok().entity(queryResult).build();
     }
 
     /**
@@ -171,10 +174,6 @@ public class AccountsResource {
         dsObj.save(contact);
         return Response.ok().build();
     }
-
-    
-
-
     
     /**
      * This API allows client user to update a contact.

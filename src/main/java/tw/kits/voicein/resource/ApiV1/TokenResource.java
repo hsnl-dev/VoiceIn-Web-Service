@@ -69,7 +69,7 @@ public class TokenResource {
                 3600);
         HashMap<String,String> reqTo = new HashMap<String,String>();
         reqTo.put("number",phone.getPhoneNumber());
-        reqTo.put("content",String.format("¿Ë·Rªº¥Î¤á±z¦n¡A±zªºÅçÃÒ½X¬O %s¡A¨Ó¦ÛKITS VoiceIn ªA°È¤¤¤ß", code.getCode()));
+        reqTo.put("content",String.format("è¦ªæ„›çš„ç”¨æˆ¶æ‚¨å¥½ï¼Œæ‚¨çš„é©—è­‰ç¢¼æ˜¯ %sï¼Œä¾†è‡ªKITS VoiceIn æœå‹™ä¸­å¿ƒ", code.getCode()));
         
         ObjectMapper mapper = new ObjectMapper();
         String reqJSON = mapper.writeValueAsString(reqTo);
