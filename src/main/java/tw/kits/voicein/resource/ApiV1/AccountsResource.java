@@ -1,5 +1,6 @@
 package tw.kits.voicein.resource.ApiV1;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.logging.*;
 
@@ -7,6 +8,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import tw.kits.voicein.util.MongoManager;
 import org.mongodb.morphia.Datastore;
 import org.bson.types.ObjectId;
@@ -143,6 +146,20 @@ public class AccountsResource {
         dsObj.save(contact);
         return Response.ok().build();
     }
+    @POST
+    @Path("/api/v1/accounts/{user-uuid}/avatar")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response uploadAvatar(
+        @FormDataParam("file") InputStream fileInputStream,
+        @FormDataParam("file") FormDataContentDisposition  header) {
+        
+ 
+        
+        return Response.ok().build();
+    
+    }
+    
     
     /**
      * This API allows client user to update a contact.
