@@ -1,6 +1,7 @@
 package tw.kits.voicein;
 
 import org.glassfish.jersey.jackson.JacksonFeature;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.mvc.jsp.JspMvcFeature;
 
@@ -16,6 +17,7 @@ public class JerseyApplication extends ResourceConfig {
         register(JspMvcFeature.class);
         register(JacksonFeature.class);
         register(TokenSecurityFilter.class);
+        register(MultiPartFeature.class);
         property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true);
         packages("tw.kits.voicein.resource.ApiV1");
     
