@@ -35,8 +35,10 @@ import tw.kits.voicein.util.Parameter;
 
 @Path("/api/v1")
 public class TokenResource {
+
     private final OkHttpClient client = new OkHttpClient();
     private final okhttp3.MediaType JSON = okhttp3.MediaType.parse("application/json; charset=utf-8");
+
     @POST
     @Path("/accounts/validations")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -67,21 +69,21 @@ public class TokenResource {
                 RandomStringUtils.random(6, false, true),
                 new Date(),
                 3600);
-        HashMap<String,String> reqTo = new HashMap<String,String>();
-        reqTo.put("number",phone.getPhoneNumber());
-        reqTo.put("content",String.format("親愛的用戶您好，您的驗證碼是 %s，來自KITS VoiceIn 服務中心", code.getCode()));
-        
+        HashMap<String, String> reqTo = new HashMap<String, String>();
+        reqTo.put("number", phone.getPhoneNumber());
+        reqTo.put("content", String.format("親愛的用戶您好，您的驗證碼是 %s，來自KITS VoiceIn 服務中心", code.getCode()));
+
         ObjectMapper mapper = new ObjectMapper();
         String reqJSON = mapper.writeValueAsString(reqTo);
-        
+
         Request request = new Request.Builder()
-                .url(Parameter.API_ROOT+Parameter.API_VER+"Call/sms")
+                .url(Parameter.API_ROOT + Parameter.API_VER + "Call/sms")
                 .header("apiKey", Parameter.API_KEY)
                 .post(RequestBody.create(JSON, reqJSON))
                 .build();
-        
+
         System.out.println(client.newCall(request).execute().body().string());
-        System.out.println(Parameter.API_ROOT+Parameter.API_VER+"Call/sms");
+        System.out.println(Parameter.API_ROOT + Parameter.API_VER + "Call/sms");
         ds.save(u);
         ds.save(code);
         //prepare response
@@ -93,6 +95,7 @@ public class TokenResource {
                 .build();
 
     }
+
     @POST
     @Path("/accounts/tokens")
     @Consumes(MediaType.APPLICATION_JSON)

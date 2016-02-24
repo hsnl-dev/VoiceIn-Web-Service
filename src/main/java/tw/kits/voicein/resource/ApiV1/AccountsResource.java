@@ -1,6 +1,5 @@
 package tw.kits.voicein.resource.ApiV1;
 
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,6 +25,13 @@ import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.util.Http;
 import tw.kits.voicein.util.Parameter;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.util.IOUtils;
+
 /**
  * Accounts Resource
  *
@@ -34,7 +40,7 @@ import tw.kits.voicein.util.Parameter;
 @Path("/api/v1")
 public class AccountsResource {
 
-    static final Logger LOGGER = Logger.getLogger(AccountsResource.class .getName());
+    static final Logger LOGGER = Logger.getLogger(AccountsResource.class.getName());
     ConsoleHandler consoleHandler = new ConsoleHandler();
     MongoManager mongoManager = MongoManager.getInstatnce();
     Datastore dsObj = mongoManager.getDs();
@@ -54,7 +60,7 @@ public class AccountsResource {
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
 
-        LOGGER.addHandler(consoleHandler);    
+        LOGGER.addHandler(consoleHandler);
 
         LOGGER.log(Level.CONFIG, "[Config] Delete user u{0}", uuid);
 
@@ -72,7 +78,7 @@ public class AccountsResource {
     @Path("/accounts/{uuid}")
     @Consumes(MediaType.APPLICATION_JSON)
     //@Produces(MediaType.APPLICATION_JSON)
-    public Response updateUserAccount(@PathParam("uuid") String uuid, User u) {        
+    public Response updateUserAccount(@PathParam("uuid") String uuid, User u) {
         u.setUuid(uuid);
         dsObj.save(u);
 
@@ -106,7 +112,7 @@ public class AccountsResource {
 
         LOGGER.log(Level.CONFIG, "[Config] Get user u{0}", uuid);
 
-        return Response.ok().entity(user).build();
+        return Response.ok(user).build();
     }
 
     /**
@@ -126,7 +132,7 @@ public class AccountsResource {
         String caller = callBean.getCaller();
         String callee = callBean.getCallee();
         String payload = "{\"caller\":\"%s\",\"callee\":\"%s\",\"check\":false}";
-        
+
         Http http = new Http();
         System.out.println(payload);
         System.out.println(http.post(endPoint, String.format(payload, caller, callee)));
@@ -153,7 +159,7 @@ public class AccountsResource {
         LOGGER.addHandler(consoleHandler);
         LOGGER.log(Level.CONFIG, "[Config] contact length {0}", queryResult.size());
 
-        return Response.ok().entity(queryResult).build();
+        return Response.ok(queryResult).build();
     }
 
     /**
@@ -174,9 +180,10 @@ public class AccountsResource {
         dsObj.save(contact);
         return Response.ok().build();
     }
-    
+
     /**
      * This API allows client user to update a contact.
+     *
      * @param uuid
      * @param contactId
      * @param contact
@@ -191,9 +198,10 @@ public class AccountsResource {
         dsObj.save(contact);
         return Response.ok().build();
     }
-    
+
     /**
      * This API allows client to delete a contact.
+     *
      * @param uuid
      * @param contactId
      * @return
@@ -206,25 +214,45 @@ public class AccountsResource {
         dsObj.delete(Contact.class, oid);
         return Response.ok().build();
     }
-    
+
     /**
      * This API allows client to retrieve their QRCode
+     *
      * @param uuid
      * @return
+     * @throws java.io.IOException
      */
     @GET
     @Path("/accounts/{uuid}/qrcode")
-    @Produces(MediaType.MULTIPART_FORM_DATA)
-    public Response getAccountQRCode(@PathParam("uuid") String uuid) {
-        // TODO: Retrieve QRCode image.
-        return Response.ok().build();
+    @Produces("image/png")
+    public Response getAccountQRCode(@PathParam("uuid") String uuid) throws IOException {
+        // [Testing]
+        byte[] qrCodeData; 
+        AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
+        String s3Bucket = "voice-in";
+        String file = String.format("qrCode/%s.png", uuid);
+        GetObjectRequest request = new GetObjectRequest(s3Bucket, file);
+        S3Object object = s3Client.getObject(request);
+        qrCodeData = IOUtils.toByteArray(object.getObjectContent());
+        /*
+        try (FileOutputStream fos = new FileOutputStream("/Volumes/JetDrive/GoogleDrive/Projects/voicein/voicein-api/test.png")) {
+            fos.write(qrCodeData);
+            fos.close();
+        }*/
+        return Response.ok(qrCodeData).build();
     }
+
     /**
      * This API allows user to upload avatar
      *
+     * @param fileInputStream
+     * @param header
+     * @param uuid
+     * @return 
+     * @throws java.io.IOException 
      */
     @POST
-    @Path("/accounts5/{uuid}/avatar")
+    @Path("/accounts/{uuid}/avatar")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public Response uploadAvatar(
@@ -234,7 +262,6 @@ public class AccountsResource {
         String tmp_dir = System.getProperty("java.io.tmpdir");
         String photoUuid = UUID.randomUUID().toString();
 
-        
         FileOutputStream out = null;
         InputStream in = fileInputStream;
         try {
@@ -244,9 +271,9 @@ public class AccountsResource {
             while ((read = in.read(bytes)) != -1) {
                 out.write(bytes, 0, read);
             }
-            LOGGER.log(Level.INFO,String.format("Upload file success", tmp_dir + "/" + photoUuid ));
+            LOGGER.log(Level.INFO, String.format("Upload file success", tmp_dir + "/" + photoUuid));
         } finally {
-            LOGGER.log(Level.INFO,String.format("Finalize", tmp_dir + "/" + photoUuid ));
+            LOGGER.log(Level.INFO, String.format("Finalize", tmp_dir + "/" + photoUuid));
             try {
                 if (in != null) {
                     in.close();

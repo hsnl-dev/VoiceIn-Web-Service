@@ -121,8 +121,10 @@
             <artifactId>jersey-media-multipart</artifactId>
             <version>${jersey.version}</version>
         </dependency>
-
-
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+        </dependency>
         <!-- Http Client Deps-->
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
