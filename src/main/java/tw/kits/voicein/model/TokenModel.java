@@ -12,16 +12,6 @@ public class TokenModel {
     private String tokenId;
     @Reference
     private User user;
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-   
     private Date createdAt;
     private int expire;
 
@@ -30,12 +20,16 @@ public class TokenModel {
         this.createdAt = createdAt;
         this.expire = expire;
     }
+    
     public TokenModel(int expire) {
         this.tokenId = UUID.randomUUID().toString();
         this.createdAt = new Date();
         this.expire = expire;
     }
-    public TokenModel(){}
+    
+    public TokenModel() {
+    }
+    
     public String getTokenId() {
         return tokenId;
     }
@@ -60,7 +54,13 @@ public class TokenModel {
         this.expire = expire;
     }
 
-    
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
     
     
 }

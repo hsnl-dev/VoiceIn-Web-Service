@@ -29,11 +29,6 @@
     </prerequisites>
         
     <dependencies>
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>3.1.2</version>
-        </dependency>
         <!-- Compile/runtime dependencies -->
         <dependency>
             <groupId>com.google.appengine</groupId>
@@ -128,6 +123,12 @@
         </dependency>
 
 
+        <!-- Http Client Deps-->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>3.1.2</version>
+        </dependency>
         <!-- Test Dependencies -->
         <dependency>
             <groupId>junit</groupId>
@@ -148,6 +149,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
 
     <build>
         <!-- for hot reload of the web application -->

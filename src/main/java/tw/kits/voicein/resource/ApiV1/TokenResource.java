@@ -59,6 +59,7 @@ public class TokenResource {
             Key key = new Key(User.class, "accounts", u.getUuid());
             VCodeModel code = ds.find(VCodeModel.class).field("user").equal(key).get();
             ds.delete(code);
+
         }
 
         VCodeModel code = new VCodeModel(
@@ -68,7 +69,7 @@ public class TokenResource {
                 3600);
         HashMap<String,String> reqTo = new HashMap<String,String>();
         reqTo.put("number",phone.getPhoneNumber());
-        reqTo.put("content",String.format("è¦ªæ„›çš„ç”¨æˆ¶æ‚¨å¥½ï¼Œæ‚¨çš„é©—è­‰ç¢¼æ˜¯ %sï¼Œä¾†è‡ªKITS VoiceIn æœå‹™ä¸­å¿ƒ", code.getCode()));
+        reqTo.put("content",String.format("¿Ë·Rªº¥Î¤á±z¦n¡A±zªºÅçÃÒ½X¬O %s¡A¨Ó¦ÛKITS VoiceIn ªA°È¤¤¤ß", code.getCode()));
         
         ObjectMapper mapper = new ObjectMapper();
         String reqJSON = mapper.writeValueAsString(reqTo);
@@ -86,14 +87,12 @@ public class TokenResource {
         //prepare response
         HashMap<String, String> res = new HashMap<String, String>();
         res.put("userUuid", u.getUuid().toString());
-        
         return Response
                 .status(Status.CREATED)
                 .entity(res)
                 .build();
 
     }
-
     @POST
     @Path("/accounts/tokens")
     @Consumes(MediaType.APPLICATION_JSON)

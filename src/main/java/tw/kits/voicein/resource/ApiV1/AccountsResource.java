@@ -1,5 +1,6 @@
 package tw.kits.voicein.resource.ApiV1;
 
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,9 +18,11 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import tw.kits.voicein.util.MongoManager;
 import org.mongodb.morphia.Datastore;
+import org.bson.types.ObjectId;
 
 import tw.kits.voicein.model.User;
 import tw.kits.voicein.model.Contact;
+import tw.kits.voicein.util.Http;
 
 /**
  * Accounts Resource
@@ -31,6 +34,8 @@ public class AccountsResource {
 
     static final Logger LOGGER = Logger.getLogger(AccountsResource.class .getName());
     ConsoleHandler consoleHandler = new ConsoleHandler();
+    MongoManager mongoManager = MongoManager.getInstatnce();
+    Datastore dsObj = mongoManager.getDs();
 
     /**
      * This API allows user to delete a user account by given uuid.
@@ -42,14 +47,13 @@ public class AccountsResource {
     @Path("/accounts/{uuid}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteUserAccount(@PathParam("uuid") String uuid) {
-        MongoManager mongoManager = MongoManager.getInstatnce();
-        Datastore dsObj = mongoManager.getDs();
         dsObj.delete(User.class, uuid);
 
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
 
-        LOGGER.addHandler(consoleHandler);
+        LOGGER.addHandler(consoleHandler);    
+
         LOGGER.log(Level.CONFIG, "[Config] Delete user u{0}", uuid);
 
         return Response.ok().build();
@@ -66,10 +70,7 @@ public class AccountsResource {
     @Path("/accounts/{uuid}")
     @Consumes(MediaType.APPLICATION_JSON)
     //@Produces(MediaType.APPLICATION_JSON)
-    public Response updateUserAccount(@PathParam("uuid") String uuid, User u) {
-        MongoManager mongoManager = MongoManager.getInstatnce();
-        Datastore dsObj = mongoManager.getDs();
-
+    public Response updateUserAccount(@PathParam("uuid") String uuid, User u) {        
         u.setUuid(uuid);
         dsObj.save(u);
 
@@ -77,6 +78,7 @@ public class AccountsResource {
         consoleHandler.setLevel(Level.ALL);
 
         LOGGER.addHandler(consoleHandler);
+
         LOGGER.log(Level.CONFIG, "[Config] Update user u{0}", u);
 
         return Response.ok().build();
@@ -92,15 +94,15 @@ public class AccountsResource {
     @Path("/accounts/{uuid}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+
     public User getUserAccount(@PathParam("uuid") String uuid) {
-        MongoManager mongoManager = MongoManager.getInstatnce();
-        Datastore dsObj = mongoManager.getDs();
         User user = dsObj.get(User.class, uuid);
 
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
 
         LOGGER.addHandler(consoleHandler);
+
         LOGGER.log(Level.CONFIG, "[Config] Get user u{0}", uuid);
 
         return user;
@@ -116,8 +118,15 @@ public class AccountsResource {
     @Path("/accounts/{uuid}/calls")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response makePhoneCall(@PathParam("uuid") String uuid) {
-        //TODO Call the phone API.
+    public Response makePhoneCall(@PathParam("uuid") String uuid) throws IOException {
+        String endPoint = "https://ts.kits.tw/projectLYS/v0/Call/test01/generalCallRequest/";
+        String caller = "0988779570";
+        String callee = "0975531859";
+        String payload = "{\"caller\":\"%s\",\"callee\":\"%s\",\"check\":false}";
+        
+        Http http = new Http();
+        System.out.println(payload);
+        System.out.println(http.post(endPoint, String.format(payload, caller, callee)));
         return Response.status(Status.OK).build();
     }
 
@@ -132,8 +141,6 @@ public class AccountsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public List<Contact> getContactListOfAnUser(@PathParam("uuid") String uuid) {
-        MongoManager mongoManager = MongoManager.getInstatnce();
-        Datastore dsObj = mongoManager.getDs();
         User user = dsObj.get(User.class, uuid);
 
         List<Contact> queryResult = dsObj.find(Contact.class).field("user").equal(user).asList();
@@ -158,12 +165,59 @@ public class AccountsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createNewContactofAnUser(@PathParam("uuid") String uuid, Contact contact) {
-        MongoManager mongoManager = MongoManager.getInstatnce();
-        Datastore dsObj = mongoManager.getDs();
         User refUser = dsObj.get(User.class, uuid);
         contact.setUser(refUser);
 
         dsObj.save(contact);
+        return Response.ok().build();
+    }
+
+    
+
+
+    
+    /**
+     * This API allows client user to update a contact.
+     * @param uuid
+     * @param contactId
+     * @param contact
+     * @return
+     */
+    @PUT
+    @Path("/accounts/{uuid}/contacts/{contactId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("contactId") String contactId, Contact contact) {
+        ObjectId oid = new ObjectId(contactId);
+        contact.setId(oid);
+        dsObj.save(contact);
+        return Response.ok().build();
+    }
+    
+    /**
+     * This API allows client to delete a contact.
+     * @param uuid
+     * @param contactId
+     * @return
+     */
+    @DELETE
+    @Path("/accounts/{uuid}/contacts/{contactId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("contactId") String contactId) {
+        ObjectId oid = new ObjectId(contactId);
+        dsObj.delete(Contact.class, oid);
+        return Response.ok().build();
+    }
+    
+    /**
+     * This API allows client to retrieve their QRCode
+     * @param uuid
+     * @return
+     */
+    @GET
+    @Path("/accounts/{uuid}/qrcode")
+    @Produces(MediaType.MULTIPART_FORM_DATA)
+    public Response getAccountQRCode(@PathParam("uuid") String uuid) {
+        // TODO: Retrieve QRCode image.
         return Response.ok().build();
     }
     /**
@@ -213,5 +267,4 @@ public class AccountsResource {
         return Response.ok().build();
 
     }
-
 }
