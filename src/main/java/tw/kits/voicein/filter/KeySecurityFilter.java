@@ -19,16 +19,18 @@ public class KeySecurityFilter implements ContainerRequestFilter{
     private final static Logger log = Logger.getLogger("tw.kits.voicein.filter.KeySecurityFilter");
     @Override
     public void filter(ContainerRequestContext crc) throws IOException {
-        if("api/v1/".equals(crc.getUriInfo().getPath())){
+        if ("api/v1/".equals(crc.getUriInfo().getPath())) {
             return;
         }
-        if ( crc.getRequest().getMethod().equals( "OPTIONS" ) ) {
+        
+        if (crc.getRequest().getMethod().equals("OPTIONS")) {
             crc.abortWith( Response.status( Response.Status.OK ).build() );
-
             return;
         }
+        
         String apiKey = crc.getHeaderString("apiKey");
-        if(apiKey == null){
+        
+        if (apiKey == null) {
             ErrorMessageBean emb = new ErrorMessageBean();
             emb.setErrorReason("api key is not allowed or must not be null");
             crc.abortWith(Response.status(Response.Status.UNAUTHORIZED)
