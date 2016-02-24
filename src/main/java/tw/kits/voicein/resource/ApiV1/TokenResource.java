@@ -6,8 +6,10 @@ import java.util.UUID;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -38,11 +40,19 @@ public class TokenResource {
         Query<User> q = ds.createQuery(User.class);
         
         User u = q.field("phoneNumber").equal(phone.getPhoneNumber()).get();
+        //if not exist, create new user
         if(u==null){
             u = new User();
             u.setUuid(UUID.randomUUID().toString());
             u.setPhoneNumber(phone.getPhoneNumber());
+        }else{
+            //if code exist for userid delete it !!!
+           Query<VCodeModel> codeQ = ds.createQuery(VCodeModel.class);
+           Key key = new Key(User.class,"accounts",u.getUuid());
+           VCodeModel code = ds.find(VCodeModel.class).field("user").equal(key).get();
+           ds.delete(code);
         }
+        
         VCodeModel code = new VCodeModel(
                 u,
                 RandomStringUtils.random(6,false,true),
@@ -63,14 +73,16 @@ public class TokenResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getToken(@Valid @NotNull UserAuthBean user){
-        System.out.print(user.getUserUuid());
         Datastore ds = MongoManager.getInstatnce().getDs();
         Key key = new Key(User.class,"accounts",user.getUserUuid());
         VCodeModel code = ds.find(VCodeModel.class).field("user").equal(key).get();
-        
-       if(code!=null){
+    
+        if(code!=null){
            if (code.getCode().equals(user.getCode())){
+               // issue new token
                TokenModel tm = new TokenModel(3600);
+               // inject user to token collection
+               tm.setUser(code.getUser());
                ds.save(tm);
                TokenResBean res = new TokenResBean(tm.getTokenId());
                return Response
@@ -79,10 +91,23 @@ public class TokenResource {
                        .build();   
            }
        }
-       
+       //fail
         return Response
                 .status(Status.UNAUTHORIZED)
                 .entity(user)
+                .build();
+      
+    }
+    @DELETE
+    @Path("/accounts/tokens/{tokenUuid}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response delToken(@PathParam("tokenUuid") String tokenUuid){
+        Datastore ds = MongoManager.getInstatnce().getDs();
+        TokenModel token = ds.get(TokenModel.class,tokenUuid);
+        ds.delete(token);
+        return Response
+                .status(Status.OK)
                 .build();
       
     }
