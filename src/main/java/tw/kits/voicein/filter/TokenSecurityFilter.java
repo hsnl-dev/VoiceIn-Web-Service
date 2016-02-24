@@ -28,7 +28,6 @@ public class TokenSecurityFilter implements ContainerRequestFilter{
 
     @Override
     public void filter(ContainerRequestContext crc) throws IOException {
-        System.out.println("IN");
         String token = crc.getHeaderString("token");
         Datastore ds = MongoManager.getInstatnce().getDs();
         final TokenModel tm = ds.get(TokenModel.class,token);

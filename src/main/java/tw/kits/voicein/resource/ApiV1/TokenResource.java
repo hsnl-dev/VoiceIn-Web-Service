@@ -2,13 +2,14 @@ package tw.kits.voicein.resource.ApiV1;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -17,6 +18,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Key;
 import org.mongodb.morphia.query.Query;
+import tw.kits.voicein.bean.TokenResBean;
 import tw.kits.voicein.bean.UserAuthBean;
 import tw.kits.voicein.bean.UserPhoneBean;
 import tw.kits.voicein.model.TokenModel;
@@ -71,32 +73,41 @@ public class TokenResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getToken(@Valid @NotNull UserAuthBean user){
-        System.out.println(user.getUserUuid());
         Datastore ds = MongoManager.getInstatnce().getDs();
         Key key = new Key(User.class,"accounts",user.getUserUuid());
-        List<TokenModel> token = ds.find(TokenModel.class).field("user").equal(key).asList();
-        System.out.println(user.getUserUuid()+"==="+token.size());
-//        VCodeModel code = ds.find(VCodeModel.class).field("user").equal(key).get();
-//        TokenModel token = ds.find(TokenModel.class).field("user").equal(key).get();
-//        System.out.println(token.getCreatedAt());
-//       if(code!=null){
-//           if (code.getCode().equals(user.getCode())){
-//               // new token
-//               TokenModel tm = new TokenModel(3600);
-//               // inject user to token collection
-//               tm.setUser(code.getUser());
-//               ds.save(tm);
-//               TokenResBean res = new TokenResBean(tm.getTokenId());
-//               return Response
-//                       .status(Status.CREATED)
-//                       .entity(res)
-//                       .build();   
-//           }
-//       }
+        VCodeModel code = ds.find(VCodeModel.class).field("user").equal(key).get();
+    
+        if(code!=null){
+           if (code.getCode().equals(user.getCode())){
+               // issue new token
+               TokenModel tm = new TokenModel(3600);
+               // inject user to token collection
+               tm.setUser(code.getUser());
+               ds.save(tm);
+               TokenResBean res = new TokenResBean(tm.getTokenId());
+               return Response
+                       .status(Status.CREATED)
+                       .entity(res)
+                       .build();   
+           }
+       }
        //fail
         return Response
                 .status(Status.UNAUTHORIZED)
                 .entity(user)
+                .build();
+      
+    }
+    @DELETE
+    @Path("/accounts/tokens/{tokenUuid}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response delToken(@PathParam("tokenUuid") String tokenUuid){
+        Datastore ds = MongoManager.getInstatnce().getDs();
+        TokenModel token = ds.get(TokenModel.class,tokenUuid);
+        ds.delete(token);
+        return Response
+                .status(Status.OK)
                 .build();
       
     }

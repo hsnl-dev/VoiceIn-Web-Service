@@ -6,7 +6,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import tw.kits.voicein.util.TokenRequired;
 
-@TokenRequired
+
 @Path("/api/v1")
 public class WelcomeResource {
     @GET
