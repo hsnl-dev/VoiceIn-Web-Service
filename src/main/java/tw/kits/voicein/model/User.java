@@ -15,7 +15,7 @@ public class User {
     private String location;
     private String profile;
     private String company;
-    private String profilePhotoUrl;
+    private String profilePhotoId;
 
     /**
      * @param uuid the uuid to set
@@ -90,15 +90,15 @@ public class User {
     /**
      * @return the profilePhotoUrl
      */
-    public String getProfilePhotoUrl() {
-        return profilePhotoUrl;
+    public String getProfilePhotoId() {
+        return profilePhotoId;
     }
 
     /**
      * @param profilePhotoUrl the profilePhotoUrl to set
      */
-    public void setProfilePhotoUrl(String profilePhotoUrl) {
-        this.profilePhotoUrl = profilePhotoUrl;
+    public void setProfilePhotoId(String profilePhotoId) {
+        this.profilePhotoId = profilePhotoId;
     }
 
     @Override

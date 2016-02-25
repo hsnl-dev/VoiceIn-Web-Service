@@ -1,7 +1,5 @@
 package tw.kits.voicein.resource.ApiV1;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -33,11 +31,25 @@ import com.amazonaws.util.IOUtils;
 import net.glxn.qrgen.QRCode;
 import net.glxn.qrgen.image.ImageType;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.imageio.ImageIO;
+import javax.servlet.annotation.MultipartConfig;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.SecurityContext;
+import org.mongodb.morphia.Key;
+import org.mongodb.morphia.query.UpdateOperations;
+import tw.kits.voicein.bean.ErrorMessageBean;
+import tw.kits.voicein.util.ImageProceesor;
+import tw.kits.voicein.util.TokenRequired;
+
 /**
  * Accounts Resource
  *
  * @author Calvin
  */
+@MultipartConfig(maxFileSize = 1024 * 1024 * 1)
 @Path("/api/v1")
 public class AccountsResource {
 
@@ -248,7 +260,7 @@ public class AccountsResource {
     @Produces("image/png")
     public Response getAccountQRCode(@PathParam("uuid") String uuid) throws IOException {
         // [Testing]
-        byte[] qrCodeData; 
+        byte[] qrCodeData;
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
         String s3Bucket = "voice-in";
         String file = String.format("qrCode/%s.png", uuid);
@@ -269,48 +281,57 @@ public class AccountsResource {
      * @param fileInputStream
      * @param header
      * @param uuid
-     * @return 
-     * @throws java.io.IOException 
+     * @return
+     * @throws java.io.IOException
      */
     @POST
+    @TokenRequired
     @Path("/accounts/{uuid}/avatar")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
+
     public Response uploadAvatar(
+            @Context SecurityContext sc,
             @NotNull @FormDataParam("photo") InputStream fileInputStream,
             @NotNull @FormDataParam("photo") FormDataContentDisposition header,
             @PathParam("uuid") String uuid) throws IOException {
-        String tmp_dir = System.getProperty("java.io.tmpdir");
+        
+        String tmpDir = System.getProperty("java.io.tmpdir");
         String photoUuid = UUID.randomUUID().toString();
-
-        FileOutputStream out = null;
-        InputStream in = fileInputStream;
+        File tmpFile = new File(tmpDir + File.separator + photoUuid);
         try {
-            byte[] bytes = new byte[1024];
-            int read = 0;
-            out = new FileOutputStream(new File(tmp_dir + "/" + photoUuid));
-            while ((read = in.read(bytes)) != -1) {
-                out.write(bytes, 0, read);
+            BufferedImage bri = ImageIO.read(fileInputStream);
+            if (bri == null) {
+                ErrorMessageBean er = new ErrorMessageBean();
+                er.setErrorReason("not supported format");
+                return Response.status(Status.NOT_ACCEPTABLE).entity(er).build();
             }
-            LOGGER.log(Level.INFO, String.format("Upload file success", tmp_dir + "/" + photoUuid));
-        } finally {
-            LOGGER.log(Level.INFO, String.format("Finalize", tmp_dir + "/" + photoUuid));
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(AccountsResource.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(AccountsResource.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            ImageProceesor ip = new ImageProceesor(bri);
+            ip.resize(256, 256);
+            ip.saveFileWithJPGCompress(tmpFile);
+            AmazonS3 s3client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
+            //upload to s3
+            LOGGER.log(Level.INFO, String.format("start upload to s3", tmpDir + "/" + photoUuid));
+            s3client.putObject(
+                    new PutObjectRequest(
+                            "voice-in",
+                            "userPhotos/" + photoUuid + ".jpg",
+                            tmpFile
+                    )
+            );
+            LOGGER.log(Level.INFO, String.format("file update"+"ok"+  tmpDir + "/" + photoUuid));
+            Key key = new Key(User.class, "accounts", sc.getUserPrincipal().getName());
+            UpdateOperations<User> upo = dsObj.createUpdateOperations(User.class).set("profilePhotoId",photoUuid);
+            dsObj.update(key, upo);
+            LOGGER.log(Level.INFO, String.format("user info update OK"));
         }
-
+        finally {
+            if(tmpFile.delete()){
+    			LOGGER.log(Level.INFO, String.format("del temp file OK"));
+    		}else{
+    			LOGGER.log(Level.WARNING, String.format("del temp file OK"));
+    		}
+        }
         return Response.ok().build();
 
     }

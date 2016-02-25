@@ -11,7 +11,7 @@ import okhttp3.Response;
  */
 public class Http {
   public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-  private static final String KITS_API_KEY = "2a4e0dd8db3807790d853dabf0f448de21cea6057b5dc48539330f934e9bddfb";
+ 
   
   OkHttpClient client = new OkHttpClient();
 
@@ -19,7 +19,7 @@ public class Http {
     RequestBody body = RequestBody.create(JSON, json);
     Request request = new Request.Builder()
         .url(url)
-        .addHeader("apiKey", KITS_API_KEY)
+        .addHeader("apiKey", Parameter.API_KEY)
         .post(body)
         .build();
     Response response = client.newCall(request).execute();
