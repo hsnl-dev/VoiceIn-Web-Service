@@ -237,22 +237,24 @@ public class AccountsResource {
     @Path("/accounts/{uuid}/qrcode")
     @Produces(MediaType.APPLICATION_JSON)
     public Response generateQRCode(@PathParam("uuid") String uuid) {
-        /** QR Code Generator test**/
+        /**
+         * QR Code Generator test*
+         */
         User u = dsObj.get(User.class, uuid);
         String s3Bucket = "voice-in";
         String s3FilePath = String.format("qrCode/%s.png", uuid);
         String qrCodeUuid = UUID.randomUUID().toString();
-        
+
         // Generate QRCode Image and Upload to S3.
         File qrCodeImage = QRCode.from(qrCodeUuid).to(ImageType.PNG).withSize(250, 250).file();
-        AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);    
+        AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
         s3Client.putObject(new PutObjectRequest(s3Bucket, s3FilePath, qrCodeImage));
         u.setQrCodeUuid(qrCodeUuid);
         dsObj.save(u);
-        
+
         return Response.ok().build();
     }
-    
+
     /**
      * This API allows client to retrieve their QRCode
      *
@@ -279,7 +281,7 @@ public class AccountsResource {
         }*/
         return Response.ok(qrCodeData).build();
     }
-    
+
     /**
      * This API allows user to upload avatar
      *
@@ -300,7 +302,7 @@ public class AccountsResource {
             @NotNull @FormDataParam("photo") InputStream fileInputStream,
             @NotNull @FormDataParam("photo") FormDataContentDisposition header,
             @PathParam("uuid") String uuid) throws IOException {
-        
+
         String tmpDir = System.getProperty("java.io.tmpdir");
         String photoUuid = UUID.randomUUID().toString();
         File tmpFile = new File(tmpDir + File.separator + photoUuid);
@@ -324,18 +326,17 @@ public class AccountsResource {
                             tmpFile
                     )
             );
-            LOGGER.log(Level.INFO, String.format("file update"+"ok"+  tmpDir + "/" + photoUuid));
+            LOGGER.log(Level.INFO, String.format("file update" + "ok" + tmpDir + "/" + photoUuid));
             Key key = new Key(User.class, "accounts", sc.getUserPrincipal().getName());
-            UpdateOperations<User> upo = dsObj.createUpdateOperations(User.class).set("profilePhotoId",photoUuid);
+            UpdateOperations<User> upo = dsObj.createUpdateOperations(User.class).set("profilePhotoId", photoUuid);
             dsObj.update(key, upo);
             LOGGER.log(Level.INFO, String.format("user info update OK"));
-        }
-        finally {
-            if(tmpFile.delete()){
-    			LOGGER.log(Level.INFO, String.format("del temp file OK"));
-    		}else{
-    			LOGGER.log(Level.WARNING, String.format("del temp file OK"));
-    		}
+        } finally {
+            if (tmpFile.delete()) {
+                LOGGER.log(Level.INFO, String.format("del temp file OK"));
+            } else {
+                LOGGER.log(Level.WARNING, String.format("del temp file OK"));
+            }
         }
         return Response.ok().build();
 

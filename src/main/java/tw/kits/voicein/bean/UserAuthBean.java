@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
  * @author Henry
  */
 public class UserAuthBean {
+
     @NotNull
     private String code;
     @NotNull
@@ -21,10 +22,11 @@ public class UserAuthBean {
         this.code = code;
         this.userUuid = userUuid;
     }
-    
+
     public UserAuthBean() {
-    
+
     }
+
     /**
      * @return the code
      */
@@ -52,5 +54,5 @@ public class UserAuthBean {
     public void setUserUuid(String userUuid) {
         this.userUuid = userUuid;
     }
-    
+
 }

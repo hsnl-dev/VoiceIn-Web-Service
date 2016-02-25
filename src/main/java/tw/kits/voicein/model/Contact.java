@@ -1,26 +1,27 @@
 package tw.kits.voicein.model;
+
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.*;
+
 /**
  *
  * @author Calvin
  */
 @Entity("contacts")
 public class Contact {
-   //Field
-   @Id
-   private ObjectId id;
-   @Reference
-   private User user;
-   private String phoneNumber;
-   private String name;
-   private String nickName;
-   
-   public Contact() {
-       
-   }
-   
-   
+    //Field
+
+    @Id
+    private ObjectId id;
+    @Reference
+    private User user;
+    private String phoneNumber;
+    private String name;
+    private String nickName;
+
+    public Contact() {
+
+    }
 
     /**
      * @return the user
@@ -91,5 +92,5 @@ public class Contact {
     public void setId(ObjectId id) {
         this.id = id;
     }
-   
+
 }

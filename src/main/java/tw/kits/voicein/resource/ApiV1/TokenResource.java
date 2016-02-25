@@ -35,8 +35,8 @@ import tw.kits.voicein.util.Parameter;
 
 @Path("/api/v1")
 public class TokenResource {
+
     private final Logger LOGGER = Logger.getLogger(TokenResource.class.getName());
-   
 
     @POST
     @Path("/accounts/validations")
@@ -75,12 +75,12 @@ public class TokenResource {
 
         ObjectMapper mapper = new ObjectMapper();
         String reqJSON = mapper.writeValueAsString(reqTo);
-        
-        Http sendWorker = new Http(); 
-        LOGGER.log(Level.INFO,Parameter.API_ROOT + Parameter.API_VER + "Call/sms");
+
+        Http sendWorker = new Http();
+        LOGGER.log(Level.INFO, Parameter.API_ROOT + Parameter.API_VER + "Call/sms");
         String workerRes = sendWorker.post(Parameter.API_ROOT + Parameter.API_VER + "Call/sms", reqJSON);
-        
-        LOGGER.log(Level.INFO,workerRes);
+
+        LOGGER.log(Level.INFO, workerRes);
         ds.save(u);
         ds.save(code);
         //prepare response
