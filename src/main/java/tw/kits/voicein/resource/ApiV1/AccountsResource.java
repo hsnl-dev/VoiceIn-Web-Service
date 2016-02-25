@@ -238,13 +238,18 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response generateQRCode(@PathParam("uuid") String uuid) {
         /** QR Code Generator test**/
+        User u = dsObj.get(User.class, uuid);
         String s3Bucket = "voice-in";
         String s3FilePath = String.format("qrCode/%s.png", uuid);
-        File qrCodeImage = QRCode.from(UUID.randomUUID().toString()).to(ImageType.PNG).withSize(250, 250).file();
-        AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
+        String qrCodeUuid = UUID.randomUUID().toString();
         
+        // Generate QRCode Image and Upload to S3.
+        File qrCodeImage = QRCode.from(qrCodeUuid).to(ImageType.PNG).withSize(250, 250).file();
+        AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);    
         s3Client.putObject(new PutObjectRequest(s3Bucket, s3FilePath, qrCodeImage));
-
+        u.setQrCodeUuid(qrCodeUuid);
+        dsObj.save(u);
+        
         return Response.ok().build();
     }
     
@@ -274,7 +279,7 @@ public class AccountsResource {
         }*/
         return Response.ok(qrCodeData).build();
     }
-
+    
     /**
      * This API allows user to upload avatar
      *
