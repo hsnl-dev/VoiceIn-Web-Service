@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
@@ -17,9 +19,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Key;
@@ -30,14 +29,14 @@ import tw.kits.voicein.bean.UserPhoneBean;
 import tw.kits.voicein.model.TokenModel;
 import tw.kits.voicein.model.User;
 import tw.kits.voicein.model.VCodeModel;
+import tw.kits.voicein.util.Http;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.Parameter;
 
 @Path("/api/v1")
 public class TokenResource {
-
-    private final OkHttpClient client = new OkHttpClient();
-    private final okhttp3.MediaType JSON = okhttp3.MediaType.parse("application/json; charset=utf-8");
+    private final Logger LOGGER = Logger.getLogger(TokenResource.class.getName());
+   
 
     @POST
     @Path("/accounts/validations")
@@ -69,21 +68,19 @@ public class TokenResource {
                 RandomStringUtils.random(6, false, true),
                 new Date(),
                 3600);
+
         HashMap<String, String> reqTo = new HashMap<String, String>();
         reqTo.put("number", phone.getPhoneNumber());
         reqTo.put("content", String.format("親愛的用戶您好，您的驗證碼是 %s，來自KITS VoiceIn 服務中心", code.getCode()));
 
         ObjectMapper mapper = new ObjectMapper();
         String reqJSON = mapper.writeValueAsString(reqTo);
-
-        Request request = new Request.Builder()
-                .url(Parameter.API_ROOT + Parameter.API_VER + "Call/sms")
-                .header("apiKey", Parameter.API_KEY)
-                .post(RequestBody.create(JSON, reqJSON))
-                .build();
-
-        System.out.println(client.newCall(request).execute().body().string());
-        System.out.println(Parameter.API_ROOT + Parameter.API_VER + "Call/sms");
+        
+        Http sendWorker = new Http(); 
+        LOGGER.log(Level.INFO,Parameter.API_ROOT + Parameter.API_VER + "Call/sms");
+        String workerRes = sendWorker.post(Parameter.API_ROOT + Parameter.API_VER + "Call/sms", reqJSON);
+        
+        LOGGER.log(Level.INFO,workerRes);
         ds.save(u);
         ds.save(code);
         //prepare response
