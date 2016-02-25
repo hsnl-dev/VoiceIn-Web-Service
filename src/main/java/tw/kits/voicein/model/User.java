@@ -1,22 +1,22 @@
 package tw.kits.voicein.model;
 
-
-
 import org.mongodb.morphia.annotations.*;
+
 /**
  *
  * @author Calvin
  */
 @Entity("accounts")
 public class User {
+
     @Id
     private String uuid;
     private String phoneNumber;
     private String location;
     private String profile;
     private String company;
-    private String profilePhotoUrl;
-    
+    private String profilePhotoId;
+
     /**
      * @param uuid the uuid to set
      */
@@ -30,7 +30,7 @@ public class User {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
-    
+
     /**
      * @return the uuid
      */
@@ -90,19 +90,19 @@ public class User {
     /**
      * @return the profilePhotoUrl
      */
-    public String getProfilePhotoUrl() {
-        return profilePhotoUrl;
+    public String getProfilePhotoId() {
+        return profilePhotoId;
     }
 
     /**
      * @param profilePhotoUrl the profilePhotoUrl to set
      */
-    public void setProfilePhotoUrl(String profilePhotoUrl) {
-        this.profilePhotoUrl = profilePhotoUrl;
+    public void setProfilePhotoId(String profilePhotoId) {
+        this.profilePhotoId = profilePhotoId;
     }
-    
+
     @Override
     public String toString() {
-	return "User [uuid=" + uuid + ", phoneNumber=" + phoneNumber + "] Saved!";
-    }    
+        return "User [uuid=" + getUuid() + ", phoneNumber=" + getPhoneNumber() + "] Saved!";
+    }
 }
