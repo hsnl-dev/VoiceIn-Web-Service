@@ -16,6 +16,7 @@ public class User {
     private String profile;
     private String company;
     private String profilePhotoId;
+    private String qrCodeUuid;
 
     /**
      * @param uuid the uuid to set
@@ -104,5 +105,19 @@ public class User {
     @Override
     public String toString() {
         return "User [uuid=" + getUuid() + ", phoneNumber=" + getPhoneNumber() + "] Saved!";
+    }
+
+    /**
+     * @return the qrCodeUuid
+     */
+    public String getQrCodeUuid() {
+        return qrCodeUuid;
+    }
+
+    /**
+     * @param qrCodeUuid the qrCodeUuid to set
+     */
+    public void setQrCodeUuid(String qrCodeUuid) {
+        this.qrCodeUuid = qrCodeUuid;
     }
 }
