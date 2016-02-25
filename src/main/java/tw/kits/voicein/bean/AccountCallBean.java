@@ -5,6 +5,7 @@ package tw.kits.voicein.bean;
  * @author Calvin
  */
 public class AccountCallBean {
+
     private String callee;
     private String caller;
 
@@ -35,6 +36,5 @@ public class AccountCallBean {
     public void setCaller(String caller) {
         this.caller = caller;
     }
-    
-    
+
 }

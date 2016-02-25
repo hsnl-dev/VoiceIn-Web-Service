@@ -1,7 +1,8 @@
 package tw.kits.voicein.bean;
 
 public class ErrorMessageBean {
-    private String errorReason; 
+
+    private String errorReason;
 
     public String getErrorReason() {
         return errorReason;
