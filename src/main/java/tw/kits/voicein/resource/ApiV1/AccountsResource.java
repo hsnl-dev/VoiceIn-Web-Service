@@ -278,6 +278,7 @@ public class AccountsResource {
     /**
      * This API allows user to upload avatar
      *
+     * @param sc
      * @param fileInputStream
      * @param header
      * @param uuid
@@ -289,7 +290,6 @@ public class AccountsResource {
     @Path("/accounts/{uuid}/avatar")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-
     public Response uploadAvatar(
             @Context SecurityContext sc,
             @NotNull @FormDataParam("photo") InputStream fileInputStream,
