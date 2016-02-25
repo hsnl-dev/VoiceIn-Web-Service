@@ -150,6 +150,12 @@
             <version>${appengine.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- QRCode Deps-->
+        <dependency>
+            <groupId>net.glxn</groupId>
+            <artifactId>qrgen</artifactId>
+            <version>1.4</version>
+        </dependency>
     </dependencies>
 
 

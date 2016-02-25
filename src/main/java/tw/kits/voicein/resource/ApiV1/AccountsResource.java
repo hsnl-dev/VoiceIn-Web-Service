@@ -12,7 +12,6 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import tw.kits.voicein.util.MongoManager;
@@ -28,9 +27,11 @@ import tw.kits.voicein.util.Parameter;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.IOUtils;
+import net.glxn.qrgen.QRCode;
+import net.glxn.qrgen.image.ImageType;
 
 /**
  * Accounts Resource
@@ -136,7 +137,7 @@ public class AccountsResource {
         Http http = new Http();
         System.out.println(payload);
         System.out.println(http.post(endPoint, String.format(payload, caller, callee)));
-        return Response.status(Status.OK).build();
+        return Response.ok().build();
     }
 
     /**
@@ -215,6 +216,26 @@ public class AccountsResource {
         return Response.ok().build();
     }
 
+    /**
+     *
+     * @param uuid
+     * @return
+     */
+    @POST
+    @Path("/accounts/{uuid}/qrcode")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response generateQRCode(@PathParam("uuid") String uuid) {
+        /** QR Code Generator test**/
+        String s3Bucket = "voice-in";
+        String s3FilePath = String.format("qrCode/%s.png", uuid);
+        File qrCodeImage = QRCode.from(UUID.randomUUID().toString()).to(ImageType.PNG).withSize(250, 250).file();
+        AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
+        
+        s3Client.putObject(new PutObjectRequest(s3Bucket, s3FilePath, qrCodeImage));
+
+        return Response.ok().build();
+    }
+    
     /**
      * This API allows client to retrieve their QRCode
      *
