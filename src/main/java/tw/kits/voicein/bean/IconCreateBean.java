@@ -1,5 +1,8 @@
 package tw.kits.voicein.bean;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 /**
  * {
  * "providerUuid": "ecsx-1030-3454-edxf", "customer":{ "name": "Henry",
@@ -7,9 +10,11 @@ package tw.kits.voicein.bean;
  *
  * @author Henry
  */
-public class IconCreateBean {
 
+public class IconCreateBean {
+    @NotNull
     private String providerUuid;
+    @Valid @NotNull
     private Customer customer;
 
     /**
@@ -72,8 +77,9 @@ public class IconCreateBean {
 }
 
 class Customer {
-
+    @NotNull
     private String name;
+    @NotNull
     private String phoneNumber;
 
     /**

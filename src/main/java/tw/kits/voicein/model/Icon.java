@@ -5,6 +5,7 @@
  */
 package tw.kits.voicein.model;
 
+import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
@@ -12,6 +13,7 @@ import org.mongodb.morphia.annotations.Reference;
  *
  * @author Henry
  */
+@Entity("icon")
 public class Icon {
     @Reference
     private User provider;

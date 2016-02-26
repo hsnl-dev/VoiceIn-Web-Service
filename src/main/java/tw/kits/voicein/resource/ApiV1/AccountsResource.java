@@ -58,6 +58,9 @@ public class AccountsResource {
     ConsoleHandler consoleHandler = new ConsoleHandler();
     MongoManager mongoManager = MongoManager.getInstatnce();
     Datastore dsObj = mongoManager.getDs();
+    private static final int AVATAR_LARGE = 256;
+    private static final int AVATAR_MID = 128;
+    private static final int AVATAR_SMALL = 64;
 
     /**
      * This API allows user to delete a user account by given uuid.
@@ -308,7 +311,7 @@ public class AccountsResource {
         String photoUuid = UUID.randomUUID().toString();
         String photoBaseName = tmpDir + File.separator + photoUuid;
         ArrayList<File> files = new ArrayList<File>();
-        int[] imageSizes = {256, 128, 64};
+        int[] imageSizes = {AVATAR_LARGE, AVATAR_MID, AVATAR_SMALL};
         try {
             BufferedImage bri = ImageIO.read(fileInputStream);
             if (bri == null) {
@@ -339,15 +342,15 @@ public class AccountsResource {
                 );
 
             }
-            if(oldId!=null){
+            if (oldId != null) {
                 //delete old
                 for (int size : imageSizes) {
-                    LOGGER.log(Level.INFO, "Delete" + oldId + "-" + size+".jpg");
-                    s3client.deleteObject("voice-in","userPhotos/" + oldId + "-" + size +".jpg");
+                    LOGGER.log(Level.INFO, "Delete" + oldId + "-" + size + ".jpg");
+                    s3client.deleteObject("voice-in", "userPhotos/" + oldId + "-" + size + ".jpg");
 
                 }
             }
-            
+
             LOGGER.log(Level.INFO, String.format("file update" + "ok" + tmpDir + "/" + photoUuid));
             UpdateOperations<User> upo = dsObj.createUpdateOperations(User.class).set("profilePhotoId", photoUuid);
             dsObj.update(key, upo);
@@ -363,6 +366,30 @@ public class AccountsResource {
             }
         }
         return Response.ok().build();
+    }
 
+    @GET
+    @Path("/accounts/{uuid}/avatar")
+    @Produces("image/jpg")
+    public Response getAccountAvatar(@PathParam("uuid") String uuid,
+            @Context SecurityContext sc,
+            @QueryParam("size") String size) throws IOException {
+        byte[] avatarPhoto;
+        AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
+        String s3Bucket = "voice-in";
+        String avatarUuid = dsObj.get(User.class, uuid).getProfilePhotoId();
+        int imgSize;
+        LOGGER.log(Level.INFO, size);
+        if("large".equals(size))
+            imgSize = AVATAR_LARGE;
+        else if ("mid".equals(size))
+            imgSize = AVATAR_MID;
+        else
+            imgSize = AVATAR_SMALL;
+        String file = String.format("userPhotos/%s-%d.jpg", avatarUuid , imgSize);
+        GetObjectRequest request = new GetObjectRequest(s3Bucket, file);
+        S3Object object = s3Client.getObject(request);
+        avatarPhoto = IOUtils.toByteArray(object.getObjectContent());
+        return Response.ok(avatarPhoto).build();
     }
 }
