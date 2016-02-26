@@ -31,7 +31,7 @@ public class ImageProceesor {
     private BufferedImage oriBri;
     private BufferedImage proBri;
     private final int type;
-    private float compressionQuality = 0.5f;
+    private float compressionQuality = 0.8f;
     private int compressionMode = ImageWriteParam.MODE_EXPLICIT;
 
     public ImageProceesor(BufferedImage fin) throws IOException {

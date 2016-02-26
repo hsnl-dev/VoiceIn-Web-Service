@@ -33,6 +33,7 @@ import net.glxn.qrgen.image.ImageType;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.servlet.annotation.MultipartConfig;
 import javax.ws.rs.core.Context;
@@ -57,6 +58,9 @@ public class AccountsResource {
     ConsoleHandler consoleHandler = new ConsoleHandler();
     MongoManager mongoManager = MongoManager.getInstatnce();
     Datastore dsObj = mongoManager.getDs();
+    private static final int AVATAR_LARGE = 256;
+    private static final int AVATAR_MID = 128;
+    private static final int AVATAR_SMALL = 64;
 
     /**
      * This API allows user to delete a user account by given uuid.
@@ -305,7 +309,9 @@ public class AccountsResource {
 
         String tmpDir = System.getProperty("java.io.tmpdir");
         String photoUuid = UUID.randomUUID().toString();
-        File tmpFile = new File(tmpDir + File.separator + photoUuid);
+        String photoBaseName = tmpDir + File.separator + photoUuid;
+        ArrayList<File> files = new ArrayList<File>();
+        int[] imageSizes = {AVATAR_LARGE, AVATAR_MID, AVATAR_SMALL};
         try {
             BufferedImage bri = ImageIO.read(fileInputStream);
             if (bri == null) {
@@ -313,32 +319,77 @@ public class AccountsResource {
                 er.setErrorReason("not supported format");
                 return Response.status(Status.NOT_ACCEPTABLE).entity(er).build();
             }
-            ImageProceesor ip = new ImageProceesor(bri);
-            ip.resize(256, 256);
-            ip.saveFileWithJPGCompress(tmpFile);
+            for (int size : imageSizes) {
+                ImageProceesor ip = new ImageProceesor(bri);
+                File tmpFile = new File(photoBaseName + "-" + size + ".jpg");
+                ip.resize(size, size).saveFileWithJPGCompress(tmpFile);
+                files.add(tmpFile);
+            }
+            String userId = sc.getUserPrincipal().getName();
+            Key key = new Key(User.class, "accounts", userId);
+            User user = dsObj.get(User.class, userId);
+            String oldId = user.getProfilePhotoId();
             AmazonS3 s3client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
-            //upload to s3
-            LOGGER.log(Level.INFO, String.format("start upload to s3", tmpDir + "/" + photoUuid));
-            s3client.putObject(
-                    new PutObjectRequest(
-                            "voice-in",
-                            "userPhotos/" + photoUuid + ".jpg",
-                            tmpFile
-                    )
-            );
+            for (File onefile : files) {
+                //upload to s3
+                LOGGER.log(Level.INFO, String.format(onefile.getName()));
+                s3client.putObject(
+                        new PutObjectRequest(
+                                "voice-in",
+                                "userPhotos/" + onefile.getName(),
+                                onefile
+                        )
+                );
+
+            }
+            if (oldId != null) {
+                //delete old
+                for (int size : imageSizes) {
+                    LOGGER.log(Level.INFO, "Delete" + oldId + "-" + size + ".jpg");
+                    s3client.deleteObject("voice-in", "userPhotos/" + oldId + "-" + size + ".jpg");
+
+                }
+            }
+
             LOGGER.log(Level.INFO, String.format("file update" + "ok" + tmpDir + "/" + photoUuid));
-            Key key = new Key(User.class, "accounts", sc.getUserPrincipal().getName());
             UpdateOperations<User> upo = dsObj.createUpdateOperations(User.class).set("profilePhotoId", photoUuid);
             dsObj.update(key, upo);
+
             LOGGER.log(Level.INFO, String.format("user info update OK"));
         } finally {
-            if (tmpFile.delete()) {
-                LOGGER.log(Level.INFO, String.format("del temp file OK"));
-            } else {
-                LOGGER.log(Level.WARNING, String.format("del temp file OK"));
+            for (File one : files) {
+                if (one.delete()) {
+                    LOGGER.log(Level.INFO, String.format("del temp file OK"));
+                } else {
+                    LOGGER.log(Level.WARNING, String.format("del temp file Failed"));
+                }
             }
         }
         return Response.ok().build();
+    }
 
+    @GET
+    @Path("/accounts/{uuid}/avatar")
+    @Produces("image/jpg")
+    public Response getAccountAvatar(@PathParam("uuid") String uuid,
+            @Context SecurityContext sc,
+            @QueryParam("size") String size) throws IOException {
+        byte[] avatarPhoto;
+        AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
+        String s3Bucket = "voice-in";
+        String avatarUuid = dsObj.get(User.class, uuid).getProfilePhotoId();
+        int imgSize;
+        LOGGER.log(Level.INFO, size);
+        if("large".equals(size))
+            imgSize = AVATAR_LARGE;
+        else if ("mid".equals(size))
+            imgSize = AVATAR_MID;
+        else
+            imgSize = AVATAR_SMALL;
+        String file = String.format("userPhotos/%s-%d.jpg", avatarUuid , imgSize);
+        GetObjectRequest request = new GetObjectRequest(s3Bucket, file);
+        S3Object object = s3Client.getObject(request);
+        avatarPhoto = IOUtils.toByteArray(object.getObjectContent());
+        return Response.ok(avatarPhoto).build();
     }
 }

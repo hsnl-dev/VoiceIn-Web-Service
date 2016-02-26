@@ -26,9 +26,9 @@ import org.mongodb.morphia.query.Query;
 import tw.kits.voicein.bean.TokenResBean;
 import tw.kits.voicein.bean.UserAuthBean;
 import tw.kits.voicein.bean.UserPhoneBean;
-import tw.kits.voicein.model.TokenModel;
+import tw.kits.voicein.model.Token;
 import tw.kits.voicein.model.User;
-import tw.kits.voicein.model.VCodeModel;
+import tw.kits.voicein.model.Code;
 import tw.kits.voicein.util.Http;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.Parameter;
@@ -56,14 +56,13 @@ public class TokenResource {
             u.setPhoneNumber(phone.getPhoneNumber());
         } else {
             //if code exist for userid delete it !!!
-            Query<VCodeModel> codeQ = ds.createQuery(VCodeModel.class);
+            Query<Code> codeQ = ds.createQuery(Code.class);
             Key key = new Key(User.class, "accounts", u.getUuid());
-            VCodeModel code = ds.find(VCodeModel.class).field("user").equal(key).get();
-            ds.delete(code);
-
+            Code code = ds.find(Code.class).field("user").equal(key).get();
+            if(code!=null)
+                ds.delete(code);
         }
-
-        VCodeModel code = new VCodeModel(
+        Code code = new Code(
                 u,
                 RandomStringUtils.random(6, false, true),
                 new Date(),
@@ -100,12 +99,12 @@ public class TokenResource {
     public Response getToken(@Valid @NotNull UserAuthBean user) {
         Datastore ds = MongoManager.getInstatnce().getDs();
         Key key = new Key(User.class, "accounts", user.getUserUuid());
-        VCodeModel code = ds.find(VCodeModel.class).field("user").equal(key).get();
+        Code code = ds.find(Code.class).field("user").equal(key).get();
 
         if (code != null) {
             if (code.getCode().equals(user.getCode())) {
                 // issue new token
-                TokenModel tm = new TokenModel(3600);
+                Token tm = new Token(3600);
                 // inject user to token collection
                 tm.setUser(code.getUser());
                 ds.save(tm);
@@ -130,7 +129,7 @@ public class TokenResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response delToken(@PathParam("tokenUuid") String tokenUuid) {
         Datastore ds = MongoManager.getInstatnce().getDs();
-        TokenModel token = ds.get(TokenModel.class, tokenUuid);
+        Token token = ds.get(Token.class, tokenUuid);
         ds.delete(token);
         return Response
                 .status(Status.OK)
