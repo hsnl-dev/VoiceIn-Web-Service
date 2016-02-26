@@ -7,7 +7,7 @@ import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
 @Entity("token")
-public class TokenModel {
+public class Token {
     @Id 
     private String tokenId;
     @Reference
@@ -15,19 +15,19 @@ public class TokenModel {
     private Date createdAt;
     private int expire;
 
-    public TokenModel(String tokenId, Date createdAt, int expire) {
+    public Token(String tokenId, Date createdAt, int expire) {
         this.tokenId = tokenId;
         this.createdAt = createdAt;
         this.expire = expire;
     }
     
-    public TokenModel(int expire) {
+    public Token(int expire) {
         this.tokenId = UUID.randomUUID().toString();
         this.createdAt = new Date();
         this.expire = expire;
     }
     
-    public TokenModel() {
+    public Token() {
     }
     
     public String getTokenId() {

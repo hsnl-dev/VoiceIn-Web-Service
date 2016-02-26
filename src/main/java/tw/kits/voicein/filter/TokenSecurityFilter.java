@@ -13,9 +13,11 @@ import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 import org.mongodb.morphia.Datastore;
 import tw.kits.voicein.bean.ErrorMessageBean;
-import tw.kits.voicein.model.TokenModel;
+import tw.kits.voicein.model.Token;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.TokenRequired;
+
+
 
 /**
  *
@@ -28,11 +30,13 @@ public class TokenSecurityFilter implements ContainerRequestFilter{
 
     @Override
     public void filter(ContainerRequestContext crc) throws IOException {
-        String token = crc.getHeaderString("token");
         Datastore ds = MongoManager.getInstatnce().getDs();
-        final TokenModel tm = ds.get(TokenModel.class, token);
+        String token = crc.getHeaderString("token");
+        final Token tm2 = ds.get(Token.class, token);
         
-        if (tm == null) {
+        
+        
+        if (tm2 == null) {
             
             ErrorMessageBean errMsg = new ErrorMessageBean();
             errMsg.setErrorReason("Your code is not correct");
@@ -50,7 +54,7 @@ public class TokenSecurityFilter implements ContainerRequestFilter{
                 return new Principal() {
                     @Override
                     public String getName() {
-                        return tm.getUser().getUuid();
+                        return tm2.getUser().getUuid();
                     }
                 };
             }
