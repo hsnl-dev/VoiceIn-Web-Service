@@ -16,16 +16,19 @@ public class Http {
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     OkHttpClient client = new OkHttpClient();
-
-    public String post(String url, String json) throws IOException {
+    public Response postResponse(String url, String json) throws IOException{
         RequestBody body = RequestBody.create(JSON, json);
         Request request = new Request.Builder()
                 .url(url)
                 .addHeader("apiKey", Parameter.API_KEY)
                 .post(body)
                 .build();
-        Response response = client.newCall(request).execute();
-        return response.body().string();
+        return client.newCall(request).execute();
     }
+    public String post(String url, String json) throws IOException {
+
+        return postResponse(url, json).body().string();
+    }
+    
 
 }
