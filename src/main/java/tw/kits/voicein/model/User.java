@@ -11,6 +11,7 @@ public class User {
 
     @Id
     private String uuid;
+    private String userName;
     private String phoneNumber;
     private String location;
     private String profile;
@@ -119,5 +120,19 @@ public class User {
      */
     public void setQrCodeUuid(String qrCodeUuid) {
         this.qrCodeUuid = qrCodeUuid;
+    }
+
+    /**
+     * @return the userName
+     */
+    public String getUserName() {
+        return userName;
+    }
+
+    /**
+     * @param userName the userName to set
+     */
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

@@ -18,7 +18,8 @@ public class Contact {
     private String phoneNumber;
     private String name;
     private String nickName;
-
+    @Reference
+    private Icon customerIcon;
     public Contact() {
 
     }
@@ -91,6 +92,20 @@ public class Contact {
      */
     public void setId(ObjectId id) {
         this.id = id;
+    }
+
+    /**
+     * @return the customerIcon
+     */
+    public Icon getCustomerIcon() {
+        return customerIcon;
+    }
+
+    /**
+     * @param customerIcon the customerIcon to set
+     */
+    public void setCustomerIcon(Icon customerIcon) {
+        this.customerIcon = customerIcon;
     }
 
 }
