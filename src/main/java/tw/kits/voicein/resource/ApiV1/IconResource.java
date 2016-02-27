@@ -17,6 +17,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import org.mongodb.morphia.Datastore;
 import tw.kits.voicein.bean.ErrorMessageBean;
 import tw.kits.voicein.bean.IconCreateBean;
@@ -112,6 +113,8 @@ public class IconResource {
     @Path("/icons/{iconId}")
     public Response genIcon(@PathParam("iconId") String iconId) throws IOException {
         Icon icon = dsObj.get(Icon.class, iconId);
+        if(icon==null)
+            return Response.status(Status.NOT_FOUND).build();
         String endPoint = Parameter.API_ROOT + Parameter.API_VER + "Call/test01/generalCallRequest/";
         HashMap<String, Object> sendToObj = new HashMap<String, Object>();
         sendToObj.put("callee", icon.getPhoneNumber());
