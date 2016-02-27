@@ -10,11 +10,12 @@ import javax.validation.constraints.NotNull;
  *
  * @author Henry
  */
-
 public class IconCreateBean {
+
     @NotNull
     private String providerUuid;
-    @Valid @NotNull
+    @Valid
+    @NotNull
     private Customer customer;
 
     /**
@@ -56,7 +57,7 @@ public class IconCreateBean {
      * @param name the name to set
      */
     public void setName(String name) {
-        
+
         this.customer.setName(name);
     }
 
@@ -77,6 +78,7 @@ public class IconCreateBean {
 }
 
 class Customer {
+
     @NotNull
     private String name;
     @NotNull

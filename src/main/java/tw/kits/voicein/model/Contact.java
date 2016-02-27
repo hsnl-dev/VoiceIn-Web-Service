@@ -20,6 +20,7 @@ public class Contact {
     private String nickName;
     @Reference
     private Icon customerIcon;
+
     public Contact() {
 
     }

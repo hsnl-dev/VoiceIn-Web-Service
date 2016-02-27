@@ -113,25 +113,25 @@ public class IconResource {
     @Path("/icons/{iconId}")
     public Response genIcon(@PathParam("iconId") String iconId) throws IOException {
         Icon icon = dsObj.get(Icon.class, iconId);
-        if(icon==null)
+        if (icon == null) {
             return Response.status(Status.NOT_FOUND).build();
+        }
         String endPoint = Parameter.API_ROOT + Parameter.API_VER + "Call/test01/generalCallRequest/";
         HashMap<String, Object> sendToObj = new HashMap<String, Object>();
         sendToObj.put("callee", icon.getPhoneNumber());
         sendToObj.put("caller", icon.getProvider().getPhoneNumber());
         sendToObj.put("check", false);
-        LOGGER.info(String.format("Starting calling %s",endPoint));
+        LOGGER.info(String.format("Starting calling %s", endPoint));
         Http http = new Http();
-        String json =  new ObjectMapper().writeValueAsString(sendToObj);
+        String json = new ObjectMapper().writeValueAsString(sendToObj);
         okhttp3.Response res = http.postResponse(endPoint, json);
-        if(res.isSuccessful()){
+        if (res.isSuccessful()) {
             return Response.status(Response.Status.CREATED).entity(res).build();
-        }else{
+        } else {
             ErrorMessageBean erb = new ErrorMessageBean("Kits Main Server Error");
             LOGGER.severe(res.body().string());
             return Response.serverError().entity(erb).build();
         }
-        
 
     }
 

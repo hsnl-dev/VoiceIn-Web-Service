@@ -8,16 +8,19 @@ import org.mongodb.morphia.annotations.Reference;
 
 @Entity("code")
 public class Code {
-    @Id 
+
+    @Id
     private String vcodeId;
     @Reference
     private User user;
     private String code;
     private Date createAt;
     private int expiredTime;
-    
+
     public Code() {
-    };
+    }
+
+    ;
 
     public Code(User userUuid, String code, Date createAt, int expiredTime) {
         this.vcodeId = UUID.randomUUID().toString();
@@ -26,7 +29,7 @@ public class Code {
         this.createAt = createAt;
         this.expiredTime = expiredTime;
     }
-  
+
     public String getVcodeId() {
         return vcodeId;
     }
@@ -72,5 +75,5 @@ public class Code {
     public void setUser(User user) {
         this.user = user;
     }
-    
+
 }

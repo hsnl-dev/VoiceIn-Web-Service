@@ -16,7 +16,8 @@ public class Http {
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     OkHttpClient client = new OkHttpClient();
-    public Response postResponse(String url, String json) throws IOException{
+
+    public Response postResponse(String url, String json) throws IOException {
         RequestBody body = RequestBody.create(JSON, json);
         Request request = new Request.Builder()
                 .url(url)
@@ -25,10 +26,10 @@ public class Http {
                 .build();
         return client.newCall(request).execute();
     }
+
     public String post(String url, String json) throws IOException {
 
         return postResponse(url, json).body().string();
     }
-    
 
 }

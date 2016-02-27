@@ -3,10 +3,14 @@ package tw.kits.voicein.bean;
 public class ErrorMessageBean {
 
     private String errorReason;
-    public ErrorMessageBean(String msg){
+
+    public ErrorMessageBean(String msg) {
         errorReason = msg;
     }
-    public ErrorMessageBean(){}
+
+    public ErrorMessageBean() {
+    }
+
     public String getErrorReason() {
         return errorReason;
     }

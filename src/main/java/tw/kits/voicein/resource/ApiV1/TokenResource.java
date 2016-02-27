@@ -59,8 +59,9 @@ public class TokenResource {
             Query<Code> codeQ = ds.createQuery(Code.class);
             Key key = new Key(User.class, "accounts", u.getUuid());
             Code code = ds.find(Code.class).field("user").equal(key).get();
-            if(code!=null)
+            if (code != null) {
                 ds.delete(code);
+            }
         }
         Code code = new Code(
                 u,
