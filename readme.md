@@ -1,29 +1,16 @@
 VoiceIn API Service
 ==
-API Web Service using jersey on GAE.
+VoiceIn API Web Service using jersey on Beanstalk.
 
 Prerequisite
 ==
-- Google App Engine SDK
-- JRE 1.8
-- JAVA 1.8
+- Jre 1.8
+- Java 1.8
 
 Build
 ==
 ```sh
 mvn clean install
-```
-Run
-==
-Use google dev server
-```sh
-mvn appengine:devserver
-```
-
-Deploy
-==
-```sh
-mvn appengine:update
 ```
 
 Doc
