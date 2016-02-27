@@ -56,7 +56,7 @@ import tw.kits.voicein.util.TokenRequired;
 public class AccountsResource {
 
     static final Logger LOGGER = Logger.getLogger(AccountsResource.class.getName());
-    
+
     ConsoleHandler consoleHandler = new ConsoleHandler();
     MongoManager mongoManager = MongoManager.getInstatnce();
     Datastore dsObj = mongoManager.getDs();
@@ -377,10 +377,12 @@ public class AccountsResource {
             @Context SecurityContext sc,
             @QueryParam("size") String size) throws IOException {
         String avatarUuid = dsObj.get(User.class, uuid).getProfilePhotoId();
-        if(avatarUuid==null)
+        if (avatarUuid == null) {
             Response.status(Status.NOT_FOUND).build();
-        return Response.ok(getAvatar(avatarUuid,size)).build();
+        }
+        return Response.ok(getAvatar(avatarUuid, size)).build();
     }
+
     @GET
     @Path("/avatars/{avatarUuid}")
     @Produces("image/jpg")
@@ -388,27 +390,28 @@ public class AccountsResource {
             @Context SecurityContext sc,
             @QueryParam("size") String size) throws IOException {
         User u = dsObj.createQuery(User.class).field("profilePhotoId").equal(uuid).get();
-        if(u==null)
+        if (u == null) {
             Response.status(Status.NOT_FOUND).build();
-        return Response.ok(getAvatar(uuid,size)).build();
+        }
+        return Response.ok(getAvatar(uuid, size)).build();
     }
-    private byte[] getAvatar(String avatarUuid, String size) throws IOException{
+
+    private byte[] getAvatar(String avatarUuid, String size) throws IOException {
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
         String s3Bucket = "voice-in";
         int imgSize;
         LOGGER.log(Level.INFO, size);
-        
-        
-        if("large".equals(size))
+
+        if ("large".equals(size)) {
             imgSize = AVATAR_LARGE;
-        else if ("mid".equals(size))
+        } else if ("mid".equals(size)) {
             imgSize = AVATAR_MID;
-        else
+        } else {
             imgSize = AVATAR_SMALL;
-        String file = String.format("userPhotos/%s-%d.jpg", avatarUuid , imgSize);
+        }
+        String file = String.format("userPhotos/%s-%d.jpg", avatarUuid, imgSize);
         GetObjectRequest request = new GetObjectRequest(s3Bucket, file);
         S3Object object = s3Client.getObject(request);
         return IOUtils.toByteArray(object.getObjectContent());
     }
 }
-    

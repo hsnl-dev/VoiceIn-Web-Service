@@ -15,12 +15,14 @@ import org.mongodb.morphia.annotations.Reference;
  */
 @Entity("icon")
 public class Icon {
+
     @Reference
     private User provider;
     private String name;
     private String phoneNumber;
     @Id
     private String iconId;
+
     /**
      * @return the provider
      */
@@ -76,5 +78,5 @@ public class Icon {
     public void setIconId(String iconId) {
         this.iconId = iconId;
     }
-    
+
 }

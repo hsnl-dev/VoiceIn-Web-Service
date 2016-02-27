@@ -7,15 +7,16 @@ package tw.kits.voicein.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-/***
+/**
+ * *
  * {
-       "name": "Henry",
-       "phoneNumber": "XXXXXXXX"
-     }
+ * "name": "Henry", "phoneNumber": "XXXXXXXX" }
+ *
  * @author Henry
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class IconUpdateBean {
+
     private String name;
     private String phoneNumber;
 
