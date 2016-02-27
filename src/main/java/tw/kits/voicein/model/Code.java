@@ -18,9 +18,8 @@ public class Code {
     private int expiredTime;
 
     public Code() {
-    }
 
-    ;
+    }
 
     public Code(User userUuid, String code, Date createAt, int expiredTime) {
         this.vcodeId = UUID.randomUUID().toString();

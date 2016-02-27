@@ -18,6 +18,9 @@ public class User {
     private String company;
     private String profilePhotoId;
     private String qrCodeUuid;
+    private String availableStartTime;
+    private String availableEndTime;
+    
 
     /**
      * @param uuid the uuid to set
@@ -134,5 +137,33 @@ public class User {
      */
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    /**
+     * @return the availableStartTime
+     */
+    public String getAvailableStartTime() {
+        return availableStartTime;
+    }
+
+    /**
+     * @param availableStartTime the availableStartTime to set
+     */
+    public void setAvailableStartTime(String availableStartTime) {
+        this.availableStartTime = availableStartTime;
+    }
+
+    /**
+     * @return the availableEndTime
+     */
+    public String getAvailableEndTime() {
+        return availableEndTime;
+    }
+
+    /**
+     * @param availableEndTime the availableEndTime to set
+     */
+    public void setAvailableEndTime(String availableEndTime) {
+        this.availableEndTime = availableEndTime;
     }
 }

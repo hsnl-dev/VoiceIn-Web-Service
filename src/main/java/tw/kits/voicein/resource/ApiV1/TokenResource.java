@@ -38,6 +38,14 @@ public class TokenResource {
 
     private final Logger LOGGER = Logger.getLogger(TokenResource.class.getName());
 
+    /**
+     *
+     * API By Henry
+     * @param phone
+     * @return
+     * @throws JsonProcessingException
+     * @throws IOException
+     */
     @POST
     @Path("/accounts/validations")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -93,6 +101,12 @@ public class TokenResource {
 
     }
 
+    /**
+     *
+     * API By Henry
+     * @param user
+     * @return
+     */
     @POST
     @Path("/accounts/tokens")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -124,6 +138,12 @@ public class TokenResource {
 
     }
 
+    /**
+     *
+     * API By Henry
+     * @param tokenUuid
+     * @return
+     */
     @DELETE
     @Path("/accounts/tokens/{tokenUuid}")
     @Consumes(MediaType.APPLICATION_JSON)

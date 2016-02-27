@@ -65,8 +65,8 @@ public class AccountsResource {
     private static final int AVATAR_SMALL = 64;
 
     /**
-     * This API allows user to delete a user account by given uuid.
-     *
+     * This API allows user to delete a user account by given UUID.
+     * API By Calvin.
      * @param uuid
      * @return
      */
@@ -88,7 +88,7 @@ public class AccountsResource {
 
     /**
      * This API allows client to update user's information.
-     *
+     * API By Calvin
      * @param uuid
      * @param u
      * @return response to the client
@@ -113,7 +113,7 @@ public class AccountsResource {
 
     /**
      * This API allows client to retrieve user's full informations.
-     *
+     * API By Calvin
      * @param uuid
      * @return User
      */
@@ -135,8 +135,8 @@ public class AccountsResource {
     }
 
     /**
-     * Call
-     *
+     * Call When user click the calling button.
+     * API By Calvin
      * @param uuid
      * @param callBean
      * @return response
@@ -160,7 +160,7 @@ public class AccountsResource {
 
     /**
      * This API allows user to get their contact list.
-     *
+     * API By Calvin
      * @param uuid
      * @return
      */
@@ -183,7 +183,7 @@ public class AccountsResource {
 
     /**
      * This API allows user to add a contact.
-     *
+     * API By Calvin
      * @param uuid
      * @param contact
      * @return
@@ -202,7 +202,7 @@ public class AccountsResource {
 
     /**
      * This API allows client user to update a contact.
-     *
+     * API By Calvin
      * @param uuid
      * @param contactId
      * @param contact
@@ -220,7 +220,7 @@ public class AccountsResource {
 
     /**
      * This API allows client to delete a contact.
-     *
+     * API By Calvin
      * @param uuid
      * @param contactId
      * @return
@@ -235,7 +235,8 @@ public class AccountsResource {
     }
 
     /**
-     *
+     * Create user's QRCode by randomized UUID.
+     * API By Calvin
      * @param uuid
      * @return
      */
@@ -263,7 +264,7 @@ public class AccountsResource {
 
     /**
      * This API allows client to retrieve their QRCode
-     *
+     * API By Calvin
      * @param uuid
      * @return
      * @throws java.io.IOException
@@ -290,7 +291,7 @@ public class AccountsResource {
 
     /**
      * This API allows user to upload avatar
-     *
+     * API By Henry
      * @param sc
      * @param fileInputStream
      * @param header
@@ -370,6 +371,15 @@ public class AccountsResource {
         return Response.ok().build();
     }
 
+    /**
+     * This API allows user to retrieve user's avatar by user's UUID.
+     * API By Henry
+     * @param uuid
+     * @param sc
+     * @param size
+     * @return
+     * @throws IOException
+     */
     @GET
     @Path("/accounts/{uuid}/avatar")
     @Produces("image/jpg")
@@ -383,6 +393,15 @@ public class AccountsResource {
         return Response.ok(getAvatar(avatarUuid, size)).build();
     }
 
+    /**
+     * This API allows user to retrieve user's avatar by UUID of avatar.
+     * API By Henry
+     * @param uuid
+     * @param sc
+     * @param size
+     * @return
+     * @throws IOException
+     */
     @GET
     @Path("/avatars/{avatarUuid}")
     @Produces("image/jpg")
