@@ -42,6 +42,7 @@ import javax.ws.rs.core.SecurityContext;
 import org.mongodb.morphia.Key;
 import org.mongodb.morphia.query.UpdateOperations;
 import tw.kits.voicein.bean.ErrorMessageBean;
+import static tw.kits.voicein.resource.ApiV1.AccountsResource.LOGGER;
 import tw.kits.voicein.util.ImageProceesor;
 import tw.kits.voicein.util.TokenRequired;
 
@@ -55,6 +56,7 @@ import tw.kits.voicein.util.TokenRequired;
 public class AccountsResource {
 
     static final Logger LOGGER = Logger.getLogger(AccountsResource.class.getName());
+    
     ConsoleHandler consoleHandler = new ConsoleHandler();
     MongoManager mongoManager = MongoManager.getInstatnce();
     Datastore dsObj = mongoManager.getDs();
@@ -374,10 +376,20 @@ public class AccountsResource {
     public Response getAccountAvatar(@PathParam("uuid") String uuid,
             @Context SecurityContext sc,
             @QueryParam("size") String size) throws IOException {
-        byte[] avatarPhoto;
+        String avatarUuid = dsObj.get(User.class, uuid).getProfilePhotoId();     
+        return Response.ok(getAvatar(avatarUuid,size)).build();
+    }
+    @GET
+    @Path("/avatar/{avatarUuid}")
+    @Produces("image/jpg")
+    public Response getAvatarByAvId(@PathParam("avatarUuid") String uuid,
+            @Context SecurityContext sc,
+            @QueryParam("size") String size) throws IOException {
+        return Response.ok(getAvatar(uuid,size)).build();
+    }
+    private byte[] getAvatar(String avatarUuid, String size) throws IOException{
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
         String s3Bucket = "voice-in";
-        String avatarUuid = dsObj.get(User.class, uuid).getProfilePhotoId();
         int imgSize;
         LOGGER.log(Level.INFO, size);
         if("large".equals(size))
@@ -389,7 +401,7 @@ public class AccountsResource {
         String file = String.format("userPhotos/%s-%d.jpg", avatarUuid , imgSize);
         GetObjectRequest request = new GetObjectRequest(s3Bucket, file);
         S3Object object = s3Client.getObject(request);
-        avatarPhoto = IOUtils.toByteArray(object.getObjectContent());
-        return Response.ok(avatarPhoto).build();
+        return IOUtils.toByteArray(object.getObjectContent());
     }
 }
+    

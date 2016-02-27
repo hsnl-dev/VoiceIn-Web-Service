@@ -4,7 +4,7 @@ package tw.kits.voicein.bean;
  *
  * @author Henry
  * "name": "Anthony Kong",
-      "profileUrl": "https://www.voicein.io/esxw-1234-wdxx-w233.png",
+      "avatarId": "...",
       "profile": "I am Anthony Kong.",
       "location": "Taipei",
       "company": "HSNL"
