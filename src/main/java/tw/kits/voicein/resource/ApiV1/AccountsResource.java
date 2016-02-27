@@ -376,15 +376,20 @@ public class AccountsResource {
     public Response getAccountAvatar(@PathParam("uuid") String uuid,
             @Context SecurityContext sc,
             @QueryParam("size") String size) throws IOException {
-        String avatarUuid = dsObj.get(User.class, uuid).getProfilePhotoId();     
+        String avatarUuid = dsObj.get(User.class, uuid).getProfilePhotoId();
+        if(avatarUuid==null)
+            Response.status(Status.NOT_FOUND).build();
         return Response.ok(getAvatar(avatarUuid,size)).build();
     }
     @GET
-    @Path("/avatar/{avatarUuid}")
+    @Path("/avatars/{avatarUuid}")
     @Produces("image/jpg")
     public Response getAvatarByAvId(@PathParam("avatarUuid") String uuid,
             @Context SecurityContext sc,
             @QueryParam("size") String size) throws IOException {
+        User u = dsObj.createQuery(User.class).field("profilePhotoId").equal(uuid).get();
+        if(u==null)
+            Response.status(Status.NOT_FOUND).build();
         return Response.ok(getAvatar(uuid,size)).build();
     }
     private byte[] getAvatar(String avatarUuid, String size) throws IOException{
@@ -392,6 +397,8 @@ public class AccountsResource {
         String s3Bucket = "voice-in";
         int imgSize;
         LOGGER.log(Level.INFO, size);
+        
+        
         if("large".equals(size))
             imgSize = AVATAR_LARGE;
         else if ("mid".equals(size))
