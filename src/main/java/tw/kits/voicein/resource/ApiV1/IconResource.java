@@ -43,6 +43,12 @@ public class IconResource {
     Datastore dsObj = mongoManager.getDs();
     private final Logger LOGGER = Logger.getLogger(IconResource.class.getName());
 
+    /**
+     * This API allows customer to add a icon. 
+     * API By Henry
+     * @param icb
+     * @return iconUuid
+     */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -71,6 +77,13 @@ public class IconResource {
 
     }
 
+    /**
+     * This API allows customer to update their information including phone number and name. 
+     * API By Henry
+     * @param uuid
+     * @param iub
+     * @return
+     */
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -89,6 +102,12 @@ public class IconResource {
         return Response.ok().build();
     }
 
+    /**
+     * This API allows client to get provider 's information by qrCodeUuid(providerId) 
+     * API By Henry
+     * @param uProviderId
+     * @return
+     */
     @GET
     @Path("/providers/{providerId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -107,11 +126,18 @@ public class IconResource {
         return Response.ok(prb).build();
     }
 
+    /**
+     * This API allows customer to call provider after confirm button click.
+     * API By Henry
+     * @param iconId
+     * @return
+     * @throws IOException
+     */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/icons/{iconId}")
-    public Response genIcon(@PathParam("iconId") String iconId) throws IOException {
+    @Path("/icons/{iconId}/calls")
+    public Response callAfterConfirm(@PathParam("iconId") String iconId) throws IOException {
         Icon icon = dsObj.get(Icon.class, iconId);
         if (icon == null) {
             return Response.status(Status.NOT_FOUND).build();
@@ -125,6 +151,7 @@ public class IconResource {
         Http http = new Http();
         String json = new ObjectMapper().writeValueAsString(sendToObj);
         okhttp3.Response res = http.postResponse(endPoint, json);
+        
         if (res.isSuccessful()) {
             return Response.status(Response.Status.CREATED).entity(res).build();
         } else {

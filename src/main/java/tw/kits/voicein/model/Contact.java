@@ -18,6 +18,8 @@ public class Contact {
     private String phoneNumber;
     private String name;
     private String nickName;
+    private String availableStartTime;
+    private String availableEndTime;
     @Reference
     private Icon customerIcon;
 
@@ -107,6 +109,34 @@ public class Contact {
      */
     public void setCustomerIcon(Icon customerIcon) {
         this.customerIcon = customerIcon;
+    }
+
+    /**
+     * @return the availableStartTime
+     */
+    public String getAvailableStartTime() {
+        return availableStartTime;
+    }
+
+    /**
+     * @param availableStartTime the availableStartTime to set
+     */
+    public void setAvailableStartTime(String availableStartTime) {
+        this.availableStartTime = availableStartTime;
+    }
+
+    /**
+     * @return the availableEndTime
+     */
+    public String getAvailableEndTime() {
+        return availableEndTime;
+    }
+
+    /**
+     * @param availableEndTime the availableEndTime to set
+     */
+    public void setAvailableEndTime(String availableEndTime) {
+        this.availableEndTime = availableEndTime;
     }
 
 }
