@@ -15,8 +15,8 @@ public class Contact {
     private ObjectId id;
     @Reference
     private User user;
-    private String phoneNumber;
-    private String name;
+    @Reference
+    private User providerUser;
     private String nickName;
     private String availableStartTime;
     private String availableEndTime;
@@ -39,34 +39,6 @@ public class Contact {
      */
     public void setUser(User user) {
         this.user = user;
-    }
-
-    /**
-     * @return the phoneNumber
-     */
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    /**
-     * @param phoneNumber the phoneNumber to set
-     */
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
     }
 
     /**
@@ -137,6 +109,20 @@ public class Contact {
      */
     public void setAvailableEndTime(String availableEndTime) {
         this.availableEndTime = availableEndTime;
+    }
+
+    /**
+     * @return the providerUser
+     */
+    public User getProviderUser() {
+        return providerUser;
+    }
+
+    /**
+     * @param providerUser the providerUser to set
+     */
+    public void setProviderUser(User providerUser) {
+        this.providerUser = providerUser;
     }
 
 }
