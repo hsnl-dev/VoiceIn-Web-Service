@@ -27,7 +27,7 @@ import tw.kits.voicein.util.Http;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.Parameter;
 
-@Path("sandboxs/api/v1")
+@Path("/sandboxs/api/v1")
 public class SandboxResource {
     
     private final Logger LOGGER = Logger.getLogger(TokenResource.class.getName());
