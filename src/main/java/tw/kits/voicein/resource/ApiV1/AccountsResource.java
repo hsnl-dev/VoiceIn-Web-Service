@@ -80,7 +80,6 @@ public class AccountsResource {
         consoleHandler.setLevel(Level.CONFIG);
 
         LOGGER.addHandler(consoleHandler);
-
         LOGGER.log(Level.CONFIG, "[Config] Delete user u{0}", uuid);
 
         return Response.ok().build();
@@ -106,7 +105,6 @@ public class AccountsResource {
         consoleHandler.setLevel(Level.ALL);
 
         LOGGER.addHandler(consoleHandler);
-
         LOGGER.log(Level.CONFIG, "[Config] Update user u{0}", u);
 
         return Response.ok().build();
@@ -130,7 +128,6 @@ public class AccountsResource {
         consoleHandler.setLevel(Level.CONFIG);
 
         LOGGER.addHandler(consoleHandler);
-
         LOGGER.log(Level.CONFIG, "[Config] Get user u{0}", uuid);
 
         return Response.ok(user).build();
@@ -175,14 +172,20 @@ public class AccountsResource {
     public Response getContactListOfAnUser(@PathParam("uuid") String uuid) {
         User user = dsObj.get(User.class, uuid);
 
-        List<Contact> queryResult = dsObj.find(Contact.class).field("user").equal(user).asList();
-
+        List<Contact> contactList = dsObj.find(Contact.class).field("user").equal(user).asList();
+        
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
         LOGGER.addHandler(consoleHandler);
-        LOGGER.log(Level.CONFIG, "[Config] contact length {0}", queryResult.size());
-
-        return Response.ok(queryResult).build();
+        LOGGER.log(Level.CONFIG, "[Config] contact length {0}", contactList.size());
+        
+        List<User> userList = new ArrayList();
+        
+        for (Contact contact : contactList) {
+            userList.add(contact.getProviderUser());
+        }
+        
+        return Response.ok(userList).build();
     }
 
     /**
@@ -202,34 +205,42 @@ public class AccountsResource {
         User refUser = dsObj.get(User.class, uuid);
         List<User> users = dsObj.createQuery(User.class).field("qrCodeUuid").equal(qrCodeUuid).asList();
         
-        if (users.size() != 1) {
+        // user.size() must be 1.
+        if (users.size() == 1) {
+            User provider = users.get(0); 
+        
+            contact.setUser(refUser);
+            contact.setProviderUser(provider);
+            contact.setQrCodeUuid(qrCodeUuid);
+            
+            dsObj.save(contact);
+            return Response.ok().build();
+        } else {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         
-        User provider = users.get(0); 
         
-        contact.setUser(refUser);
-        contact.setProviderUser(provider);
-        
-        dsObj.save(contact);
-        return Response.ok().build();
     }
 
     /**
      * This API allows client user to update a contact.
      * API By Calvin
      * @param uuid
-     * @param contactId
+     * @param qrCodeUuid
      * @param contact
      * @return
      */
     @PUT
     @TokenRequired
-    @Path("/accounts/{uuid}/contacts/{contactId}")
+    @Path("/accounts/{uuid}/contacts/{qrCodeUuid}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("contactId") String contactId, Contact contact) {
-        ObjectId oid = new ObjectId(contactId);
-        contact.setId(oid);
+    public Response updateAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, Contact contact) {
+        User u = dsObj.get(User.class, uuid);
+        Contact modifiedContact = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", u).get();
+        
+        contact.setId(modifiedContact.getId());
+        contact.setQrCodeUuid(qrCodeUuid);
+        
         dsObj.save(contact);
         return Response.ok().build();
     }
@@ -238,16 +249,17 @@ public class AccountsResource {
      * This API allows client to delete a contact.
      * API By Calvin
      * @param uuid
-     * @param contactId
+     * @param qrCodeUuid
      * @return
      */
     @DELETE
     @TokenRequired
-    @Path("/accounts/{uuid}/contacts/{contactId}")
+    @Path("/accounts/{uuid}/contacts/{qrCodeUuid}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("contactId") String contactId) {
-        ObjectId oid = new ObjectId(contactId);
-        dsObj.delete(Contact.class, oid);
+    public Response deleteAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid) {
+        User u = dsObj.get(User.class, uuid);
+        Contact modifiedContact = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", u).get();
+        dsObj.delete(Contact.class, modifiedContact.getId());
         return Response.ok().build();
     }
 

@@ -18,8 +18,10 @@ public class Contact {
     @Reference
     private User providerUser;
     private String nickName;
+    private Boolean isFree;
     private String availableStartTime;
     private String availableEndTime;
+    private String qrCodeUuid;
     @Reference
     private Icon customerIcon;
 
@@ -123,6 +125,34 @@ public class Contact {
      */
     public void setProviderUser(User providerUser) {
         this.providerUser = providerUser;
+    }
+
+    /**
+     * @return the isFree
+     */
+    public Boolean getIsFree() {
+        return isFree;
+    }
+
+    /**
+     * @param isFree the isFree to set
+     */
+    public void setIsFree(Boolean isFree) {
+        this.isFree = isFree;
+    }
+
+    /**
+     * @return the qrCodeUuid
+     */
+    public String getQrCodeUuid() {
+        return qrCodeUuid;
+    }
+
+    /**
+     * @param qrCodeUuid the qrCodeUuid to set
+     */
+    public void setQrCodeUuid(String qrCodeUuid) {
+        this.qrCodeUuid = qrCodeUuid;
     }
 
 }
