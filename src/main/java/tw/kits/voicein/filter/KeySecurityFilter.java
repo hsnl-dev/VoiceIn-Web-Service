@@ -1,6 +1,7 @@
 package tw.kits.voicein.filter;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.logging.Logger;
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -17,6 +18,15 @@ import tw.kits.voicein.bean.ErrorMessageBean;
 @Priority(Priorities.AUTHORIZATION)
 public class KeySecurityFilter implements ContainerRequestFilter{
     private final static Logger log = Logger.getLogger("tw.kits.voicein.filter.KeySecurityFilter");
+    private final static HashMap<String,String> keystore;
+    static{
+        log.info("initiate key store");
+        keystore = new HashMap<String,String>();
+        keystore.put("784a48e7-a15f-4623-916a-1bd304dc9f56", "android-client");
+        keystore.put("f4c34db9-c4f8-4356-9442-51ece7adca67", "iOS-client");
+        keystore.put("def278b0-4414-4914-8337-31d9a0b43082", "web-client");
+    
+    }
     @Override
     public void filter(ContainerRequestContext crc) throws IOException {
         if ("api/v1/".equals(crc.getUriInfo().getPath())) {
