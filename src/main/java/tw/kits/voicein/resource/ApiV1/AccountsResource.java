@@ -42,7 +42,6 @@ import javax.ws.rs.core.SecurityContext;
 import org.mongodb.morphia.Key;
 import org.mongodb.morphia.query.UpdateOperations;
 import tw.kits.voicein.bean.ErrorMessageBean;
-import static tw.kits.voicein.resource.ApiV1.AccountsResource.LOGGER;
 import tw.kits.voicein.util.ImageProceesor;
 import tw.kits.voicein.util.TokenRequired;
 
@@ -71,6 +70,7 @@ public class AccountsResource {
      * @return
      */
     @DELETE
+    @TokenRequired
     @Path("/accounts/{uuid}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteUserAccount(@PathParam("uuid") String uuid) {
@@ -94,6 +94,7 @@ public class AccountsResource {
      * @return response to the client
      */
     @PUT
+    @TokenRequired
     @Path("/accounts/{uuid}")
     @Consumes(MediaType.APPLICATION_JSON)
     //@Produces(MediaType.APPLICATION_JSON)
@@ -118,6 +119,7 @@ public class AccountsResource {
      * @return User
      */
     @GET
+    @TokenRequired
     @Path("/accounts/{uuid}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -143,6 +145,7 @@ public class AccountsResource {
      * @throws java.io.IOException
      */
     @POST
+    @TokenRequired
     @Path("/accounts/{uuid}/calls")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -165,6 +168,7 @@ public class AccountsResource {
      * @return
      */
     @GET
+    @TokenRequired
     @Path("/accounts/{uuid}/contacts")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -189,6 +193,7 @@ public class AccountsResource {
      * @return
      */
     @POST
+    @TokenRequired
     @Path("/accounts/{uuid}/contacts")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -209,6 +214,7 @@ public class AccountsResource {
      * @return
      */
     @PUT
+    @TokenRequired
     @Path("/accounts/{uuid}/contacts/{contactId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("contactId") String contactId, Contact contact) {
@@ -226,6 +232,7 @@ public class AccountsResource {
      * @return
      */
     @DELETE
+    @TokenRequired
     @Path("/accounts/{uuid}/contacts/{contactId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("contactId") String contactId) {
@@ -241,6 +248,7 @@ public class AccountsResource {
      * @return
      */
     @POST
+    @TokenRequired
     @Path("/accounts/{uuid}/qrcode")
     @Produces(MediaType.APPLICATION_JSON)
     public Response generateQRCode(@PathParam("uuid") String uuid) {
@@ -270,6 +278,7 @@ public class AccountsResource {
      * @throws java.io.IOException
      */
     @GET
+    @TokenRequired
     @Path("/accounts/{uuid}/qrcode")
     @Produces("image/png")
     public Response getAccountQRCode(@PathParam("uuid") String uuid) throws IOException {
@@ -343,7 +352,6 @@ public class AccountsResource {
                                 onefile
                         )
                 );
-
             }
             if (oldId != null) {
                 //delete old
@@ -353,7 +361,6 @@ public class AccountsResource {
 
                 }
             }
-
             LOGGER.log(Level.INFO, String.format("file update" + "ok" + tmpDir + "/" + photoUuid));
             UpdateOperations<User> upo = dsObj.createUpdateOperations(User.class).set("profilePhotoId", photoUuid);
             dsObj.update(key, upo);
@@ -380,6 +387,7 @@ public class AccountsResource {
      * @return
      * @throws IOException
      */
+    @TokenRequired
     @GET
     @Path("/accounts/{uuid}/avatar")
     @Produces("image/jpg")
