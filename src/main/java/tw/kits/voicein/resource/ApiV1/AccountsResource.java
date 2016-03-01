@@ -189,18 +189,28 @@ public class AccountsResource {
      * This API allows user to add a contact.
      * API By Calvin
      * @param uuid
+     * @param qrCodeUuid
      * @param contact
      * @return
      */
     @POST
     @TokenRequired
-    @Path("/accounts/{uuid}/contacts")
+    @Path("/accounts/{uuid}/contacts/{qrCodeUuid}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createNewContactofAnUser(@PathParam("uuid") String uuid, Contact contact) {
+    public Response createNewContactofAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, Contact contact) {      
         User refUser = dsObj.get(User.class, uuid);
+        List<User> users = dsObj.createQuery(User.class).field("qrCodeUuid").equal(qrCodeUuid).asList();
+        
+        if (users.size() != 1) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        
+        User provider = users.get(0); 
+        
         contact.setUser(refUser);
-
+        contact.setProviderUser(provider);
+        
         dsObj.save(contact);
         return Response.ok().build();
     }
