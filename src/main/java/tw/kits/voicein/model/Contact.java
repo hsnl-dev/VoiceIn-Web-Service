@@ -20,6 +20,7 @@ public class Contact {
     private User user;
     @Reference
     private User providerUser;
+    @NotNull
     private String nickName;
     @NotNull
     @Min(0)

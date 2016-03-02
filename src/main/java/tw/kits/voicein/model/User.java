@@ -16,12 +16,18 @@ public class User {
     private String userName;
     @NotNull
     private String phoneNumber;
+    @NotNull
     private String location;
+    @NotNull
     private String profile;
+    @NotNull
     private String company;
+    @NotNull
     private String profilePhotoId;
     private String qrCodeUuid;
+    @NotNull
     private String availableStartTime;
+    @NotNull
     private String availableEndTime;
     
 
