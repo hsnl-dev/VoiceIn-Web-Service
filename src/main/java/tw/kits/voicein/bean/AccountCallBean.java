@@ -1,12 +1,15 @@
 package tw.kits.voicein.bean;
 
+import javax.validation.constraints.NotNull;
+
 /**
  *
  * @author Calvin
  */
 public class AccountCallBean {
-
+    @NotNull
     private String callee;
+    @NotNull
     private String caller;
 
     /**
