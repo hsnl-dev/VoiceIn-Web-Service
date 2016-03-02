@@ -22,7 +22,6 @@ public class User {
     private String profile;
     @NotNull
     private String company;
-    @NotNull
     private String profilePhotoId;
     private String qrCodeUuid;
     @NotNull
