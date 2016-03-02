@@ -1,5 +1,7 @@
 package tw.kits.voicein.model;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.*;
@@ -20,11 +22,15 @@ public class Contact {
     private User providerUser;
     private String nickName;
     @NotNull
-    private Boolean isFree;
+    @Min(0)
+    @Max(2)
+    private int chargeType;
     @NotNull
     private String availableStartTime;
     @NotNull
     private String availableEndTime;
+    @NotNull
+    private Boolean isEnable;
     private String qrCodeUuid;
     @Reference
     private Icon customerIcon;
@@ -132,20 +138,6 @@ public class Contact {
     }
 
     /**
-     * @return the isFree
-     */
-    public Boolean getIsFree() {
-        return isFree;
-    }
-
-    /**
-     * @param isFree the isFree to set
-     */
-    public void setIsFree(Boolean isFree) {
-        this.isFree = isFree;
-    }
-
-    /**
      * @return the qrCodeUuid
      */
     public String getQrCodeUuid() {
@@ -157,6 +149,34 @@ public class Contact {
      */
     public void setQrCodeUuid(String qrCodeUuid) {
         this.qrCodeUuid = qrCodeUuid;
+    }
+
+    /**
+     * @return the chargeType
+     */
+    public int getChargeType() {
+        return chargeType;
+    }
+
+    /**
+     * @param chargeType the chargeType to set
+     */
+    public void setChargeType(int chargeType) {
+        this.chargeType = chargeType;
+    }
+
+    /**
+     * @return the isEnable
+     */
+    public Boolean getIsEnable() {
+        return isEnable;
+    }
+
+    /**
+     * @param isEnable the isEnable to set
+     */
+    public void setIsEnable(Boolean isEnable) {
+        this.isEnable = isEnable;
     }
 
 }
