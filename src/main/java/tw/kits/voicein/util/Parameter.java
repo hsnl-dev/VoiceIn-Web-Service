@@ -11,5 +11,5 @@ public interface Parameter {
     public static final AWSCredentials AWS_CREDENTIALS = new BasicAWSCredentials("AKIAI4RNBMGTLTP6HWFQ", "bKOJ+9emilF2cZIK+44bRBoRHpPxyJmfc7y+VpFe");
     public static final String DB_NAME = "voicein";
     public final static String DB_URI = "mongodb://hsnl-dev:hsnl33564hsnl33564@ds013908.mongolab.com:13908/voicein";
-
+    public static final Boolean IS_SANDBOX = true;
 }

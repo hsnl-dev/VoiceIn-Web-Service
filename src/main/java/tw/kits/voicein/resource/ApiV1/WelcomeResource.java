@@ -11,10 +11,9 @@ import tw.kits.voicein.util.TokenRequired;
 public class WelcomeResource {
     @GET
     @Path("/")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_HTML)
     public String index() {
-        return "<center>Voicein API Version: V1.<br/> 2016 built by Henry Chang and Calvin Jeng</center>";
-        
+        return "<center>VoiceIn API Version: V1.<br/> 2016 built by Henry Chang and Calvin Jeng</center>";
     }
     
 }

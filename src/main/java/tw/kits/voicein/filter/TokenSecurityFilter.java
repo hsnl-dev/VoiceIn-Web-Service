@@ -15,9 +15,8 @@ import org.mongodb.morphia.Datastore;
 import tw.kits.voicein.bean.ErrorMessageBean;
 import tw.kits.voicein.model.Token;
 import tw.kits.voicein.util.MongoManager;
+import tw.kits.voicein.util.Parameter;
 import tw.kits.voicein.util.TokenRequired;
-
-
 
 /**
  *
@@ -26,28 +25,26 @@ import tw.kits.voicein.util.TokenRequired;
 @TokenRequired
 @Provider
 @Priority(Priorities.HEADER_DECORATOR)
-public class TokenSecurityFilter implements ContainerRequestFilter{
+public class TokenSecurityFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext crc) throws IOException {
         Datastore ds = MongoManager.getInstatnce().getDs();
         String token = crc.getHeaderString("token");
         final Token tm2 = ds.get(Token.class, token);
-        
-        
-        
-        if (tm2 == null) {
-            
+
+        if (tm2 == null && !Parameter.IS_SANDBOX) {
+
             ErrorMessageBean errMsg = new ErrorMessageBean();
             errMsg.setErrorReason("Your code is not correct");
             crc.abortWith(
                     Response.status(Status.UNAUTHORIZED)
-                            .type(MediaType.APPLICATION_JSON)
-                            .entity(errMsg)
-                            .build()
+                    .type(MediaType.APPLICATION_JSON)
+                    .entity(errMsg)
+                    .build()
             );
         }
-        
+
         crc.setSecurityContext(new SecurityContext() {
             @Override
             public Principal getUserPrincipal() {
@@ -61,7 +58,7 @@ public class TokenSecurityFilter implements ContainerRequestFilter{
 
             @Override
             public boolean isUserInRole(String string) {
-               return false;
+                return false;
             }
 
             @Override
@@ -74,6 +71,6 @@ public class TokenSecurityFilter implements ContainerRequestFilter{
                 return null;
             }
         });
-        
-    }   
+
+    }
 }

@@ -1,5 +1,6 @@
 package tw.kits.voicein.model;
 
+import javax.validation.constraints.NotNull;
 import org.mongodb.morphia.annotations.*;
 
 /**
@@ -11,7 +12,9 @@ public class User {
 
     @Id
     private String uuid;
+    @NotNull
     private String userName;
+    @NotNull
     private String phoneNumber;
     private String location;
     private String profile;

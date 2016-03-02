@@ -14,7 +14,6 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import tw.kits.voicein.util.MongoManager;
 import org.mongodb.morphia.Datastore;
-import org.bson.types.ObjectId;
 import tw.kits.voicein.bean.AccountCallBean;
 
 import tw.kits.voicein.model.User;
@@ -36,6 +35,7 @@ import java.io.File;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.servlet.annotation.MultipartConfig;
+import javax.validation.Valid;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
@@ -64,40 +64,41 @@ public class AccountsResource {
     private static final int AVATAR_SMALL = 64;
 
     /**
-     * This API allows user to delete a user account by given UUID.
-     * API By Calvin.
+     * This API allows client to retrieve user's full informations. API By
+     * Calvin
+     *
      * @param uuid
-     * @return
+     * @return User
      */
-    @DELETE
-    @TokenRequired
+    @GET
     @Path("/accounts/{uuid}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response deleteUserAccount(@PathParam("uuid") String uuid) {
-        dsObj.delete(User.class, uuid);
+    @Produces(MediaType.APPLICATION_JSON)
+    @TokenRequired
+    public Response getUserAccount(@PathParam("uuid") String uuid) {
+        User user = dsObj.get(User.class, uuid);
 
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
 
         LOGGER.addHandler(consoleHandler);
-        LOGGER.log(Level.CONFIG, "[Config] Delete user u{0}", uuid);
+        LOGGER.log(Level.CONFIG, "[Config] Get user u{0}", uuid);
 
-        return Response.ok().build();
+        return Response.ok(user).build();
     }
-
+    
     /**
-     * This API allows client to update user's information.
-     * API By Calvin
+     * This API allows client to update user's information. API By Calvin
+     *
      * @param uuid
      * @param u
      * @return response to the client
      */
     @PUT
-    @TokenRequired
     @Path("/accounts/{uuid}")
     @Consumes(MediaType.APPLICATION_JSON)
-    //@Produces(MediaType.APPLICATION_JSON)
-    public Response updateUserAccount(@PathParam("uuid") String uuid, User u) {
+    @TokenRequired
+    public Response updateUserAccount(@PathParam("uuid") String uuid, @Valid User u) {
         u.setUuid(uuid);
         dsObj.save(u);
 
@@ -111,42 +112,42 @@ public class AccountsResource {
     }
 
     /**
-     * This API allows client to retrieve user's full informations.
-     * API By Calvin
+     * This API allows user to delete a user account by given UUID. API By
+     * Calvin.
+     *
      * @param uuid
-     * @return User
+     * @return
      */
-    @GET
-    @TokenRequired
+    @DELETE
     @Path("/accounts/{uuid}")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getUserAccount(@PathParam("uuid") String uuid) {
-        User user = dsObj.get(User.class, uuid);
+    @TokenRequired
+    public Response deleteUserAccount(@PathParam("uuid") String uuid) {
+        dsObj.delete(User.class, uuid);
 
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
 
         LOGGER.addHandler(consoleHandler);
-        LOGGER.log(Level.CONFIG, "[Config] Get user u{0}", uuid);
+        LOGGER.log(Level.CONFIG, "[Config] Delete user u{0}", uuid);
 
-        return Response.ok(user).build();
+        return Response.ok().build();
     }
 
     /**
-     * Call When user click the calling button.
-     * API By Calvin
+     * Call When user click the calling button. API By Calvin
+     *
      * @param uuid
      * @param callBean
      * @return response
      * @throws java.io.IOException
      */
     @POST
-    @TokenRequired
     @Path("/accounts/{uuid}/calls")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response makePhoneCall(@PathParam("uuid") String uuid, AccountCallBean callBean) throws IOException {
+    @TokenRequired
+    public Response makePhoneCall(@PathParam("uuid") String uuid, @Valid AccountCallBean callBean) throws IOException {
         String endPoint = Parameter.API_ROOT + Parameter.API_VER + "Call/test01/generalCallRequest/";
         String caller = callBean.getCaller();
         String callee = callBean.getCallee();
@@ -159,120 +160,147 @@ public class AccountsResource {
     }
 
     /**
-     * This API allows user to get their contact list.
-     * API By Calvin
+     * This API allows user to get their contact list. API By Calvin
+     *
      * @param uuid
      * @return
      */
     @GET
-    @TokenRequired
     @Path("/accounts/{uuid}/contacts")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @TokenRequired
     public Response getContactListOfAnUser(@PathParam("uuid") String uuid) {
         User user = dsObj.get(User.class, uuid);
 
         List<Contact> contactList = dsObj.find(Contact.class).field("user").equal(user).asList();
-        
+
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
         LOGGER.addHandler(consoleHandler);
         LOGGER.log(Level.CONFIG, "[Config] contact length {0}", contactList.size());
-        
+
         List<User> userList = new ArrayList();
-        
+
         for (Contact contact : contactList) {
             userList.add(contact.getProviderUser());
         }
-        
+
         return Response.ok(userList).build();
     }
-
+    
     /**
-     * This API allows user to add a contact.
-     * API By Calvin
-     * @param uuid
-     * @param qrCodeUuid
-     * @param contact
-     * @return
-     */
-    @POST
-    @TokenRequired
-    @Path("/accounts/{uuid}/contacts/{qrCodeUuid}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response createNewContactofAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, Contact contact) {      
-        User refUser = dsObj.get(User.class, uuid);
-        List<User> users = dsObj.createQuery(User.class).field("qrCodeUuid").equal(qrCodeUuid).asList();
-        
-        // user.size() must be 1.
-        if (users.size() == 1) {
-            User provider = users.get(0); 
-        
-            contact.setUser(refUser);
-            contact.setProviderUser(provider);
-            contact.setQrCodeUuid(qrCodeUuid);
-            
-            dsObj.save(contact);
-            return Response.ok().build();
-        } else {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        
-        
-    }
-
-    /**
-     * This API allows client user to update a contact.
-     * API By Calvin
+     * This API allows client user to update a contact. API By Calvin
+     *
      * @param uuid
      * @param qrCodeUuid
      * @param contact
      * @return
      */
     @PUT
-    @TokenRequired
     @Path("/accounts/{uuid}/contacts/{qrCodeUuid}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, Contact contact) {
+    @TokenRequired
+    public Response updateAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, @Valid Contact contact) {
         User u = dsObj.get(User.class, uuid);
         Contact modifiedContact = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", u).get();
-        
+
         contact.setId(modifiedContact.getId());
         contact.setQrCodeUuid(qrCodeUuid);
-        
+
         dsObj.save(contact);
         return Response.ok().build();
     }
 
     /**
-     * This API allows client to delete a contact.
-     * API By Calvin
+     * This API allows user to add a contact. API By Calvin
+     *
+     * @param uuid
+     * @param qrCodeUuid
+     * @param contact
+     * @return
+     */
+    @POST
+    @Path("/accounts/{uuid}/contacts/{qrCodeUuid}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @TokenRequired
+    public Response createNewContactofAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, @Valid Contact contact) {
+        User refUser = dsObj.get(User.class, uuid);
+        List<User> users = dsObj.createQuery(User.class).field("qrCodeUuid").equal(qrCodeUuid).asList();
+
+        // user.size() must be 1.
+        if (users.size() == 1) {
+            User provider = users.get(0);
+
+            contact.setUser(refUser);
+            contact.setProviderUser(provider);
+            contact.setQrCodeUuid(qrCodeUuid);
+
+            dsObj.save(contact);
+            return Response.ok().build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+    }
+
+    /**
+     * This API allows client to delete a contact. API By Calvin
+     *
      * @param uuid
      * @param qrCodeUuid
      * @return
      */
     @DELETE
-    @TokenRequired
     @Path("/accounts/{uuid}/contacts/{qrCodeUuid}")
     @Produces(MediaType.APPLICATION_JSON)
+    @TokenRequired
     public Response deleteAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid) {
         User u = dsObj.get(User.class, uuid);
         Contact modifiedContact = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", u).get();
         dsObj.delete(Contact.class, modifiedContact.getId());
         return Response.ok().build();
     }
+    
+    /**
+     * This API allows client to retrieve their QRCode API By Calvin
+     *
+     * @param uuid
+     * @return
+     * @throws java.io.IOException
+     */
+    @GET
+    @Path("/accounts/{uuid}/qrcode")
+    @Produces("image/png")
+    @TokenRequired
+    public Response getAccountQRCode(@PathParam("uuid") String uuid) throws IOException {
+        // [Testing]
+        byte[] qrCodeData;
+        AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
+        String s3Bucket = "voice-in";
+        String file = String.format("qrCode/%s.png", uuid);
+        GetObjectRequest request = new GetObjectRequest(s3Bucket, file);
+        S3Object object = s3Client.getObject(request);
+        qrCodeData = IOUtils.toByteArray(object.getObjectContent());
+        /*
+        try (FileOutputStream fos = new FileOutputStream("/Volumes/JetDrive/GoogleDrive/Projects/voicein/voicein-api/test.png")) {
+            fos.write(qrCodeData);
+            fos.close();
+        }*/
+        return Response.ok(qrCodeData).build();
+    }
 
     /**
-     * Create user's QRCode by randomized UUID.
-     * API By Calvin
+     * Create user's QRCode by randomized UUID. API By Calvin
+     *
      * @param uuid
      * @return
      */
     @POST
-    @TokenRequired
     @Path("/accounts/{uuid}/qrcode")
     @Produces(MediaType.APPLICATION_JSON)
+    @TokenRequired
     public Response generateQRCode(@PathParam("uuid") String uuid) {
         /**
          * QR Code Generator test*
@@ -293,36 +321,8 @@ public class AccountsResource {
     }
 
     /**
-     * This API allows client to retrieve their QRCode
-     * API By Calvin
-     * @param uuid
-     * @return
-     * @throws java.io.IOException
-     */
-    @GET
-    @TokenRequired
-    @Path("/accounts/{uuid}/qrcode")
-    @Produces("image/png")
-    public Response getAccountQRCode(@PathParam("uuid") String uuid) throws IOException {
-        // [Testing]
-        byte[] qrCodeData;
-        AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
-        String s3Bucket = "voice-in";
-        String file = String.format("qrCode/%s.png", uuid);
-        GetObjectRequest request = new GetObjectRequest(s3Bucket, file);
-        S3Object object = s3Client.getObject(request);
-        qrCodeData = IOUtils.toByteArray(object.getObjectContent());
-        /*
-        try (FileOutputStream fos = new FileOutputStream("/Volumes/JetDrive/GoogleDrive/Projects/voicein/voicein-api/test.png")) {
-            fos.write(qrCodeData);
-            fos.close();
-        }*/
-        return Response.ok(qrCodeData).build();
-    }
-
-    /**
-     * This API allows user to upload avatar
-     * API By Henry
+     * This API allows user to upload avatar API By Henry
+     *
      * @param sc
      * @param fileInputStream
      * @param header
@@ -331,10 +331,10 @@ public class AccountsResource {
      * @throws java.io.IOException
      */
     @POST
-    @TokenRequired
     @Path("/accounts/{uuid}/avatar")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
+    @TokenRequired
     public Response uploadAvatar(
             @Context SecurityContext sc,
             @NotNull @FormDataParam("photo") InputStream fileInputStream,
@@ -401,18 +401,19 @@ public class AccountsResource {
     }
 
     /**
-     * This API allows user to retrieve user's avatar by user's UUID.
-     * API By Henry
+     * This API allows user to retrieve user's avatar by user's UUID. API By
+     * Henry
+     *
      * @param uuid
      * @param sc
      * @param size
      * @return
      * @throws IOException
      */
-    @TokenRequired
     @GET
     @Path("/accounts/{uuid}/avatar")
     @Produces("image/jpg")
+    @TokenRequired
     public Response getAccountAvatar(@PathParam("uuid") String uuid,
             @Context SecurityContext sc,
             @QueryParam("size") String size) throws IOException {
@@ -424,8 +425,9 @@ public class AccountsResource {
     }
 
     /**
-     * This API allows user to retrieve user's avatar by UUID of avatar.
-     * API By Henry
+     * This API allows user to retrieve user's avatar by UUID of avatar. API By
+     * Henry
+     *
      * @param uuid
      * @param sc
      * @param size

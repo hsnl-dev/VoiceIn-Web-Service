@@ -1,5 +1,6 @@
 package tw.kits.voicein.model;
 
+import javax.validation.constraints.NotNull;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.*;
 
@@ -18,8 +19,11 @@ public class Contact {
     @Reference
     private User providerUser;
     private String nickName;
+    @NotNull
     private Boolean isFree;
+    @NotNull
     private String availableStartTime;
+    @NotNull
     private String availableEndTime;
     private String qrCodeUuid;
     @Reference
