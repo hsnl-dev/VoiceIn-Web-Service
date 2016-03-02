@@ -99,7 +99,12 @@ public class AccountsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response updateUserAccount(@PathParam("uuid") String uuid, @Valid User u) {
+        User modifiedUser = dsObj.get(User.class, uuid);
+        
         u.setUuid(uuid);
+        u.setProfilePhotoId(modifiedUser.getProfilePhotoId());
+        u.setQrCodeUuid(modifiedUser.getQrCodeUuid());
+        
         dsObj.save(u);
 
         LOGGER.setLevel(Level.ALL);
@@ -207,6 +212,9 @@ public class AccountsResource {
 
         contact.setId(modifiedContact.getId());
         contact.setQrCodeUuid(qrCodeUuid);
+        contact.setCustomerIcon(modifiedContact.getCustomerIcon());
+        contact.setProviderUser(modifiedContact.getProviderUser());
+        contact.setUser(u);
 
         dsObj.save(contact);
         return Response.ok().build();
