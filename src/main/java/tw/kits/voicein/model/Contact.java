@@ -1,0 +1,183 @@
+package tw.kits.voicein.model;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.*;
+
+/**
+ *
+ * @author Calvin
+ */
+@Entity("contacts")
+public class Contact {
+    //Field
+
+    @Id
+    private ObjectId id;
+    @Reference
+    private User user;
+    @Reference
+    private User providerUser;
+    @NotNull
+    private String nickName;
+    @NotNull
+    @Min(0)
+    @Max(2)
+    private int chargeType;
+    @NotNull
+    private String availableStartTime;
+    @NotNull
+    private String availableEndTime;
+    @NotNull
+    private Boolean isEnable;
+    private String qrCodeUuid;
+    @Reference
+    private Icon customerIcon;
+
+    public Contact() {
+
+    }
+
+    /**
+     * @return the user
+     */
+    public User getUser() {
+        return user;
+    }
+
+    /**
+     * @param user the user to set
+     */
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    /**
+     * @return the nickName
+     */
+    public String getNickName() {
+        return nickName;
+    }
+
+    /**
+     * @param nickName the nickName to set
+     */
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    /**
+     * @return the id
+     */
+    public ObjectId getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(ObjectId id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the customerIcon
+     */
+    public Icon getCustomerIcon() {
+        return customerIcon;
+    }
+
+    /**
+     * @param customerIcon the customerIcon to set
+     */
+    public void setCustomerIcon(Icon customerIcon) {
+        this.customerIcon = customerIcon;
+    }
+
+    /**
+     * @return the availableStartTime
+     */
+    public String getAvailableStartTime() {
+        return availableStartTime;
+    }
+
+    /**
+     * @param availableStartTime the availableStartTime to set
+     */
+    public void setAvailableStartTime(String availableStartTime) {
+        this.availableStartTime = availableStartTime;
+    }
+
+    /**
+     * @return the availableEndTime
+     */
+    public String getAvailableEndTime() {
+        return availableEndTime;
+    }
+
+    /**
+     * @param availableEndTime the availableEndTime to set
+     */
+    public void setAvailableEndTime(String availableEndTime) {
+        this.availableEndTime = availableEndTime;
+    }
+
+    /**
+     * @return the providerUser
+     */
+    public User getProviderUser() {
+        return providerUser;
+    }
+
+    /**
+     * @param providerUser the providerUser to set
+     */
+    public void setProviderUser(User providerUser) {
+        this.providerUser = providerUser;
+    }
+
+    /**
+     * @return the qrCodeUuid
+     */
+    public String getQrCodeUuid() {
+        return qrCodeUuid;
+    }
+
+    /**
+     * @param qrCodeUuid the qrCodeUuid to set
+     */
+    public void setQrCodeUuid(String qrCodeUuid) {
+        this.qrCodeUuid = qrCodeUuid;
+    }
+
+    /**
+     * @return the chargeType
+     */
+    public int getChargeType() {
+        return chargeType;
+    }
+
+    /**
+     * @param chargeType the chargeType to set
+     */
+    public void setChargeType(int chargeType) {
+        this.chargeType = chargeType;
+    }
+
+    /**
+     * @return the isEnable
+     */
+    public Boolean getIsEnable() {
+        return isEnable;
+    }
+
+    /**
+     * @param isEnable the isEnable to set
+     */
+    public void setIsEnable(Boolean isEnable) {
+        this.isEnable = isEnable;
+    }
+
+}
