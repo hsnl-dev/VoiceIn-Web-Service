@@ -97,6 +97,7 @@ public class AccountsResource {
     @PUT
     @Path("/accounts/{uuid}")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response updateUserAccount(@PathParam("uuid") String uuid, @Valid User u) {
         User modifiedUser = dsObj.get(User.class, uuid);
@@ -126,6 +127,7 @@ public class AccountsResource {
     @DELETE
     @Path("/accounts/{uuid}")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response deleteUserAccount(@PathParam("uuid") String uuid) {
         dsObj.delete(User.class, uuid);
@@ -204,6 +206,7 @@ public class AccountsResource {
      */
     @PUT
     @Path("/accounts/{uuid}/contacts/{qrCodeUuid}")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response updateAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, @Valid Contact contact) {
@@ -262,6 +265,7 @@ public class AccountsResource {
      */
     @DELETE
     @Path("/accounts/{uuid}/contacts/{qrCodeUuid}")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response deleteAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid) {
@@ -307,6 +311,7 @@ public class AccountsResource {
      */
     @POST
     @Path("/accounts/{uuid}/qrcode")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response generateQRCode(@PathParam("uuid") String uuid) {
