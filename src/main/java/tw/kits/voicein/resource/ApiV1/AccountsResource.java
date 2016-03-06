@@ -88,7 +88,8 @@ public class AccountsResource {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         User user = dsObj.get(User.class, uuid);
-        
+        if(user==null)
+            return Response.status(Status.NOT_FOUND).build();
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
 
