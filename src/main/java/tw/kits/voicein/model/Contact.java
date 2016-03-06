@@ -22,9 +22,8 @@ public class Contact {
     private User providerUser;
     @NotNull
     private String nickName;
-    @NotNull
     @Min(0)
-    @Max(2)
+    @NotNull
     private int chargeType;
     @NotNull
     private String availableStartTime;

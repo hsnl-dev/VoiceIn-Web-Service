@@ -39,6 +39,7 @@ import javax.validation.Valid;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
+import org.bson.types.ObjectId;
 import org.mongodb.morphia.Key;
 import org.mongodb.morphia.query.UpdateOperations;
 import tw.kits.voicein.bean.ErrorMessageBean;
@@ -239,7 +240,12 @@ public class AccountsResource {
     public Response createNewContactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, @NotNull @Valid Contact contact) {
         User refUser = dsObj.get(User.class, uuid);
         List<User> users = dsObj.createQuery(User.class).field("qrCodeUuid").equal(qrCodeUuid).asList();
-
+        
+        LOGGER.setLevel(Level.ALL);
+        consoleHandler.setLevel(Level.CONFIG);
+        
+        LOGGER.addHandler(consoleHandler);
+        LOGGER.log(Level.CONFIG, "[Config] Save a contact.");
         // user.size() must be 1.
         if (users.size() == 1) {
             User provider = users.get(0);
@@ -253,6 +259,7 @@ public class AccountsResource {
                 dsObj.save(contact);
 
                 // the contact of the provider side.
+                contact.setId(new ObjectId());
                 contact.setUser(provider);
                 contact.setProviderUser(refUser);
                 contact.setQrCodeUuid(qrCodeUuid);
