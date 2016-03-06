@@ -236,19 +236,39 @@ public class AccountsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
-    public Response createNewContactofAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, @Valid Contact contact) {
+    public Response createNewContactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, @NotNull @Valid Contact contact) {
         User refUser = dsObj.get(User.class, uuid);
         List<User> users = dsObj.createQuery(User.class).field("qrCodeUuid").equal(qrCodeUuid).asList();
 
         // user.size() must be 1.
         if (users.size() == 1) {
             User provider = users.get(0);
+            if (contact.getChargeType() != 0) { 
+                // the contact of the scanner side.
+                contact.setUser(refUser);
+                contact.setProviderUser(provider);
+                contact.setQrCodeUuid(qrCodeUuid);
+                contact.setIsEnable(true);
+                contact.setChargeType(1);
+                dsObj.save(contact);
 
-            contact.setUser(refUser);
-            contact.setProviderUser(provider);
-            contact.setQrCodeUuid(qrCodeUuid);
-
-            dsObj.save(contact);
+                // the contact of the provider side.
+                contact.setUser(provider);
+                contact.setProviderUser(refUser);
+                contact.setQrCodeUuid(qrCodeUuid);
+                contact.setIsEnable(true);
+                contact.setChargeType(2);
+                dsObj.save(contact);
+            } else {
+                // icon
+                contact.setUser(provider);
+                contact.setProviderUser(refUser);
+                contact.setQrCodeUuid(qrCodeUuid);
+                contact.setIsEnable(true);
+                contact.setChargeType(0);
+                dsObj.save(contact);
+            } 
+               
             return Response.ok().build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).build();
