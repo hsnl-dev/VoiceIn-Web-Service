@@ -358,6 +358,11 @@ public class AccountsResource {
          * QR Code Generator test*
          */
         User u = dsObj.get(User.class, uuid);
+                
+        if (u.getQrCodeUuid() != null) {
+            return Response.notModified().build();
+        }
+        
         String s3Bucket = "voice-in";
         String s3FilePath = String.format("qrCode/%s.png", uuid);
         String qrCodeUuid = UUID.randomUUID().toString();
