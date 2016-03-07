@@ -54,16 +54,24 @@ import tw.kits.voicein.util.TokenRequired;
 @MultipartConfig(maxFileSize = 1024 * 1024 * 1)
 @Path("/api/v1")
 public class AccountsResource {
-
+    @Context SecurityContext context;
     static final Logger LOGGER = Logger.getLogger(AccountsResource.class.getName());
-
+    
     ConsoleHandler consoleHandler = new ConsoleHandler();
     MongoManager mongoManager = MongoManager.getInstatnce();
     Datastore dsObj = mongoManager.getDs();
     private static final int AVATAR_LARGE = 256;
     private static final int AVATAR_MID = 128;
     private static final int AVATAR_SMALL = 64;
-
+    public boolean isUserMatchToken(String userUuid){
+        String tokenUserUuid = context.getUserPrincipal().getName();
+        LOGGER.info(userUuid);
+        LOGGER.info(":"+tokenUserUuid);
+        if(tokenUserUuid.equals(userUuid))
+            return true;
+        else
+            return false;
+    }
     /**
      * This API allows client to retrieve user's full informations. API By
      * Calvin
@@ -77,8 +85,12 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response getUserAccount(@PathParam("uuid") String uuid) {
+        if(!isUserMatchToken(uuid)){
+            return Response.status(Status.UNAUTHORIZED).build();
+        }
         User user = dsObj.get(User.class, uuid);
-
+        if(user==null)
+            return Response.status(Status.NOT_FOUND).build();
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
 
@@ -210,7 +222,7 @@ public class AccountsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
-    public Response updateAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, @Valid Contact contact) {
+    public Response updateAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, @NotNull @Valid Contact contact) {
         User u = dsObj.get(User.class, uuid);
         Contact modifiedContact = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", u).get();
 
