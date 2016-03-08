@@ -264,6 +264,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>2.6</version>
                 <configuration>
+                    <finalName>${project.artifactId}</finalName>
                     <archiveClasses>true</archiveClasses>
                     <webResources>
                         <!-- in order to interpolate version from pom into appengine-web.xml -->
