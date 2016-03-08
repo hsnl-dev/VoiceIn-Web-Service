@@ -7,7 +7,7 @@
     <version>1.0</version>
 
     <groupId>tw.kits.voicein</groupId>
-    <artifactId>webservice</artifactId>
+    <artifactId>ROOT</artifactId>
 
     <properties>
         <app.id>voicein-api-service</app.id>
