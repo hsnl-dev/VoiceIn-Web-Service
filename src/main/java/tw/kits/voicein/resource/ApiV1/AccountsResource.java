@@ -336,6 +336,7 @@ public class AccountsResource {
                 contact.setProviderUser(owner);
                 contact.setQrCodeUuid(qrCodeUuid);
                 contact.setIsEnable(true);
+                contact.setNickName("");
                 contact.setChargeType(2);
                 dsObj.save(contact);
             } else {
@@ -369,9 +370,10 @@ public class AccountsResource {
     @TokenRequired
     public Response deleteAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid) {
         User user = dsObj.get(User.class, uuid);
-        User provider = dsObj.createQuery(User.class).field("qrCodeUuid").equal(qrCodeUuid).asList().get(0);
 
         Contact payContact = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", user).get();
+        
+        User provider = payContact.getProviderUser();
         Contact freeContact = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", provider).get();
 
         dsObj.delete(Contact.class, payContact.getId());
