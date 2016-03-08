@@ -250,20 +250,28 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response createNewContactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, @NotNull @Valid Contact contact) {
-        User refUser = dsObj.get(User.class, uuid);
-        List<User> users = dsObj.createQuery(User.class).field("qrCodeUuid").equal(qrCodeUuid).asList();
+        User owner = dsObj.get(User.class, uuid);
+        List<User> providers = dsObj.createQuery(User.class).field("qrCodeUuid").equal(qrCodeUuid).asList();
         
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
         
         LOGGER.addHandler(consoleHandler);
         LOGGER.log(Level.CONFIG, "[Config] Save a contact.");
+        
+        List<Contact> contacts = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", owner).asList();
+        
+        if (contacts.size() > 0) {
+            // Owner has already add the provider as friend.
+            return Response.notModified().build();
+        }
+        
         // user.size() must be 1.
-        if (users.size() == 1) {
-            User provider = users.get(0);
+        if (providers.size() == 1) {
+            User provider = providers.get(0);
             if (contact.getChargeType() != 0) { 
                 // the contact of the scanner side.
-                contact.setUser(refUser);
+                contact.setUser(owner);
                 contact.setProviderUser(provider);
                 contact.setQrCodeUuid(qrCodeUuid);
                 contact.setIsEnable(true);
@@ -273,7 +281,7 @@ public class AccountsResource {
                 // the contact of the provider side.
                 contact.setId(new ObjectId());
                 contact.setUser(provider);
-                contact.setProviderUser(refUser);
+                contact.setProviderUser(owner);
                 contact.setQrCodeUuid(qrCodeUuid);
                 contact.setIsEnable(true);
                 contact.setChargeType(2);
@@ -281,7 +289,7 @@ public class AccountsResource {
             } else {
                 // icon
                 contact.setUser(provider);
-                contact.setProviderUser(refUser);
+                contact.setProviderUser(owner);
                 contact.setQrCodeUuid(qrCodeUuid);
                 contact.setIsEnable(true);
                 contact.setChargeType(0);
@@ -308,9 +316,14 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response deleteAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid) {
-        User u = dsObj.get(User.class, uuid);
-        Contact modifiedContact = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", u).get();
-        dsObj.delete(Contact.class, modifiedContact.getId());
+        User user = dsObj.get(User.class, uuid);
+        User provider = dsObj.createQuery(User.class).field("qrCodeUuid").equal(qrCodeUuid).asList().get(0);
+
+        Contact payContact = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", user).get();
+        Contact freeContact = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", provider).get();
+
+        dsObj.delete(Contact.class, payContact.getId());
+        dsObj.delete(Contact.class, freeContact.getId());
         return Response.ok().build();
     }
     
