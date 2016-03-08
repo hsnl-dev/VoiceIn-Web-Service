@@ -43,6 +43,7 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.Key;
 import org.mongodb.morphia.query.UpdateOperations;
 import tw.kits.voicein.bean.ErrorMessageBean;
+import tw.kits.voicein.bean.UserContactBean;
 import tw.kits.voicein.util.ImageProceesor;
 import tw.kits.voicein.util.TokenRequired;
 
@@ -200,10 +201,29 @@ public class AccountsResource {
         LOGGER.addHandler(consoleHandler);
         LOGGER.log(Level.CONFIG, "[Config] contact length {0}", contactList.size());
 
-        List<User> userList = new ArrayList();
-
+        List<UserContactBean> userList = new ArrayList();
+        UserContactBean userContactBean; 
+                
         for (Contact contact : contactList) {
-            userList.add(contact.getProviderUser());
+            userContactBean = new UserContactBean();
+            User provider = contact.getProviderUser();
+            
+            userContactBean.setCompany(provider.getCompany());
+            userContactBean.setUserName(provider.getUserName());
+            userContactBean.setLocation(provider.getLocation());
+            userContactBean.setCompany(provider.getCompany());
+            userContactBean.setProfile(provider.getProfile());
+            userContactBean.setPhoneNumber(provider.getPhoneNumber());
+            userContactBean.setProfilePhotoId(provider.getProfilePhotoId());
+            userContactBean.setAvailableEndTime(contact.getAvailableEndTime());
+            userContactBean.setChargeType(contact.getChargeType());
+            userContactBean.setAvailableStartTime(contact.getAvailableStartTime());
+            userContactBean.setIsEnable(contact.getIsEnable());
+            userContactBean.setCustomerIcon(contact.getCustomerIcon());
+            userContactBean.setNickName(contact.getNickName());
+            userContactBean.setQrCodeUuid(contact.getQrCodeUuid());
+            
+            userList.add(userContactBean);
         }
 
         return Response.ok(userList).build();
@@ -214,7 +234,10 @@ public class AccountsResource {
      *
      * @param uuid
      * @param qrCodeUuid
-     * @param contact
+     * @param nickName
+     * @param availableStartTime
+     * @param availableEndTime
+     * @param isEnable
      * @return
      */
     @PUT
@@ -222,17 +245,46 @@ public class AccountsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
-    public Response updateAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, @NotNull @Valid Contact contact) {
+    public Response updateAcontactOfAnUser(
+                @PathParam("uuid") String uuid, 
+                @PathParam("qrCodeUuid") String qrCodeUuid, 
+                @QueryParam("nickName") String nickName,
+                @QueryParam("availableStartTime") String availableStartTime,
+                @QueryParam("availableEndTime") String availableEndTime,
+                @QueryParam("isEnable") String isEnable
+            ) {
         User u = dsObj.get(User.class, uuid);
         Contact modifiedContact = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", u).get();
+        
+        LOGGER.setLevel(Level.ALL);
+        consoleHandler.setLevel(Level.CONFIG);
+        
+        LOGGER.addHandler(consoleHandler);
+        
+        LOGGER.log(Level.CONFIG, "[Config] Save a contact.{0}", nickName);
 
-        contact.setId(modifiedContact.getId());
-        contact.setQrCodeUuid(qrCodeUuid);
-        contact.setCustomerIcon(modifiedContact.getCustomerIcon());
-        contact.setProviderUser(modifiedContact.getProviderUser());
-        contact.setUser(u);
+        if (nickName != null) {
+            modifiedContact.setNickName(nickName);
+        }
+        
+        if (isEnable != null) {
+            if (isEnable.equalsIgnoreCase("true")) {
+                modifiedContact.setIsEnable(true);
+            } else {
+                modifiedContact.setIsEnable(false);
+            }
+            
+        }
+        
+        if (availableStartTime != null) {
+            modifiedContact.setAvailableStartTime(availableStartTime);
+        }
+        
+        if (availableEndTime != null) {
+            modifiedContact.setAvailableEndTime(availableEndTime);
+        }
 
-        dsObj.save(contact);
+        dsObj.save(modifiedContact);
         return Response.ok().build();
     }
 
