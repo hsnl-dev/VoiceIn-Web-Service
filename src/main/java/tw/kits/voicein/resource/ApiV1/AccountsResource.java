@@ -33,6 +33,7 @@ import net.glxn.qrgen.image.ImageType;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.imageio.ImageIO;
 import javax.servlet.annotation.MultipartConfig;
 import javax.validation.Valid;
@@ -42,8 +43,10 @@ import javax.ws.rs.core.SecurityContext;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Key;
 import org.mongodb.morphia.query.UpdateOperations;
+import tw.kits.voicein.bean.CustomQRcodeCreateBean;
 import tw.kits.voicein.bean.ErrorMessageBean;
 import tw.kits.voicein.bean.UserContactBean;
+import tw.kits.voicein.model.QRcode;
 import tw.kits.voicein.util.ImageProceesor;
 import tw.kits.voicein.util.TokenRequired;
 
@@ -57,7 +60,7 @@ import tw.kits.voicein.util.TokenRequired;
 public class AccountsResource {
     @Context SecurityContext context;
     static final Logger LOGGER = Logger.getLogger(AccountsResource.class.getName());
-    
+//    private String tokenUser = context.getUserPrincipal().getName(); //user id of token
     ConsoleHandler consoleHandler = new ConsoleHandler();
     MongoManager mongoManager = MongoManager.getInstatnce();
     Datastore dsObj = mongoManager.getDs();
@@ -86,9 +89,6 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response getUserAccount(@PathParam("uuid") String uuid) {
-        if(!isUserMatchToken(uuid)){
-            return Response.status(Status.UNAUTHORIZED).build();
-        }
         User user = dsObj.get(User.class, uuid);
         if(user==null)
             return Response.status(Status.NOT_FOUND).build();
@@ -547,7 +547,42 @@ public class AccountsResource {
         }
         return Response.ok(getAvatar(avatarUuid, size)).build();
     }
+    /***
+     * To create special qrcode for user
+     * @param uuid
+     * @param info
+     * @return 
+     */
+    @POST
+    @Path("/accounts/{uuid}/customQrcodes")
+    @Produces(MediaType.APPLICATION_JSON)
+    @TokenRequired
+    public Response createSpecifiedQrcodes(@PathParam("uuid") String uuid, @Valid @NotNull CustomQRcodeCreateBean info){
+        User user = dsObj.get(User.class, context.getUserPrincipal().getName());
+        if(user==null)
+            return Response.status(Status.NOT_FOUND).build();
 
+        String s3Bucket = "voice-in";
+        String qrCodeUuid = UUID.randomUUID().toString();
+        String s3FilePath = String.format("qrCode/%s.png", qrCodeUuid);
+        
+
+        // Generate QRCode Image and Upload to S3.
+        File qrCodeImage = QRCode.from(qrCodeUuid).to(ImageType.PNG).withSize(250, 250).file();
+        AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
+        s3Client.putObject(new PutObjectRequest(s3Bucket, s3FilePath, qrCodeImage));
+        
+        QRcode code = new QRcode();
+        code.setId(qrCodeUuid);
+        code.setPhoneNumber(info.getPhoneNumber());
+        code.setProvider(user);
+        code.setState("enabled");
+        code.setCreatedAt(new Date());
+        code.setUserName(info.getName());
+        
+        dsObj.save(code);
+        return  Response.status(Status.CREATED).build();
+    }
     /**
      * This API allows user to retrieve user's avatar by UUID of avatar. API By
      * Henry
@@ -570,7 +605,9 @@ public class AccountsResource {
         }
         return Response.ok(getAvatar(uuid, size)).build();
     }
-
+    
+    
+    
     private byte[] getAvatar(String avatarUuid, String size) throws IOException {
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
         String s3Bucket = "voice-in";
@@ -589,4 +626,5 @@ public class AccountsResource {
         S3Object object = s3Client.getObject(request);
         return IOUtils.toByteArray(object.getObjectContent());
     }
+    
 }
