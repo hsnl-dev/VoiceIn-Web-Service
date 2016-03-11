@@ -34,7 +34,7 @@ public class TokenSecurityFilter implements ContainerRequestFilter {
         final Token tm2 = ds.get(Token.class, token);
 
         if (tm2 == null && !Parameter.IS_SANDBOX) {
-
+            System.out.println("");
             ErrorMessageBean errMsg = new ErrorMessageBean();
             errMsg.setErrorReason("Your code is not correct");
             crc.abortWith(
