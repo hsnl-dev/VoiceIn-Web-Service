@@ -41,7 +41,6 @@ public class QRcodeResource {
             //following code is to old Account QRcode!! 
             User user = dsObj.createQuery(User.class).field("qrCodeUuid").equal(qrUuid).get();
             if(user==null){
-                System.out.println("sdadsda");
                return Response.status(Response.Status.NOT_FOUND).build();
             }else{ 
                QRcode userCode = new QRcode();
@@ -63,6 +62,10 @@ public class QRcodeResource {
     @Produces("image/png")
     public Response getQRCodeImgById(@PathParam("uuid") String uuid) throws IOException {
         byte[] qrCodeData;
+         QRcode code = dsObj.get(QRcode.class, uuid);
+         if(code==null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+         }
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
         String s3Bucket = "voice-in";
         String file = String.format("qrCode/%s.png", uuid);

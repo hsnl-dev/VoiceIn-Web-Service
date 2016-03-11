@@ -46,7 +46,7 @@ import org.mongodb.morphia.Key;
 import org.mongodb.morphia.query.UpdateOperations;
 import tw.kits.voicein.bean.CustomQRcodeCreateBean;
 import tw.kits.voicein.bean.ErrorMessageBean;
-import tw.kits.voicein.bean.QRCodesNoProviderBean;
+import tw.kits.voicein.bean.QRcodeNoProviderBean;
 import tw.kits.voicein.bean.UserContactBean;
 import tw.kits.voicein.model.QRcode;
 import tw.kits.voicein.util.ImageProceesor;
@@ -577,7 +577,7 @@ public class AccountsResource {
     public Response createSpecifiedQrcodes(@PathParam("uuid") String uuid, @Valid @NotNull CustomQRcodeCreateBean info){
         User user = dsObj.get(User.class, context.getUserPrincipal().getName());
         if(user==null)
-            return Response.status(Status.NOT_FOUND).build();
+            return Response.status(Status.UNAUTHORIZED).build();
 
         String s3Bucket = "voice-in";
         String qrCodeUuid = UUID.randomUUID().toString();
@@ -593,6 +593,7 @@ public class AccountsResource {
         code.setId(qrCodeUuid);
         code.setPhoneNumber(info.getPhoneNumber());
         code.setProvider(user);
+        code.setType(QRcodeType.TYPE_SPECIAL);
         code.setState(QRcodeType.STATE_ENABLED);
         Date date = new Date();
         code.setCreatedAt(date);
@@ -616,10 +617,19 @@ public class AccountsResource {
     public Response getAccountCustomQRcodes(@PathParam("uuid")String uuid){
         String tokenAccount = context.getUserPrincipal().getName();
         Key<User> key = new Key(User.class,"accounts",tokenAccount);
-        List<QRcode> qrcodes= dsObj.createQuery(QRcode.class).field("provider").equal(key).asList();
+        List<QRcode> qrcodes= dsObj.createQuery(QRcode.class)
+                .field("provider")
+                .equal(key)
+                .field("type")
+                .equal(QRcodeType.TYPE_SPECIAL)
+                .asList();
+        List<QRcodeNoProviderBean> res = new ArrayList();
+        for(QRcode code : qrcodes ){
+            res.add(new QRcodeNoProviderBean(code));
+        }
         HashMap<String,Object> response = new HashMap();
         
-        response.put("qrcodes",qrcodes);
+        response.put("qrcodes",res);
         return Response.ok(response).build();
     }
        /***
@@ -638,12 +648,33 @@ public class AccountsResource {
         if(!this.isUserMatchToken(uuid))
             return Response.status(Status.UNAUTHORIZED).build();
         QRcode code= dsObj.get(QRcode.class, qrCode);
-        if(!code.getProvider().getUuid().equals("uuid")){
+        if(!code.getProvider().getUuid().equals(uuid)){
             return Response.status(Status.UNAUTHORIZED).build();
         }
         code.setPhoneNumber(info.getPhoneNumber());
         code.setUserName(info.getName());
         code.setUpdateAt(new Date());
+        dsObj.save(code);
+        return Response.ok().build();
+    }
+    @DELETE
+    @Path("/accounts/{uuid}/customQrcodes/{qrcodeid}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @TokenRequired
+    public Response delAccountCustomQRcodes(@PathParam("uuid")String uuid,@PathParam("qrcodeid") String qrCode){
+        if(!this.isUserMatchToken(uuid))
+            return Response.status(Status.UNAUTHORIZED).build();
+        QRcode code= dsObj.get(QRcode.class, qrCode);
+        if(QRcodeType.TYPE_ACCOUNT.equals(code.getType()) || !code.getProvider().getUuid().equals(uuid)){
+            return Response.status(Status.UNAUTHORIZED).build();
+        }
+        
+        String s3Bucket = "voice-in";
+        String s3FilePath = String.format("qrCode/%s.png", code.getId());
+        AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
+        s3Client.deleteObject(s3Bucket, s3FilePath);
+        dsObj.delete(code);
+        
         return Response.ok().build();
     }
     /**
