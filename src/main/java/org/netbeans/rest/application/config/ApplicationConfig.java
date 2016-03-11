@@ -28,6 +28,7 @@ public class ApplicationConfig extends Application {
         resources.add(tw.kits.voicein.filter.TokenSecurityFilter.class);
         resources.add(tw.kits.voicein.resource.ApiV1.AccountsResource.class);
         resources.add(tw.kits.voicein.resource.ApiV1.IconResource.class);
+        resources.add(tw.kits.voicein.resource.ApiV1.QRcodeResource.class);
         resources.add(tw.kits.voicein.resource.ApiV1.SandboxResource.class);
         resources.add(tw.kits.voicein.resource.ApiV1.TokenResource.class);
         resources.add(tw.kits.voicein.resource.ApiV1.WelcomeResource.class);

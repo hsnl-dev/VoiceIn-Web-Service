@@ -19,6 +19,8 @@ public class QRcode {
     private String phoneNumber;
     private String state;
     private Date createdAt;
+    private Date updateAt;
+    private String type;
 
     /**
      * @return the id
@@ -102,6 +104,34 @@ public class QRcode {
      */
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    /**
+     * @return the updateAt
+     */
+    public Date getUpdateAt() {
+        return updateAt;
+    }
+
+    /**
+     * @param updateAt the updateAt to set
+     */
+    public void setUpdateAt(Date updateAt) {
+        this.updateAt = updateAt;
+    }
+
+    /**
+     * @return the type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(String type) {
+        this.type = type;
     }
     
     

@@ -34,6 +34,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import javax.imageio.ImageIO;
 import javax.servlet.annotation.MultipartConfig;
 import javax.validation.Valid;
@@ -45,9 +46,11 @@ import org.mongodb.morphia.Key;
 import org.mongodb.morphia.query.UpdateOperations;
 import tw.kits.voicein.bean.CustomQRcodeCreateBean;
 import tw.kits.voicein.bean.ErrorMessageBean;
+import tw.kits.voicein.bean.QRCodesNoProviderBean;
 import tw.kits.voicein.bean.UserContactBean;
 import tw.kits.voicein.model.QRcode;
 import tw.kits.voicein.util.ImageProceesor;
+import tw.kits.voicein.util.QRcodeType;
 import tw.kits.voicein.util.TokenRequired;
 
 /**
@@ -396,8 +399,11 @@ public class AccountsResource {
         // [Testing]
         byte[] qrCodeData;
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
+        User user = dsObj.get(User.class, uuid);
+        if(user==null)
+            return Response.status(Status.NOT_FOUND).build();
         String s3Bucket = "voice-in";
-        String file = String.format("qrCode/%s.png", uuid);
+        String file = String.format("qrCode/%s.png", user.getUuid());
         GetObjectRequest request = new GetObjectRequest(s3Bucket, file);
         S3Object object = s3Client.getObject(request);
         qrCodeData = IOUtils.toByteArray(object.getObjectContent());
@@ -431,8 +437,9 @@ public class AccountsResource {
         }
         
         String s3Bucket = "voice-in";
-        String s3FilePath = String.format("qrCode/%s.png", uuid);
         String qrCodeUuid = UUID.randomUUID().toString();
+        String s3FilePath = String.format("qrCode/%s.png", qrCodeUuid);
+        
 
         // Generate QRCode Image and Upload to S3.
         File qrCodeImage = QRCode.from(qrCodeUuid).to(ImageType.PNG).withSize(250, 250).file();
@@ -440,7 +447,16 @@ public class AccountsResource {
         s3Client.putObject(new PutObjectRequest(s3Bucket, s3FilePath, qrCodeImage));
         u.setQrCodeUuid(qrCodeUuid);
         dsObj.save(u);
-
+        // save info to qrcode
+        QRcode code = new QRcode();
+        code.setProvider(u);
+        code.setCreatedAt(new Date());
+        code.setUpdateAt(code.getCreatedAt());
+        code.setState(QRcodeType.STATE_ENABLED);
+        code.setId(qrCodeUuid);
+        code.setType(QRcodeType.TYPE_ACCOUNT);
+        dsObj.save(code);
+        
         return Response.ok().build();
     }
 
@@ -549,6 +565,7 @@ public class AccountsResource {
     }
     /***
      * To create special qrcode for user
+     * @author Henry
      * @param uuid
      * @param info
      * @return 
@@ -576,12 +593,58 @@ public class AccountsResource {
         code.setId(qrCodeUuid);
         code.setPhoneNumber(info.getPhoneNumber());
         code.setProvider(user);
-        code.setState("enabled");
-        code.setCreatedAt(new Date());
+        code.setState(QRcodeType.STATE_ENABLED);
+        Date date = new Date();
+        code.setCreatedAt(date);
+        code.setUpdateAt(date);
         code.setUserName(info.getName());
         
         dsObj.save(code);
         return  Response.status(Status.CREATED).build();
+    }
+       /***
+     * To list of get special qrcodes of user
+     * @author Henry
+     * @param uuid
+     * @param info
+     * @return 
+     */
+    @GET
+    @Path("/accounts/{uuid}/customQrcodes")
+    @Produces(MediaType.APPLICATION_JSON)
+    @TokenRequired
+    public Response getAccountCustomQRcodes(@PathParam("uuid")String uuid){
+        String tokenAccount = context.getUserPrincipal().getName();
+        Key<User> key = new Key(User.class,"accounts",tokenAccount);
+        List<QRcode> qrcodes= dsObj.createQuery(QRcode.class).field("provider").equal(key).asList();
+        HashMap<String,Object> response = new HashMap();
+        
+        response.put("qrcodes",qrcodes);
+        return Response.ok(response).build();
+    }
+       /***
+     * To update a special qrcodes of user
+     * @author Henry
+     * @param uuid
+     * @param info
+     * @return 
+     */
+    @PUT
+    @Path("/accounts/{uuid}/customQrcodes/{qrcodeid}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @TokenRequired
+    public Response modifyAccountCustomQRcodes(@PathParam("uuid")String uuid,@PathParam("qrcodeid") String qrCode,
+            @Valid @NotNull CustomQRcodeCreateBean info){
+        if(!this.isUserMatchToken(uuid))
+            return Response.status(Status.UNAUTHORIZED).build();
+        QRcode code= dsObj.get(QRcode.class, qrCode);
+        if(!code.getProvider().getUuid().equals("uuid")){
+            return Response.status(Status.UNAUTHORIZED).build();
+        }
+        code.setPhoneNumber(info.getPhoneNumber());
+        code.setUserName(info.getName());
+        code.setUpdateAt(new Date());
+        return Response.ok().build();
     }
     /**
      * This API allows user to retrieve user's avatar by UUID of avatar. API By
