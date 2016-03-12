@@ -32,6 +32,7 @@ import net.glxn.qrgen.image.ImageType;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -68,10 +69,28 @@ public class AccountsResource {
 //    private String tokenUser = context.getUserPrincipal().getName(); //user id of token
     ConsoleHandler consoleHandler = new ConsoleHandler();
     MongoManager mongoManager = MongoManager.getInstatnce();
-    Datastore dsObj = mongoManager.getDs();
+    Datastore dataStoreObject = mongoManager.getDs();
     private static final int AVATAR_LARGE = 256;
     private static final int AVATAR_MID = 128;
     private static final int AVATAR_SMALL = 64;
+
+    // Helpers methods.
+    private boolean isAllowedtoCall(Contact contact) {
+        String availableStartTime = contact.getAvailableEndTime();
+        String availableEndTime = contact.getAvailableEndTime();
+        boolean isEnable = contact.getIsEnable();
+        
+        // Get current time.
+        Date currentTimeStamp = new Date();
+        // In 24 type.
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        String currentTimeInString = sdf.format(currentTimeStamp);
+        
+        boolean isAfter = currentTimeInString.compareTo(availableStartTime) >= 0;
+        boolean isBefore = currentTimeInString.compareTo(availableEndTime) < 0;
+        
+        return isEnable && isAfter && isBefore;
+    }
 
     public boolean isUserMatchToken(String userUuid) {
         String tokenUserUuid = context.getUserPrincipal().getName();
@@ -93,7 +112,7 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response getUserAccount(@PathParam("uuid") String uuid) {
-        User user = dsObj.get(User.class, uuid);
+        User user = dataStoreObject.get(User.class, uuid);
         if (user == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
@@ -119,13 +138,13 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response updateUserAccount(@PathParam("uuid") String uuid, @Valid User u) {
-        User modifiedUser = dsObj.get(User.class, uuid);
+        User modifiedUser = dataStoreObject.get(User.class, uuid);
 
         u.setUuid(uuid);
         u.setProfilePhotoId(modifiedUser.getProfilePhotoId());
         u.setQrCodeUuid(modifiedUser.getQrCodeUuid());
 
-        dsObj.save(u);
+        dataStoreObject.save(u);
 
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.ALL);
@@ -149,7 +168,7 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response deleteUserAccount(@PathParam("uuid") String uuid) {
-        dsObj.delete(User.class, uuid);
+        dataStoreObject.delete(User.class, uuid);
 
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
@@ -164,25 +183,41 @@ public class AccountsResource {
      * Call When user click the calling button. API By Calvin
      *
      * @param uuid
+     * @param qrCodeUuid
      * @param callBean
      * @return response
      * @throws java.io.IOException
      */
     @POST
-    @Path("/accounts/{uuid}/calls")
+    @Path("/accounts/{uuid}/calls/{qrCodeUuid}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
-    public Response makePhoneCall(@PathParam("uuid") String uuid, @Valid AccountCallBean callBean) throws IOException {
+    public Response makePhoneCall(
+            @PathParam("uuid") String uuid,
+            @PathParam("qrCdoeUuid") String qrCodeUuid,
+            @Valid AccountCallBean callBean
+    ) throws IOException {
         String endPoint = Parameter.API_ROOT + Parameter.API_VER + "Call/test01/generalCallRequest/";
-        String caller = callBean.getCaller();
-        String callee = callBean.getCallee();
-        String payload = "{\"caller\":\"%s\",\"callee\":\"%s\",\"check\":false}";
+        User user = dataStoreObject.createQuery(User.class).field(qrCodeUuid).equal(qrCodeUuid).get();
 
-        Http http = new Http();
-        System.out.println(payload);
-        System.out.println(http.post(endPoint, String.format(payload, caller, callee)));
-        return Response.ok().build();
+        Contact contactToCall = dataStoreObject
+                .createQuery(Contact.class)
+                .filter("qrCodeUuid =", qrCodeUuid)
+                .filter("user =", user).get();
+
+        if (isAllowedtoCall(contactToCall)) {
+            String caller = callBean.getCaller();
+            String callee = callBean.getCallee();
+            String payload = "{\"caller\":\"%s\",\"callee\":\"%s\",\"check\":false}";
+
+            Http http = new Http();
+            System.out.println(payload);
+            System.out.println(http.post(endPoint, String.format(payload, caller, callee)));
+            return Response.ok().build();
+        } else {
+            return Response.status(Status.FORBIDDEN).build();
+        }
     }
 
     /**
@@ -197,9 +232,9 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response getContactListOfAnUser(@PathParam("uuid") String uuid) {
-        User user = dsObj.get(User.class, uuid);
+        User user = dataStoreObject.get(User.class, uuid);
 
-        List<Contact> contactList = dsObj.find(Contact.class).field("user").equal(user).asList();
+        List<Contact> contactList = dataStoreObject.find(Contact.class).field("user").equal(user).asList();
 
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
@@ -258,8 +293,8 @@ public class AccountsResource {
             @QueryParam("availableEndTime") String availableEndTime,
             @QueryParam("isEnable") String isEnable
     ) {
-        User u = dsObj.get(User.class, uuid);
-        Contact modifiedContact = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", u).get();
+        User u = dataStoreObject.get(User.class, uuid);
+        Contact modifiedContact = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", u).get();
 
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
@@ -289,7 +324,7 @@ public class AccountsResource {
             modifiedContact.setAvailableEndTime(availableEndTime);
         }
 
-        dsObj.save(modifiedContact);
+        dataStoreObject.save(modifiedContact);
         return Response.ok().build();
     }
 
@@ -307,8 +342,8 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response createNewContactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, @NotNull @Valid Contact contact) {
-        User owner = dsObj.get(User.class, uuid);
-        List<User> providers = dsObj.createQuery(User.class).field("qrCodeUuid").equal(qrCodeUuid).asList();
+        User owner = dataStoreObject.get(User.class, uuid);
+        List<User> providers = dataStoreObject.createQuery(User.class).field("qrCodeUuid").equal(qrCodeUuid).asList();
 
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
@@ -316,7 +351,7 @@ public class AccountsResource {
         LOGGER.addHandler(consoleHandler);
         LOGGER.log(Level.CONFIG, "[Config] Save a contact.");
 
-        List<Contact> contacts = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", owner).asList();
+        List<Contact> contacts = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", owner).asList();
 
         if (contacts.size() > 0) {
             // Owner has already add the provider as friend.
@@ -333,7 +368,7 @@ public class AccountsResource {
                 contact.setQrCodeUuid(qrCodeUuid);
                 contact.setIsEnable(true);
                 contact.setChargeType(1);
-                dsObj.save(contact);
+                dataStoreObject.save(contact);
 
                 // the contact of the provider side.
                 contact.setId(new ObjectId());
@@ -343,7 +378,7 @@ public class AccountsResource {
                 contact.setIsEnable(true);
                 contact.setNickName("");
                 contact.setChargeType(2);
-                dsObj.save(contact);
+                dataStoreObject.save(contact);
             } else {
                 // icon
                 contact.setUser(provider);
@@ -351,7 +386,7 @@ public class AccountsResource {
                 contact.setQrCodeUuid(qrCodeUuid);
                 contact.setIsEnable(true);
                 contact.setChargeType(0);
-                dsObj.save(contact);
+                dataStoreObject.save(contact);
             }
 
             return Response.ok().build();
@@ -374,15 +409,15 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response deleteAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid) {
-        User user = dsObj.get(User.class, uuid);
+        User user = dataStoreObject.get(User.class, uuid);
 
-        Contact payContact = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", user).get();
+        Contact payContact = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", user).get();
 
         User provider = payContact.getProviderUser();
-        Contact freeContact = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", provider).get();
+        Contact freeContact = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", provider).get();
 
-        dsObj.delete(Contact.class, payContact.getId());
-        dsObj.delete(Contact.class, freeContact.getId());
+        dataStoreObject.delete(Contact.class, payContact.getId());
+        dataStoreObject.delete(Contact.class, freeContact.getId());
         return Response.ok().build();
     }
 
@@ -401,7 +436,7 @@ public class AccountsResource {
         // [Testing]
         byte[] qrCodeData;
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
-        User user = dsObj.get(User.class, uuid);
+        User user = dataStoreObject.get(User.class, uuid);
         if (user == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
@@ -433,7 +468,7 @@ public class AccountsResource {
         /**
          * QR Code Generator test*
          */
-        User u = dsObj.get(User.class, uuid);
+        User u = dataStoreObject.get(User.class, uuid);
 
         if (u.getQrCodeUuid() != null) {
             return Response.notModified().build();
@@ -448,7 +483,7 @@ public class AccountsResource {
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
         s3Client.putObject(new PutObjectRequest(s3Bucket, s3FilePath, qrCodeImage));
         u.setQrCodeUuid(qrCodeUuid);
-        dsObj.save(u);
+        dataStoreObject.save(u);
         // save info to qrcode
         QRcode code = new QRcode();
         code.setProvider(u);
@@ -457,7 +492,7 @@ public class AccountsResource {
         code.setState(QRcodeType.STATE_ENABLED);
         code.setId(qrCodeUuid);
         code.setType(QRcodeType.TYPE_ACCOUNT);
-        dsObj.save(code);
+        dataStoreObject.save(code);
 
         return Response.ok().build();
     }
@@ -503,7 +538,7 @@ public class AccountsResource {
             }
             String userId = sc.getUserPrincipal().getName();
             Key key = new Key(User.class, "accounts", userId);
-            User user = dsObj.get(User.class, userId);
+            User user = dataStoreObject.get(User.class, userId);
             String oldId = user.getProfilePhotoId();
             AmazonS3 s3client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
             for (File onefile : files) {
@@ -526,8 +561,8 @@ public class AccountsResource {
                 }
             }
             LOGGER.log(Level.INFO, String.format("file update" + "ok" + tmpDir + "/" + photoUuid));
-            UpdateOperations<User> upo = dsObj.createUpdateOperations(User.class).set("profilePhotoId", photoUuid);
-            dsObj.update(key, upo);
+            UpdateOperations<User> upo = dataStoreObject.createUpdateOperations(User.class).set("profilePhotoId", photoUuid);
+            dataStoreObject.update(key, upo);
 
             LOGGER.log(Level.INFO, String.format("user info update OK"));
         } finally {
@@ -559,7 +594,7 @@ public class AccountsResource {
     public Response getAccountAvatar(@PathParam("uuid") String uuid,
             @Context SecurityContext sc,
             @QueryParam("size") String size) throws IOException {
-        String avatarUuid = dsObj.get(User.class, uuid).getProfilePhotoId();
+        String avatarUuid = dataStoreObject.get(User.class, uuid).getProfilePhotoId();
         if (avatarUuid == null) {
             Response.status(Status.NOT_FOUND).build();
         }
@@ -580,7 +615,7 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response createSpecifiedQrcodes(@PathParam("uuid") String uuid, @Valid @NotNull CustomQRcodeCreateBean info) {
-        User user = dsObj.get(User.class, context.getUserPrincipal().getName());
+        User user = dataStoreObject.get(User.class, context.getUserPrincipal().getName());
         if (user == null) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
@@ -605,7 +640,7 @@ public class AccountsResource {
         code.setUpdateAt(date);
         code.setUserName(info.getName());
 
-        dsObj.save(code);
+        dataStoreObject.save(code);
         return Response.status(Status.CREATED).build();
     }
 
@@ -625,7 +660,7 @@ public class AccountsResource {
     public Response getAccountCustomQRcodes(@PathParam("uuid") String uuid) {
         String tokenAccount = context.getUserPrincipal().getName();
         Key<User> key = new Key(User.class, "accounts", tokenAccount);
-        List<QRcode> qrcodes = dsObj.createQuery(QRcode.class)
+        List<QRcode> qrcodes = dataStoreObject.createQuery(QRcode.class)
                 .field("provider")
                 .equal(key)
                 .field("type")
@@ -659,14 +694,14 @@ public class AccountsResource {
         if (!this.isUserMatchToken(uuid)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
-        QRcode code = dsObj.get(QRcode.class, qrCode);
+        QRcode code = dataStoreObject.get(QRcode.class, qrCode);
         if (!code.getProvider().getUuid().equals(uuid)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         code.setPhoneNumber(info.getPhoneNumber());
         code.setUserName(info.getName());
         code.setUpdateAt(new Date());
-        dsObj.save(code);
+        dataStoreObject.save(code);
         return Response.ok().build();
     }
 
@@ -678,7 +713,7 @@ public class AccountsResource {
         if (!this.isUserMatchToken(uuid)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
-        QRcode code = dsObj.get(QRcode.class, qrCode);
+        QRcode code = dataStoreObject.get(QRcode.class, qrCode);
         if (QRcodeType.TYPE_ACCOUNT.equals(code.getType()) || !code.getProvider().getUuid().equals(uuid)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
@@ -687,7 +722,7 @@ public class AccountsResource {
         String s3FilePath = String.format("qrCode/%s.png", code.getId());
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
         s3Client.deleteObject(s3Bucket, s3FilePath);
-        dsObj.delete(code);
+        dataStoreObject.delete(code);
 
         return Response.ok().build();
     }
@@ -708,7 +743,7 @@ public class AccountsResource {
     public Response getAvatarByAvId(@PathParam("avatarUuid") String uuid,
             @Context SecurityContext sc,
             @QueryParam("size") String size) throws IOException {
-        User u = dsObj.createQuery(User.class).field("profilePhotoId").equal(uuid).get();
+        User u = dataStoreObject.createQuery(User.class).field("profilePhotoId").equal(uuid).get();
         if (u == null) {
             Response.status(Status.NOT_FOUND).build();
         }
