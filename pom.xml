@@ -274,7 +274,7 @@
                             <targetPath>WEB-INF</targetPath>
                         </resource>
                     </webResources>
-                    <outputDirectory>${basedir}</outputDirectory>
+                    <!--<outputDirectory>${basedir}</outputDirectory>-->
                 </configuration>
             </plugin>
 
