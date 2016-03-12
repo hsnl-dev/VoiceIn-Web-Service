@@ -75,7 +75,7 @@ public class AccountsResource {
     private static final int AVATAR_SMALL = 64;
 
     // Helpers methods.
-    private boolean isAllowedtoCall(Contact contact) {
+    private boolean isAllowedToCall(Contact contact) {
         String availableStartTime = contact.getAvailableEndTime();
         String availableEndTime = contact.getAvailableEndTime();
         boolean isEnable = contact.getIsEnable();
@@ -120,7 +120,7 @@ public class AccountsResource {
         consoleHandler.setLevel(Level.CONFIG);
 
         LOGGER.addHandler(consoleHandler);
-        LOGGER.log(Level.CONFIG, "[Config] Get user u{0}", uuid);
+        LOGGER.log(Level.CONFIG, "[Config] Get User u{0}", uuid);
 
         return Response.ok(user).build();
     }
@@ -150,7 +150,7 @@ public class AccountsResource {
         consoleHandler.setLevel(Level.ALL);
 
         LOGGER.addHandler(consoleHandler);
-        LOGGER.log(Level.CONFIG, "[Config] Update user u{0}", u);
+        LOGGER.log(Level.CONFIG, "[Config] Update User u{0}", u);
 
         return Response.ok().build();
     }
@@ -174,7 +174,7 @@ public class AccountsResource {
         consoleHandler.setLevel(Level.CONFIG);
 
         LOGGER.addHandler(consoleHandler);
-        LOGGER.log(Level.CONFIG, "[Config] Delete user u{0}", uuid);
+        LOGGER.log(Level.CONFIG, "[Config] Delete User u{0}", uuid);
 
         return Response.ok().build();
     }
@@ -206,7 +206,7 @@ public class AccountsResource {
                 .filter("qrCodeUuid =", qrCodeUuid)
                 .filter("user =", user).get();
 
-        if (isAllowedtoCall(contactToCall)) {
+        if (isAllowedToCall(contactToCall)) {
             String caller = callBean.getCaller();
             String callee = callBean.getCallee();
             String payload = "{\"caller\":\"%s\",\"callee\":\"%s\",\"check\":false}";
@@ -239,7 +239,7 @@ public class AccountsResource {
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
         LOGGER.addHandler(consoleHandler);
-        LOGGER.log(Level.CONFIG, "[Config] contact length {0}", contactList.size());
+        LOGGER.log(Level.CONFIG, "[Config] Contact Length {0}", contactList.size());
 
         List<UserContactBean> userList = new ArrayList();
         UserContactBean userContactBean;
@@ -301,7 +301,7 @@ public class AccountsResource {
 
         LOGGER.addHandler(consoleHandler);
 
-        LOGGER.log(Level.CONFIG, "[Config] Save a contact.{0}", nickName);
+        LOGGER.log(Level.CONFIG, "[Config] Save A Contact.{0}", nickName);
 
         if (nickName != null) {
             modifiedContact.setNickName(nickName);
@@ -349,7 +349,7 @@ public class AccountsResource {
         consoleHandler.setLevel(Level.CONFIG);
 
         LOGGER.addHandler(consoleHandler);
-        LOGGER.log(Level.CONFIG, "[Config] Save a contact.");
+        LOGGER.log(Level.CONFIG, "[Config] Save A Contact.");
 
         List<Contact> contacts = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", owner).asList();
 
@@ -650,7 +650,6 @@ public class AccountsResource {
      *
      * @author Henry
      * @param uuid
-     * @param info
      * @return
      */
     @GET
@@ -682,6 +681,7 @@ public class AccountsResource {
      *
      * @author Henry
      * @param uuid
+     * @param qrCode
      * @param info
      * @return
      */
