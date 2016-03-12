@@ -90,7 +90,7 @@ public class AccountsResource {
         boolean isBefore = currentTimeInString.compareTo(availableEndTime) < 0;
         
         if (isEnable) {
-            return isEnable && isAfter && isBefore;
+            return isAfter && isBefore;
         } else {
             return isEnable;
         }         
