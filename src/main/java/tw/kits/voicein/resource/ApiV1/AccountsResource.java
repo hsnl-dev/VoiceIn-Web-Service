@@ -89,7 +89,11 @@ public class AccountsResource {
         boolean isAfter = currentTimeInString.compareTo(availableStartTime) >= 0;
         boolean isBefore = currentTimeInString.compareTo(availableEndTime) < 0;
         
-        return isEnable && isAfter && isBefore;
+        if (isEnable) {
+            return isEnable && isAfter && isBefore;
+        } else {
+            return isEnable;
+        }         
     }
 
     public boolean isUserMatchToken(String userUuid) {
