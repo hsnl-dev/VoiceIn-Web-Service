@@ -61,7 +61,9 @@ import tw.kits.voicein.util.TokenRequired;
 @MultipartConfig(maxFileSize = 1024 * 1024 * 1)
 @Path("/api/v1")
 public class AccountsResource {
-    @Context SecurityContext context;
+
+    @Context
+    SecurityContext context;
     static final Logger LOGGER = Logger.getLogger(AccountsResource.class.getName());
 //    private String tokenUser = context.getUserPrincipal().getName(); //user id of token
     ConsoleHandler consoleHandler = new ConsoleHandler();
@@ -70,15 +72,14 @@ public class AccountsResource {
     private static final int AVATAR_LARGE = 256;
     private static final int AVATAR_MID = 128;
     private static final int AVATAR_SMALL = 64;
-    public boolean isUserMatchToken(String userUuid){
+
+    public boolean isUserMatchToken(String userUuid) {
         String tokenUserUuid = context.getUserPrincipal().getName();
         LOGGER.info(userUuid);
-        LOGGER.info(":"+tokenUserUuid);
-        if(tokenUserUuid.equals(userUuid))
-            return true;
-        else
-            return false;
+        LOGGER.log(Level.CONFIG, ":{0}", tokenUserUuid);
+        return tokenUserUuid.equals(userUuid);
     }
+
     /**
      * This API allows client to retrieve user's full informations. API By
      * Calvin
@@ -93,8 +94,9 @@ public class AccountsResource {
     @TokenRequired
     public Response getUserAccount(@PathParam("uuid") String uuid) {
         User user = dsObj.get(User.class, uuid);
-        if(user==null)
+        if (user == null) {
             return Response.status(Status.NOT_FOUND).build();
+        }
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
 
@@ -103,7 +105,7 @@ public class AccountsResource {
 
         return Response.ok(user).build();
     }
-    
+
     /**
      * This API allows client to update user's information. API By Calvin
      *
@@ -118,11 +120,11 @@ public class AccountsResource {
     @TokenRequired
     public Response updateUserAccount(@PathParam("uuid") String uuid, @Valid User u) {
         User modifiedUser = dsObj.get(User.class, uuid);
-        
+
         u.setUuid(uuid);
         u.setProfilePhotoId(modifiedUser.getProfilePhotoId());
         u.setQrCodeUuid(modifiedUser.getQrCodeUuid());
-        
+
         dsObj.save(u);
 
         LOGGER.setLevel(Level.ALL);
@@ -205,12 +207,12 @@ public class AccountsResource {
         LOGGER.log(Level.CONFIG, "[Config] contact length {0}", contactList.size());
 
         List<UserContactBean> userList = new ArrayList();
-        UserContactBean userContactBean; 
-                
+        UserContactBean userContactBean;
+
         for (Contact contact : contactList) {
             userContactBean = new UserContactBean();
             User provider = contact.getProviderUser();
-            
+
             userContactBean.setCompany(provider.getCompany());
             userContactBean.setUserName(provider.getUserName());
             userContactBean.setLocation(provider.getLocation());
@@ -225,13 +227,13 @@ public class AccountsResource {
             userContactBean.setCustomerIcon(contact.getCustomerIcon());
             userContactBean.setNickName(contact.getNickName());
             userContactBean.setQrCodeUuid(contact.getQrCodeUuid());
-            
+
             userList.add(userContactBean);
         }
 
         return Response.ok(userList).build();
     }
-    
+
     /**
      * This API allows client user to update a contact. API By Calvin
      *
@@ -249,40 +251,40 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response updateAcontactOfAnUser(
-                @PathParam("uuid") String uuid, 
-                @PathParam("qrCodeUuid") String qrCodeUuid, 
-                @QueryParam("nickName") String nickName,
-                @QueryParam("availableStartTime") String availableStartTime,
-                @QueryParam("availableEndTime") String availableEndTime,
-                @QueryParam("isEnable") String isEnable
-            ) {
+            @PathParam("uuid") String uuid,
+            @PathParam("qrCodeUuid") String qrCodeUuid,
+            @QueryParam("nickName") String nickName,
+            @QueryParam("availableStartTime") String availableStartTime,
+            @QueryParam("availableEndTime") String availableEndTime,
+            @QueryParam("isEnable") String isEnable
+    ) {
         User u = dsObj.get(User.class, uuid);
         Contact modifiedContact = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", u).get();
-        
+
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
-        
+
         LOGGER.addHandler(consoleHandler);
-        
+
         LOGGER.log(Level.CONFIG, "[Config] Save a contact.{0}", nickName);
 
         if (nickName != null) {
             modifiedContact.setNickName(nickName);
         }
-        
+
         if (isEnable != null) {
             if (isEnable.equalsIgnoreCase("true")) {
                 modifiedContact.setIsEnable(true);
             } else {
                 modifiedContact.setIsEnable(false);
             }
-            
+
         }
-        
+
         if (availableStartTime != null) {
             modifiedContact.setAvailableStartTime(availableStartTime);
         }
-        
+
         if (availableEndTime != null) {
             modifiedContact.setAvailableEndTime(availableEndTime);
         }
@@ -307,24 +309,24 @@ public class AccountsResource {
     public Response createNewContactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, @NotNull @Valid Contact contact) {
         User owner = dsObj.get(User.class, uuid);
         List<User> providers = dsObj.createQuery(User.class).field("qrCodeUuid").equal(qrCodeUuid).asList();
-        
+
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
-        
+
         LOGGER.addHandler(consoleHandler);
         LOGGER.log(Level.CONFIG, "[Config] Save a contact.");
-        
+
         List<Contact> contacts = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", owner).asList();
-        
+
         if (contacts.size() > 0) {
             // Owner has already add the provider as friend.
             return Response.notModified().build();
         }
-        
+
         // user.size() must be 1.
         if (providers.size() == 1) {
             User provider = providers.get(0);
-            if (contact.getChargeType() != 0) { 
+            if (contact.getChargeType() != 0) {
                 // the contact of the scanner side.
                 contact.setUser(owner);
                 contact.setProviderUser(provider);
@@ -350,8 +352,8 @@ public class AccountsResource {
                 contact.setIsEnable(true);
                 contact.setChargeType(0);
                 dsObj.save(contact);
-            } 
-               
+            }
+
             return Response.ok().build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -375,7 +377,7 @@ public class AccountsResource {
         User user = dsObj.get(User.class, uuid);
 
         Contact payContact = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", user).get();
-        
+
         User provider = payContact.getProviderUser();
         Contact freeContact = dsObj.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", provider).get();
 
@@ -383,7 +385,7 @@ public class AccountsResource {
         dsObj.delete(Contact.class, freeContact.getId());
         return Response.ok().build();
     }
-    
+
     /**
      * This API allows client to retrieve their QRCode API By Calvin
      *
@@ -400,8 +402,9 @@ public class AccountsResource {
         byte[] qrCodeData;
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
         User user = dsObj.get(User.class, uuid);
-        if(user==null)
+        if (user == null) {
             return Response.status(Status.NOT_FOUND).build();
+        }
         String s3Bucket = "voice-in";
         String file = String.format("qrCode/%s.png", user.getUuid());
         GetObjectRequest request = new GetObjectRequest(s3Bucket, file);
@@ -431,15 +434,14 @@ public class AccountsResource {
          * QR Code Generator test*
          */
         User u = dsObj.get(User.class, uuid);
-                
+
         if (u.getQrCodeUuid() != null) {
             return Response.notModified().build();
         }
-        
+
         String s3Bucket = "voice-in";
         String qrCodeUuid = UUID.randomUUID().toString();
         String s3FilePath = String.format("qrCode/%s.png", qrCodeUuid);
-        
 
         // Generate QRCode Image and Upload to S3.
         File qrCodeImage = QRCode.from(qrCodeUuid).to(ImageType.PNG).withSize(250, 250).file();
@@ -456,7 +458,7 @@ public class AccountsResource {
         code.setId(qrCodeUuid);
         code.setType(QRcodeType.TYPE_ACCOUNT);
         dsObj.save(code);
-        
+
         return Response.ok().build();
     }
 
@@ -563,32 +565,35 @@ public class AccountsResource {
         }
         return Response.ok(getAvatar(avatarUuid, size)).build();
     }
-    /***
+
+    /**
+     * *
      * To create special qrcode for user
+     *
      * @author Henry
      * @param uuid
      * @param info
-     * @return 
+     * @return
      */
     @POST
     @Path("/accounts/{uuid}/customQrcodes")
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
-    public Response createSpecifiedQrcodes(@PathParam("uuid") String uuid, @Valid @NotNull CustomQRcodeCreateBean info){
+    public Response createSpecifiedQrcodes(@PathParam("uuid") String uuid, @Valid @NotNull CustomQRcodeCreateBean info) {
         User user = dsObj.get(User.class, context.getUserPrincipal().getName());
-        if(user==null)
+        if (user == null) {
             return Response.status(Status.UNAUTHORIZED).build();
+        }
 
         String s3Bucket = "voice-in";
         String qrCodeUuid = UUID.randomUUID().toString();
         String s3FilePath = String.format("qrCode/%s.png", qrCodeUuid);
-        
 
         // Generate QRCode Image and Upload to S3.
         File qrCodeImage = QRCode.from(qrCodeUuid).to(ImageType.PNG).withSize(250, 250).file();
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
         s3Client.putObject(new PutObjectRequest(s3Bucket, s3FilePath, qrCodeImage));
-        
+
         QRcode code = new QRcode();
         code.setId(qrCodeUuid);
         code.setPhoneNumber(info.getPhoneNumber());
@@ -599,56 +604,63 @@ public class AccountsResource {
         code.setCreatedAt(date);
         code.setUpdateAt(date);
         code.setUserName(info.getName());
-        
+
         dsObj.save(code);
-        return  Response.status(Status.CREATED).build();
+        return Response.status(Status.CREATED).build();
     }
-       /***
+
+    /**
+     * *
      * To list of get special qrcodes of user
+     *
      * @author Henry
      * @param uuid
      * @param info
-     * @return 
+     * @return
      */
     @GET
     @Path("/accounts/{uuid}/customQrcodes")
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
-    public Response getAccountCustomQRcodes(@PathParam("uuid")String uuid){
+    public Response getAccountCustomQRcodes(@PathParam("uuid") String uuid) {
         String tokenAccount = context.getUserPrincipal().getName();
-        Key<User> key = new Key(User.class,"accounts",tokenAccount);
-        List<QRcode> qrcodes= dsObj.createQuery(QRcode.class)
+        Key<User> key = new Key(User.class, "accounts", tokenAccount);
+        List<QRcode> qrcodes = dsObj.createQuery(QRcode.class)
                 .field("provider")
                 .equal(key)
                 .field("type")
                 .equal(QRcodeType.TYPE_SPECIAL)
                 .asList();
         List<QRcodeNoProviderBean> res = new ArrayList();
-        for(QRcode code : qrcodes ){
+        for (QRcode code : qrcodes) {
             res.add(new QRcodeNoProviderBean(code));
         }
-        HashMap<String,Object> response = new HashMap();
-        
-        response.put("qrcodes",res);
+        HashMap<String, Object> response = new HashMap();
+
+        response.put("qrcodes", res);
         return Response.ok(response).build();
     }
-       /***
+
+    /**
+     * *
      * To update a special qrcodes of user
+     *
      * @author Henry
      * @param uuid
      * @param info
-     * @return 
+     * @return
      */
     @PUT
     @Path("/accounts/{uuid}/customQrcodes/{qrcodeid}")
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
-    public Response modifyAccountCustomQRcodes(@PathParam("uuid")String uuid,@PathParam("qrcodeid") String qrCode,
-            @Valid @NotNull CustomQRcodeCreateBean info){
-        if(!this.isUserMatchToken(uuid))
+    public Response modifyAccountCustomQRcodes(@PathParam("uuid") String uuid, @PathParam("qrcodeid") String qrCode,
+            @Valid @NotNull CustomQRcodeCreateBean info) {
+        if (!this.isUserMatchToken(uuid)) {
             return Response.status(Status.UNAUTHORIZED).build();
-        QRcode code= dsObj.get(QRcode.class, qrCode);
-        if(!code.getProvider().getUuid().equals(uuid)){
+        }
+        QRcode code = dsObj.get(QRcode.class, qrCode);
+        if (!code.getProvider().getUuid().equals(uuid)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         code.setPhoneNumber(info.getPhoneNumber());
@@ -657,26 +669,29 @@ public class AccountsResource {
         dsObj.save(code);
         return Response.ok().build();
     }
+
     @DELETE
     @Path("/accounts/{uuid}/customQrcodes/{qrcodeid}")
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
-    public Response delAccountCustomQRcodes(@PathParam("uuid")String uuid,@PathParam("qrcodeid") String qrCode){
-        if(!this.isUserMatchToken(uuid))
-            return Response.status(Status.UNAUTHORIZED).build();
-        QRcode code= dsObj.get(QRcode.class, qrCode);
-        if(QRcodeType.TYPE_ACCOUNT.equals(code.getType()) || !code.getProvider().getUuid().equals(uuid)){
+    public Response delAccountCustomQRcodes(@PathParam("uuid") String uuid, @PathParam("qrcodeid") String qrCode) {
+        if (!this.isUserMatchToken(uuid)) {
             return Response.status(Status.UNAUTHORIZED).build();
         }
-        
+        QRcode code = dsObj.get(QRcode.class, qrCode);
+        if (QRcodeType.TYPE_ACCOUNT.equals(code.getType()) || !code.getProvider().getUuid().equals(uuid)) {
+            return Response.status(Status.UNAUTHORIZED).build();
+        }
+
         String s3Bucket = "voice-in";
         String s3FilePath = String.format("qrCode/%s.png", code.getId());
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
         s3Client.deleteObject(s3Bucket, s3FilePath);
         dsObj.delete(code);
-        
+
         return Response.ok().build();
     }
+
     /**
      * This API allows user to retrieve user's avatar by UUID of avatar. API By
      * Henry
@@ -699,9 +714,7 @@ public class AccountsResource {
         }
         return Response.ok(getAvatar(uuid, size)).build();
     }
-    
-    
-    
+
     private byte[] getAvatar(String avatarUuid, String size) throws IOException {
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
         String s3Bucket = "voice-in";
@@ -720,5 +733,5 @@ public class AccountsResource {
         S3Object object = s3Client.getObject(request);
         return IOUtils.toByteArray(object.getObjectContent());
     }
-    
+
 }

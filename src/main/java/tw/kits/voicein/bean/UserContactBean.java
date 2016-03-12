@@ -6,13 +6,13 @@
 package tw.kits.voicein.bean;
 
 import tw.kits.voicein.model.Icon;
-import tw.kits.voicein.model.User;
 
 /**
  *
  * @author Calvin
  */
 public class UserContactBean {
+
     //Field
     private String userName;
     private String phoneNumber;
@@ -213,5 +213,5 @@ public class UserContactBean {
     public void setProfilePhotoId(String profilePhotoId) {
         this.profilePhotoId = profilePhotoId;
     }
- 
+
 }
