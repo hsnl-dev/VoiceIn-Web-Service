@@ -76,7 +76,7 @@ public class AccountsResource {
 
     // Helpers methods.
     private boolean isAllowedToCall(Contact contact) {
-        String availableStartTime = contact.getAvailableEndTime();
+        String availableStartTime = contact.getAvailableStartTime();
         String availableEndTime = contact.getAvailableEndTime();
         boolean isEnable = contact.getIsEnable();
         
@@ -90,8 +90,10 @@ public class AccountsResource {
         boolean isBefore = currentTimeInString.compareTo(availableEndTime) < 0;
         
         if (isEnable) {
+            // If the contact is isEnable, check the available time.
             return isAfter && isBefore;
         } else {
+            // If the contact is Disable, the call is not allowed.
             return isEnable;
         }         
     }
@@ -124,7 +126,7 @@ public class AccountsResource {
         consoleHandler.setLevel(Level.CONFIG);
 
         LOGGER.addHandler(consoleHandler);
-        LOGGER.log(Level.CONFIG, "[Config] Get User u{0}", uuid);
+        LOGGER.log(Level.CONFIG, "Get User u{0}", uuid);
 
         return Response.ok(user).build();
     }
@@ -133,7 +135,7 @@ public class AccountsResource {
      * This API allows client to update user's information. API By Calvin
      *
      * @param uuid
-     * @param u
+     * @param user
      * @return response to the client
      */
     @PUT
@@ -141,20 +143,20 @@ public class AccountsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
-    public Response updateUserAccount(@PathParam("uuid") String uuid, @Valid User u) {
+    public Response updateUserAccount(@PathParam("uuid") String uuid, @Valid User user) {
         User modifiedUser = dataStoreObject.get(User.class, uuid);
 
-        u.setUuid(uuid);
-        u.setProfilePhotoId(modifiedUser.getProfilePhotoId());
-        u.setQrCodeUuid(modifiedUser.getQrCodeUuid());
+        user.setUuid(uuid);
+        user.setProfilePhotoId(modifiedUser.getProfilePhotoId());
+        user.setQrCodeUuid(modifiedUser.getQrCodeUuid());
 
-        dataStoreObject.save(u);
+        dataStoreObject.save(user);
 
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.ALL);
 
         LOGGER.addHandler(consoleHandler);
-        LOGGER.log(Level.CONFIG, "[Config] Update User u{0}", u);
+        LOGGER.log(Level.CONFIG, "Update User u{0}", user);
 
         return Response.ok().build();
     }
@@ -178,7 +180,7 @@ public class AccountsResource {
         consoleHandler.setLevel(Level.CONFIG);
 
         LOGGER.addHandler(consoleHandler);
-        LOGGER.log(Level.CONFIG, "[Config] Delete User u{0}", uuid);
+        LOGGER.log(Level.CONFIG, "Delete User u{0}", uuid);
 
         return Response.ok().build();
     }
@@ -199,17 +201,21 @@ public class AccountsResource {
     @TokenRequired
     public Response makePhoneCall(
             @PathParam("uuid") String uuid,
-            @PathParam("qrCdoeUuid") String qrCodeUuid,
+            @PathParam("qrCodeUuid") String qrCodeUuid,
             @Valid AccountCallBean callBean
     ) throws IOException {
         String endPoint = Parameter.API_ROOT + Parameter.API_VER + "Call/test01/generalCallRequest/";
-        User user = dataStoreObject.createQuery(User.class).field(qrCodeUuid).equal(qrCodeUuid).get();
-
-        Contact contactToCall = dataStoreObject
-                .createQuery(Contact.class)
-                .filter("qrCodeUuid =", qrCodeUuid)
-                .filter("user =", user).get();
-
+        User user = dataStoreObject.get(User.class, uuid);
+        
+        LOGGER.setLevel(Level.ALL);
+        consoleHandler.setLevel(Level.CONFIG);
+        LOGGER.addHandler(consoleHandler);
+        
+        Contact contactToCall = dataStoreObject.createQuery(Contact.class).filter("user =", user).filter("qrCodeUuid", qrCodeUuid).get();
+        
+        LOGGER.log(Level.CONFIG, " ContactToCall {0}", contactToCall);
+        LOGGER.log(Level.CONFIG, " qrCodeUuid {0}", qrCodeUuid);
+                
         if (isAllowedToCall(contactToCall)) {
             String caller = callBean.getCaller();
             String callee = callBean.getCallee();
@@ -243,7 +249,7 @@ public class AccountsResource {
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
         LOGGER.addHandler(consoleHandler);
-        LOGGER.log(Level.CONFIG, "[Config] Contact Length {0}", contactList.size());
+        LOGGER.log(Level.CONFIG, "Contact Length {0}", contactList.size());
 
         List<UserContactBean> userList = new ArrayList();
         UserContactBean userContactBean;
@@ -305,7 +311,7 @@ public class AccountsResource {
 
         LOGGER.addHandler(consoleHandler);
 
-        LOGGER.log(Level.CONFIG, "[Config] Save A Contact.{0}", nickName);
+        LOGGER.log(Level.CONFIG, "Save A Contact.{0}", nickName);
 
         if (nickName != null) {
             modifiedContact.setNickName(nickName);
@@ -353,7 +359,7 @@ public class AccountsResource {
         consoleHandler.setLevel(Level.CONFIG);
 
         LOGGER.addHandler(consoleHandler);
-        LOGGER.log(Level.CONFIG, "[Config] Save A Contact.");
+        LOGGER.log(Level.CONFIG, "Save A Contact.");
 
         List<Contact> contacts = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", owner).asList();
 
