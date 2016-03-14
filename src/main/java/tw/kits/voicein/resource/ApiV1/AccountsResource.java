@@ -257,6 +257,7 @@ public class AccountsResource {
         for (Contact contact : contactList) {
             userContactBean = new UserContactBean();
             User provider = contact.getProviderUser();
+            Contact providerContact = dataStoreObject.find(Contact.class).filter("user =", provider).filter("qrCodeUuid =", contact.getQrCodeUuid()).get();
 
             userContactBean.setCompany(provider.getCompany());
             userContactBean.setUserName(provider.getUserName());
@@ -264,6 +265,9 @@ public class AccountsResource {
             userContactBean.setCompany(provider.getCompany());
             userContactBean.setProfile(provider.getProfile());
             userContactBean.setPhoneNumber(provider.getPhoneNumber());
+            userContactBean.setProviderAvailableEndTime(provider.getAvailableEndTime());
+            userContactBean.setProviderAvailableStartTime(provider.getAvailableStartTime());
+            userContactBean.setProviderIsEnable(providerContact.getIsEnable());
             userContactBean.setProfilePhotoId(provider.getProfilePhotoId());
             userContactBean.setAvailableEndTime(contact.getAvailableEndTime());
             userContactBean.setChargeType(contact.getChargeType());
