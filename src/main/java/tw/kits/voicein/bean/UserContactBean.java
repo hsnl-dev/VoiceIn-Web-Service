@@ -25,6 +25,9 @@ public class UserContactBean {
     private String availableStartTime;
     private String availableEndTime;
     private Boolean isEnable;
+    private String providerAvailableStartTime;
+    private String providerAvailableEndTime;
+    private Boolean providerIsEnable;
     private String qrCodeUuid;
     private Icon customerIcon;
 
@@ -212,6 +215,48 @@ public class UserContactBean {
      */
     public void setProfilePhotoId(String profilePhotoId) {
         this.profilePhotoId = profilePhotoId;
+    }
+
+    /**
+     * @return the providerAvailableStartTime
+     */
+    public String getProviderAvailableStartTime() {
+        return providerAvailableStartTime;
+    }
+
+    /**
+     * @param providerAvailableStartTime the providerAvailableStartTime to set
+     */
+    public void setProviderAvailableStartTime(String providerAvailableStartTime) {
+        this.providerAvailableStartTime = providerAvailableStartTime;
+    }
+
+    /**
+     * @return the providerAvailableEndTime
+     */
+    public String getProviderAvailableEndTime() {
+        return providerAvailableEndTime;
+    }
+
+    /**
+     * @param providerAvailableEndTime the providerAvailableEndTime to set
+     */
+    public void setProviderAvailableEndTime(String providerAvailableEndTime) {
+        this.providerAvailableEndTime = providerAvailableEndTime;
+    }
+
+    /**
+     * @return the providerIsEnable
+     */
+    public Boolean getProviderIsEnable() {
+        return providerIsEnable;
+    }
+
+    /**
+     * @param providerIsEnable the providerIsEnable to set
+     */
+    public void setProviderIsEnable(Boolean providerIsEnable) {
+        this.providerIsEnable = providerIsEnable;
     }
 
 }
