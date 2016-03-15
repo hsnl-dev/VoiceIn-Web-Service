@@ -76,9 +76,18 @@ public class AccountsResource {
 
     // Helpers methods.
     private boolean isAllowedToCall(Contact contact) {
-        String availableStartTime = contact.getAvailableStartTime();
-        String availableEndTime = contact.getAvailableEndTime();
+        String availableStartTime;
+        String availableEndTime;
+        User provider = contact.getProviderUser();
         boolean isEnable = contact.getIsEnable();
+        
+        if (contact.getIsHigherPriorityThanGlobal()) {
+            availableStartTime = contact.getAvailableStartTime();
+            availableEndTime = contact.getAvailableEndTime();
+        } else {
+            availableStartTime = provider.getAvailableStartTime();
+            availableEndTime = provider.getAvailableEndTime();
+        }
         
         // Get current time.
         Date currentTimeStamp = new Date();
@@ -265,8 +274,6 @@ public class AccountsResource {
             userContactBean.setCompany(provider.getCompany());
             userContactBean.setProfile(provider.getProfile());
             userContactBean.setPhoneNumber(provider.getPhoneNumber());
-            userContactBean.setProviderAvailableEndTime(provider.getAvailableEndTime());
-            userContactBean.setProviderAvailableStartTime(provider.getAvailableStartTime());
             userContactBean.setProviderIsEnable(providerContact.getIsEnable());
             userContactBean.setProfilePhotoId(provider.getProfilePhotoId());
             userContactBean.setAvailableEndTime(contact.getAvailableEndTime());
@@ -277,7 +284,15 @@ public class AccountsResource {
             userContactBean.setNickName(contact.getNickName());
             userContactBean.setQrCodeUuid(contact.getQrCodeUuid());
             userContactBean.setIsHigherPriorityThanGlobal(contact.getIsHigherPriorityThanGlobal());
-
+            
+            if (contact.getIsHigherPriorityThanGlobal()) {
+                userContactBean.setProviderAvailableEndTime(contact.getAvailableEndTime());
+                userContactBean.setProviderAvailableStartTime(contact.getAvailableStartTime());
+            } else {
+                userContactBean.setProviderAvailableEndTime(provider.getAvailableEndTime());
+                userContactBean.setProviderAvailableStartTime(provider.getAvailableStartTime());
+            }
+            
             userList.add(userContactBean);
         }
 
@@ -403,6 +418,7 @@ public class AccountsResource {
                 contact.setIsEnable(true);
                 contact.setNickName("");
                 contact.setChargeType(2);
+                
                 dataStoreObject.save(contact);
             } else {
                 // icon
