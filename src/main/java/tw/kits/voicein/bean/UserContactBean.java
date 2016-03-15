@@ -25,6 +25,7 @@ public class UserContactBean {
     private String availableStartTime;
     private String availableEndTime;
     private Boolean isEnable;
+    private Boolean isHigherPriorityThanGlobal;
     private String providerAvailableStartTime;
     private String providerAvailableEndTime;
     private Boolean providerIsEnable;
@@ -257,6 +258,20 @@ public class UserContactBean {
      */
     public void setProviderIsEnable(Boolean providerIsEnable) {
         this.providerIsEnable = providerIsEnable;
+    }
+
+    /**
+     * @return the isHigherPriorityThanGlobal
+     */
+    public Boolean getIsHigherPriorityThanGlobal() {
+        return isHigherPriorityThanGlobal;
+    }
+
+    /**
+     * @param isHigherPriorityThanGlobal the isHigherPriorityThanGlobal to set
+     */
+    public void setIsHigherPriorityThanGlobal(Boolean isHigherPriorityThanGlobal) {
+        this.isHigherPriorityThanGlobal = isHigherPriorityThanGlobal;
     }
 
 }
