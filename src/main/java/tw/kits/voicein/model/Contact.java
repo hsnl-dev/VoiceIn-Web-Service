@@ -37,6 +37,8 @@ public class Contact {
 
     public Contact() {
         this.isHigherPriorityThanGlobal = false;
+        this.availableEndTime = "23:59";
+        this.availableStartTime = "00:00";
     }
 
     /**
