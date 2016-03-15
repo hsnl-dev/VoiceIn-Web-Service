@@ -279,7 +279,7 @@ public class AccountsResource {
             userContactBean.setCompany(provider.getCompany());
             userContactBean.setProfile(provider.getProfile());
             userContactBean.setPhoneNumber(provider.getPhoneNumber());
-            userContactBean.setProviderIsEnable(providerContact.getIsEnable());
+            userContactBean.setProviderIsEnable(isAllowedToCall(providerContact));
             userContactBean.setProfilePhotoId(provider.getProfilePhotoId());
             
             userContactBean.setAvailableEndTime(contact.getAvailableEndTime());
