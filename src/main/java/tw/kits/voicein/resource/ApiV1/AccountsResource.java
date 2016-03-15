@@ -276,6 +276,7 @@ public class AccountsResource {
             userContactBean.setCustomerIcon(contact.getCustomerIcon());
             userContactBean.setNickName(contact.getNickName());
             userContactBean.setQrCodeUuid(contact.getQrCodeUuid());
+            userContactBean.setIsHigherPriorityThanGlobal(contact.getIsHigherPriorityThanGlobal());
 
             userList.add(userContactBean);
         }
@@ -292,6 +293,7 @@ public class AccountsResource {
      * @param availableStartTime
      * @param availableEndTime
      * @param isEnable
+     * @param isHigherPriorityThanGlobal
      * @return
      */
     @PUT
@@ -305,8 +307,9 @@ public class AccountsResource {
             @QueryParam("nickName") String nickName,
             @QueryParam("availableStartTime") String availableStartTime,
             @QueryParam("availableEndTime") String availableEndTime,
-            @QueryParam("isEnable") String isEnable
-    ) {
+            @QueryParam("isEnable") String isEnable,
+            @QueryParam("isHigherPriorityThanGlobal") String isHigherPriorityThanGlobal
+            ) {
         User u = dataStoreObject.get(User.class, uuid);
         Contact modifiedContact = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", u).get();
 
@@ -328,6 +331,14 @@ public class AccountsResource {
                 modifiedContact.setIsEnable(false);
             }
 
+        }
+        
+        if (isHigherPriorityThanGlobal != null) {
+            if (isHigherPriorityThanGlobal.equalsIgnoreCase("true")) {
+                modifiedContact.setIsHigherPriorityThanGlobal(true);
+            } else {
+                modifiedContact.setIsHigherPriorityThanGlobal(false);
+            }
         }
 
         if (availableStartTime != null) {

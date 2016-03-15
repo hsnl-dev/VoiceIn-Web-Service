@@ -1,6 +1,5 @@
 package tw.kits.voicein.model;
 
-import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import org.bson.types.ObjectId;
@@ -34,9 +33,10 @@ public class Contact {
     private String qrCodeUuid;
     @Reference
     private Icon customerIcon;
+    private Boolean isHigherPriorityThanGlobal;
 
     public Contact() {
-
+        this.isHigherPriorityThanGlobal = false;
     }
 
     /**
@@ -177,6 +177,20 @@ public class Contact {
      */
     public void setIsEnable(Boolean isEnable) {
         this.isEnable = isEnable;
+    }
+
+    /**
+     * @return the isHigherPriorityThanGlobal
+     */
+    public Boolean getIsHigherPriorityThanGlobal() {
+        return isHigherPriorityThanGlobal;
+    }
+
+    /**
+     * @param isHigherPriorityThanGlobal the isHigherPriorityThanGlobal to set
+     */
+    public void setIsHigherPriorityThanGlobal(Boolean isHigherPriorityThanGlobal) {
+        this.isHigherPriorityThanGlobal = isHigherPriorityThanGlobal;
     }
 
 }
