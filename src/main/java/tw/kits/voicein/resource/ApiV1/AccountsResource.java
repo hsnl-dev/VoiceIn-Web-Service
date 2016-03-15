@@ -74,13 +74,21 @@ public class AccountsResource {
     private static final int AVATAR_MID = 128;
     private static final int AVATAR_SMALL = 64;
 
+    private void initLogger() {
+        LOGGER.setLevel(Level.ALL);
+        consoleHandler.setLevel(Level.CONFIG);
+        LOGGER.addHandler(consoleHandler);
+    }
+
     // Helpers methods.
     private boolean isAllowedToCall(Contact contact) {
         String availableStartTime;
         String availableEndTime;
-        User provider = contact.getProviderUser();
+        User provider = contact.getUser();
         boolean isEnable = contact.getIsEnable();
-        
+
+        initLogger();
+
         if (contact.getIsHigherPriorityThanGlobal()) {
             availableStartTime = contact.getAvailableStartTime();
             availableEndTime = contact.getAvailableEndTime();
@@ -88,23 +96,26 @@ public class AccountsResource {
             availableStartTime = provider.getAvailableStartTime();
             availableEndTime = provider.getAvailableEndTime();
         }
-        
+
         // Get current time.
         Date currentTimeStamp = new Date();
         // In 24 type.
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
         String currentTimeInString = sdf.format(currentTimeStamp);
-        
+
         boolean isAfter = currentTimeInString.compareTo(availableStartTime) >= 0;
-        boolean isBefore = currentTimeInString.compareTo(availableEndTime) < 0;
-        
+        boolean isBefore = availableEndTime.compareTo(currentTimeInString) >= 0;
+
+        LOGGER.log(Level.CONFIG, "{0} {1}", new Object[]{availableStartTime, availableEndTime});
+
         if (isEnable) {
             // If the contact is isEnable, check the available time.
+
             return isAfter && isBefore;
         } else {
             // If the contact is Disable, the call is not allowed.
             return isEnable;
-        }         
+        }
     }
 
     public boolean isUserMatchToken(String userUuid) {
@@ -131,10 +142,9 @@ public class AccountsResource {
         if (user == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        LOGGER.setLevel(Level.ALL);
-        consoleHandler.setLevel(Level.CONFIG);
 
-        LOGGER.addHandler(consoleHandler);
+        initLogger();
+
         LOGGER.log(Level.CONFIG, "Get User u{0}", uuid);
 
         return Response.ok(user).build();
@@ -161,10 +171,7 @@ public class AccountsResource {
 
         dataStoreObject.save(user);
 
-        LOGGER.setLevel(Level.ALL);
-        consoleHandler.setLevel(Level.ALL);
-
-        LOGGER.addHandler(consoleHandler);
+        initLogger();
         LOGGER.log(Level.CONFIG, "Update User u{0}", user);
 
         return Response.ok().build();
@@ -185,10 +192,8 @@ public class AccountsResource {
     public Response deleteUserAccount(@PathParam("uuid") String uuid) {
         dataStoreObject.delete(User.class, uuid);
 
-        LOGGER.setLevel(Level.ALL);
-        consoleHandler.setLevel(Level.CONFIG);
+        initLogger();
 
-        LOGGER.addHandler(consoleHandler);
         LOGGER.log(Level.CONFIG, "Delete User u{0}", uuid);
 
         return Response.ok().build();
@@ -215,16 +220,17 @@ public class AccountsResource {
     ) throws IOException {
         String endPoint = Parameter.API_ROOT + Parameter.API_VER + "Call/test01/generalCallRequest/";
         User user = dataStoreObject.get(User.class, uuid);
-        
-        LOGGER.setLevel(Level.ALL);
-        consoleHandler.setLevel(Level.CONFIG);
-        LOGGER.addHandler(consoleHandler);
-        
+
+        initLogger();
+
         Contact contactToCall = dataStoreObject.createQuery(Contact.class).filter("user =", user).filter("qrCodeUuid", qrCodeUuid).get();
-        
+        contactToCall = dataStoreObject.createQuery(Contact.class)
+                .filter("user =", contactToCall.getProviderUser())
+                .filter("qrCodeUuid =", qrCodeUuid).get();
+
         LOGGER.log(Level.CONFIG, " ContactToCall {0}", contactToCall);
         LOGGER.log(Level.CONFIG, " qrCodeUuid {0}", qrCodeUuid);
-                
+
         if (isAllowedToCall(contactToCall)) {
             String caller = callBean.getCaller();
             String callee = callBean.getCallee();
@@ -255,9 +261,8 @@ public class AccountsResource {
 
         List<Contact> contactList = dataStoreObject.find(Contact.class).field("user").equal(user).asList();
 
-        LOGGER.setLevel(Level.ALL);
-        consoleHandler.setLevel(Level.CONFIG);
-        LOGGER.addHandler(consoleHandler);
+        initLogger();
+
         LOGGER.log(Level.CONFIG, "Contact Length {0}", contactList.size());
 
         List<UserContactBean> userList = new ArrayList();
@@ -276,23 +281,24 @@ public class AccountsResource {
             userContactBean.setPhoneNumber(provider.getPhoneNumber());
             userContactBean.setProviderIsEnable(providerContact.getIsEnable());
             userContactBean.setProfilePhotoId(provider.getProfilePhotoId());
+            
             userContactBean.setAvailableEndTime(contact.getAvailableEndTime());
-            userContactBean.setChargeType(contact.getChargeType());
             userContactBean.setAvailableStartTime(contact.getAvailableStartTime());
+            userContactBean.setChargeType(contact.getChargeType());
             userContactBean.setIsEnable(contact.getIsEnable());
             userContactBean.setCustomerIcon(contact.getCustomerIcon());
             userContactBean.setNickName(contact.getNickName());
             userContactBean.setQrCodeUuid(contact.getQrCodeUuid());
             userContactBean.setIsHigherPriorityThanGlobal(contact.getIsHigherPriorityThanGlobal());
-            
-            if (contact.getIsHigherPriorityThanGlobal()) {
-                userContactBean.setProviderAvailableEndTime(contact.getAvailableEndTime());
-                userContactBean.setProviderAvailableStartTime(contact.getAvailableStartTime());
+
+            if (providerContact.getIsHigherPriorityThanGlobal()) {
+                userContactBean.setProviderAvailableEndTime(providerContact.getAvailableEndTime());
+                userContactBean.setProviderAvailableStartTime(providerContact.getAvailableStartTime());
             } else {
                 userContactBean.setProviderAvailableEndTime(provider.getAvailableEndTime());
                 userContactBean.setProviderAvailableStartTime(provider.getAvailableStartTime());
             }
-            
+
             userList.add(userContactBean);
         }
 
@@ -324,14 +330,11 @@ public class AccountsResource {
             @QueryParam("availableEndTime") String availableEndTime,
             @QueryParam("isEnable") String isEnable,
             @QueryParam("isHigherPriorityThanGlobal") String isHigherPriorityThanGlobal
-            ) {
+    ) {
         User u = dataStoreObject.get(User.class, uuid);
         Contact modifiedContact = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", u).get();
 
-        LOGGER.setLevel(Level.ALL);
-        consoleHandler.setLevel(Level.CONFIG);
-
-        LOGGER.addHandler(consoleHandler);
+        initLogger();
 
         LOGGER.log(Level.CONFIG, "Save A Contact.{0}", nickName);
 
@@ -347,7 +350,7 @@ public class AccountsResource {
             }
 
         }
-        
+
         if (isHigherPriorityThanGlobal != null) {
             if (isHigherPriorityThanGlobal.equalsIgnoreCase("true")) {
                 modifiedContact.setIsHigherPriorityThanGlobal(true);
@@ -385,10 +388,8 @@ public class AccountsResource {
         User owner = dataStoreObject.get(User.class, uuid);
         List<User> providers = dataStoreObject.createQuery(User.class).field("qrCodeUuid").equal(qrCodeUuid).asList();
 
-        LOGGER.setLevel(Level.ALL);
-        consoleHandler.setLevel(Level.CONFIG);
+        initLogger();
 
-        LOGGER.addHandler(consoleHandler);
         LOGGER.log(Level.CONFIG, "Save A Contact.");
 
         List<Contact> contacts = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", owner).asList();
@@ -408,17 +409,17 @@ public class AccountsResource {
                 contact.setQrCodeUuid(qrCodeUuid);
                 contact.setIsEnable(true);
                 contact.setChargeType(1);
+                contact.setAvailableStartTime("00:00");
+                contact.setAvailableEndTime("23:59");
                 dataStoreObject.save(contact);
 
                 // the contact of the provider side.
                 contact.setId(new ObjectId());
                 contact.setUser(provider);
                 contact.setProviderUser(owner);
-                contact.setQrCodeUuid(qrCodeUuid);
-                contact.setIsEnable(true);
                 contact.setNickName("");
                 contact.setChargeType(2);
-                
+
                 dataStoreObject.save(contact);
             } else {
                 // icon
@@ -482,7 +483,7 @@ public class AccountsResource {
             return Response.status(Status.NOT_FOUND).build();
         }
         String s3Bucket = "voice-in";
-        String file = String.format("qrCode/%s.png", user.getUuid());
+        String file = String.format("qrCode/%s.png", user.getQrCodeUuid());
         GetObjectRequest request = new GetObjectRequest(s3Bucket, file);
         S3Object object = s3Client.getObject(request);
         qrCodeData = IOUtils.toByteArray(object.getObjectContent());
