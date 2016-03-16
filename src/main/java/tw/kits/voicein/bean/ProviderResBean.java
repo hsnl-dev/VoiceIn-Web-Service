@@ -15,6 +15,12 @@ public class ProviderResBean {
     private String profile;
     private String location;
     private String company;
+    private String customerName;
+    private String customerPhoneNum;
+    private String customerCompany;
+    private String customerLocation;
+    private String state;
+    private String type;
 
     /**
      * @return the name
@@ -86,5 +92,89 @@ public class ProviderResBean {
      */
     public void setAvatarId(String avatarId) {
         this.avatarId = avatarId;
+    }
+
+    /**
+     * @return the customerCompany
+     */
+    public String getCustomerCompany() {
+        return customerCompany;
+    }
+
+    /**
+     * @param customerCompany the customerCompany to set
+     */
+    public void setCustomerCompany(String customerCompany) {
+        this.customerCompany = customerCompany;
+    }
+
+    /**
+     * @return the customerName
+     */
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    /**
+     * @param customerName the customerName to set
+     */
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    /**
+     * @return the customerPhoneNum
+     */
+    public String getCustomerPhoneNum() {
+        return customerPhoneNum;
+    }
+
+    /**
+     * @param customerPhoneNum the customerPhoneNum to set
+     */
+    public void setCustomerPhoneNum(String customerPhoneNum) {
+        this.customerPhoneNum = customerPhoneNum;
+    }
+
+    /**
+     * @return the customerLocation
+     */
+    public String getCustomerLocation() {
+        return customerLocation;
+    }
+
+    /**
+     * @param customerLocation the customerLocation to set
+     */
+    public void setCustomerLocation(String customerLocation) {
+        this.customerLocation = customerLocation;
+    }
+
+    /**
+     * @return the state
+     */
+    public String getState() {
+        return state;
+    }
+
+    /**
+     * @param state the state to set
+     */
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    /**
+     * @return the type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(String type) {
+        this.type = type;
     }
 }

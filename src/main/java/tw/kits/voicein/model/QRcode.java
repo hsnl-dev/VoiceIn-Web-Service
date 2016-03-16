@@ -17,6 +17,8 @@ public class QRcode {
     private User provider;
     private String userName;
     private String phoneNumber;
+    private String location;
+    private String company;
     private String state;
     private Date createdAt;
     private Date updateAt;
@@ -132,6 +134,34 @@ public class QRcode {
      */
     public void setType(String type) {
         this.type = type;
+    }
+
+    /**
+     * @return the location
+     */
+    public String getLocation() {
+        return location;
+    }
+
+    /**
+     * @param location the location to set
+     */
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    /**
+     * @return the company
+     */
+    public String getCompany() {
+        return company;
+    }
+
+    /**
+     * @param company the company to set
+     */
+    public void setCompany(String company) {
+        this.company = company;
     }
     
     

@@ -674,6 +674,8 @@ public class AccountsResource {
         QRcode code = new QRcode();
         code.setId(qrCodeUuid);
         code.setPhoneNumber(info.getPhoneNumber());
+        code.setLocation(info.getLocation());
+        code.setCompany(info.getCompany());
         code.setProvider(user);
         code.setType(QRcodeType.TYPE_SPECIAL);
         code.setState(QRcodeType.STATE_ENABLED);
@@ -741,6 +743,8 @@ public class AccountsResource {
             return Response.status(Status.UNAUTHORIZED).build();
         }
         code.setPhoneNumber(info.getPhoneNumber());
+        code.setCompany(info.getCompany());
+        code.setLocation(info.getLocation());
         code.setUserName(info.getName());
         code.setUpdateAt(new Date());
         dataStoreObject.save(code);

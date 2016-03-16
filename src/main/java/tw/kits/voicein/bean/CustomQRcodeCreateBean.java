@@ -17,7 +17,8 @@ public class CustomQRcodeCreateBean {
     @NotNull
     private String phoneNumber;
     private String company;
-
+    private String location;
+    
     /**
      * @return the name
      */
@@ -58,6 +59,20 @@ public class CustomQRcodeCreateBean {
      */
     public void setCompany(String company) {
         this.company = company;
+    }
+
+    /**
+     * @return the location
+     */
+    public String getLocation() {
+        return location;
+    }
+
+    /**
+     * @param location the location to set
+     */
+    public void setLocation(String location) {
+        this.location = location;
     }
     
 
