@@ -25,6 +25,7 @@ import tw.kits.voicein.bean.IconUpdateBean;
 import tw.kits.voicein.bean.ProviderResBean;
 import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.Icon;
+import tw.kits.voicein.model.QRcode;
 import tw.kits.voicein.model.User;
 import tw.kits.voicein.util.Http;
 import tw.kits.voicein.util.MongoManager;
@@ -112,17 +113,20 @@ public class IconResource {
     @Path("/providers/{providerId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getIconProvider(@PathParam("providerId") String uProviderId) {
-        List<User> users = dsObj.createQuery(User.class).field("qrCodeUuid").equal(uProviderId).asList();
-        if (users.size() != 1) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        User user = users.get(0);
+        QRcode code = dsObj.get(QRcode.class, uProviderId); 
+        User user = code.getProvider();
         ProviderResBean prb = new ProviderResBean();
         prb.setName(user.getUserName());
         prb.setCompany(user.getCompany());
         prb.setLocation(user.getLocation());
         prb.setProfile(user.getProfile());
         prb.setAvatarId(user.getProfilePhotoId());
+        prb.setCustomerName(code.getUserName());
+        prb.setCustomerCompany(code.getCompany());
+        prb.setCustomerLocation(code.getLocation());
+        prb.setCustomerPhoneNum(code.getPhoneNumber());
+        prb.setType(code.getType());
+        prb.setState(code.getState());
         return Response.ok(prb).build();
     }
 

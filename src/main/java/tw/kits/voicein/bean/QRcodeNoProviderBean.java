@@ -15,6 +15,8 @@ public class QRcodeNoProviderBean {
     private String state;
     private Date createdAt;
     private Date updateAt;
+    private String location;
+    private String company;
     private String type;
     public QRcodeNoProviderBean(){}
     public QRcodeNoProviderBean(QRcode code){
@@ -22,6 +24,8 @@ public class QRcodeNoProviderBean {
         this.id = code.getId();
         this.userName = code.getUserName();
         this.phoneNumber = code.getPhoneNumber();
+        this.location = code.getLocation();
+        this.company = code.getCompany();
         this.state = code.getState();
         this.createdAt = code.getCreatedAt();
         this.updateAt = code.getUpdateAt();
@@ -123,6 +127,34 @@ public class QRcodeNoProviderBean {
      */
     public void setType(String type) {
         this.type = type;
+    }
+
+    /**
+     * @return the location
+     */
+    public String getLocation() {
+        return location;
+    }
+
+    /**
+     * @param location the location to set
+     */
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    /**
+     * @return the company
+     */
+    public String getCompany() {
+        return company;
+    }
+
+    /**
+     * @param company the company to set
+     */
+    public void setCompany(String company) {
+        this.company = company;
     }
     
     

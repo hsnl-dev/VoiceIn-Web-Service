@@ -26,6 +26,9 @@ public class ApplicationConfig extends Application {
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(tw.kits.voicein.filter.KeySecurityFilter.class);
         resources.add(tw.kits.voicein.filter.TokenSecurityFilter.class);
+        resources.add(tw.kits.voicein.resource.ApiV1.AccountAvatarsResource.class);
+        resources.add(tw.kits.voicein.resource.ApiV1.AccountContactsResource.class);
+        resources.add(tw.kits.voicein.resource.ApiV1.AccountQRcodesResource.class);
         resources.add(tw.kits.voicein.resource.ApiV1.AccountsResource.class);
         resources.add(tw.kits.voicein.resource.ApiV1.IconResource.class);
         resources.add(tw.kits.voicein.resource.ApiV1.QRcodeResource.class);
