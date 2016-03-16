@@ -5,19 +5,22 @@
  */
 package tw.kits.voicein.util;
 
-import static com.sun.xml.internal.ws.spi.db.BindingContextFactory.LOGGER;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.core.SecurityContext;
 import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.User;
+import tw.kits.voicein.resource.ApiV1.AccountAvatarsResource;
 
 /**
  *
  * @author Henry
  */
 public class Helpers {
+
+    static final Logger LOGGER = Logger.getLogger(Helpers.class.getName());
 
     public static boolean isUserMatchToken(String userUuid, SecurityContext sc) {
         String tokenUserUuid = sc.getUserPrincipal().getName();
@@ -32,8 +35,6 @@ public class Helpers {
         String availableEndTime;
         User provider = contact.getUser();
         boolean isEnable = contact.getIsEnable();
-
-      
 
         if (contact.getIsHigherPriorityThanGlobal()) {
             availableStartTime = contact.getAvailableStartTime();
