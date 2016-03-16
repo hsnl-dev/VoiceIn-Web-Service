@@ -43,7 +43,6 @@ import org.mongodb.morphia.query.UpdateOperations;
 import tw.kits.voicein.bean.ErrorMessageBean;
 import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.User;
-import static tw.kits.voicein.resource.ApiV1.AccountsResource.LOGGER;
 import tw.kits.voicein.util.ImageProceesor;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.Parameter;
@@ -58,7 +57,7 @@ public class AccountAvatarsResource {
     private static final int AVATAR_SMALL = 64;
     @Context
     SecurityContext mContext;
-    static final Logger LOGGER = Logger.getLogger(AccountsResource.class.getName());
+    static final Logger LOGGER = Logger.getLogger(AccountAvatarsResource.class.getName());
 //    private String tokenUser = context.getUserPrincipal().getName(); //user id of token
     ConsoleHandler consoleHandler = new ConsoleHandler();
     MongoManager mongoManager = MongoManager.getInstatnce();

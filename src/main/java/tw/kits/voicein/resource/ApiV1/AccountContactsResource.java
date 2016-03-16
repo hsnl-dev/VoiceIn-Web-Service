@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.annotation.MultipartConfig;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
@@ -31,10 +32,12 @@ import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.TokenRequired;
 
+@MultipartConfig(maxFileSize = 1024 * 1024 * 1)
+@Path("/api/v1")
 public class AccountContactsResource {
     @Context
     SecurityContext mContext;
-    static final Logger LOGGER = Logger.getLogger(AccountsResource.class.getName());
+    static final Logger LOGGER = Logger.getLogger(AccountContactsResource.class.getName());
     ConsoleHandler consoleHandler = new ConsoleHandler();
     MongoManager mongoManager = MongoManager.getInstatnce();
     Datastore dataStoreObject = mongoManager.getDs();

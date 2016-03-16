@@ -48,7 +48,7 @@ import tw.kits.voicein.util.TokenRequired;
 public class AccountQRcodesResource {
     @Context
     SecurityContext mContext;
-    static final Logger LOGGER = Logger.getLogger(AccountsResource.class.getName());
+    static final Logger LOGGER = Logger.getLogger(AccountQRcodesResource.class.getName());
 //    private String tokenUser = context.getUserPrincipal().getName(); //user id of token
     ConsoleHandler consoleHandler = new ConsoleHandler();
     MongoManager mongoManager = MongoManager.getInstatnce();
