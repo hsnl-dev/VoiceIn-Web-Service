@@ -7,7 +7,6 @@ package tw.kits.voicein.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.core.SecurityContext;
@@ -52,20 +51,17 @@ public class Helpers {
 
         boolean isAfter = currentTimeInString.compareTo(availableStartTime) >= 0;
         boolean isBefore = availableEndTime.compareTo(currentTimeInString) >= 0;
-        
-        ConsoleHandler consoleHandler = new ConsoleHandler();
-        
+               
         LOGGER.setLevel(Level.ALL);
-        consoleHandler.setLevel(Level.CONFIG);
-        LOGGER.addHandler(consoleHandler);
         LOGGER.log(Level.CONFIG, "{0} {1}", new Object[]{availableStartTime, availableEndTime});
 
         if (isEnable) {
             // If the contact is isEnable, check the available time.
-
+            LOGGER.log(Level.CONFIG, "{0}-{1}", new Object[]{isAfter, isAfter});
             return isAfter && isBefore;
         } else {
             // If the contact is Disable, the call is not allowed.
+            LOGGER.log(Level.CONFIG, "{0}", isEnable);
             return isEnable;
         }
     }
