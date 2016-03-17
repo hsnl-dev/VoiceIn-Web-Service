@@ -7,7 +7,7 @@ package tw.kits.voicein.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
+import java.util.TimeZone;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,8 +52,9 @@ public class Helpers {
         // Get current time.
         Date currentTimeStamp = new Date();
         // In 24 type.
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.TAIWAN);
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
         String currentTimeInString = sdf.format(currentTimeStamp);
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT+08:00"));        
 
         // timeA.compareTo(timeB) timeA > timeB; return 1; timeA = time B; return 0; timeA < timeB; return -1;
         boolean isAfter = currentTimeInString.compareTo(availableStartTime) >= 0;
