@@ -80,6 +80,7 @@ public class AccountContactsResource {
             userContactBean.setCompany(provider.getCompany());
             userContactBean.setProfile(provider.getProfile());
             userContactBean.setPhoneNumber(provider.getPhoneNumber());
+            LOGGER.log(Level.CONFIG, "Contact Length {0}", Helpers.isAllowedToCall(providerContact));
             userContactBean.setProviderIsEnable(Helpers.isAllowedToCall(providerContact));
             userContactBean.setProfilePhotoId(provider.getProfilePhotoId());
             
