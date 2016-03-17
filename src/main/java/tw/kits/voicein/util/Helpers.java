@@ -53,8 +53,9 @@ public class Helpers {
         Date currentTimeStamp = new Date();
         // In 24 type.
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+
         String currentTimeInString = sdf.format(currentTimeStamp);
-        sdf.setTimeZone(TimeZone.getTimeZone("GMT+08:00"));        
 
         // timeA.compareTo(timeB) timeA > timeB; return 1; timeA = time B; return 0; timeA < timeB; return -1;
         boolean isAfter = currentTimeInString.compareTo(availableStartTime) >= 0;
