@@ -7,6 +7,7 @@ package tw.kits.voicein.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.core.SecurityContext;
@@ -50,8 +51,11 @@ public class Helpers {
         String currentTimeInString = sdf.format(currentTimeStamp);
 
         boolean isAfter = currentTimeInString.compareTo(availableStartTime) >= 0;
-        boolean isBefore = availableEndTime.compareTo(currentTimeInString) >= 0;
-               
+        boolean isBefore = currentTimeInString.compareTo(availableEndTime) < 0;
+        
+        ConsoleHandler consoleHandler = new ConsoleHandler();
+        consoleHandler.setLevel(Level.CONFIG);
+        LOGGER.addHandler(consoleHandler);    
         LOGGER.setLevel(Level.ALL);
         LOGGER.log(Level.CONFIG, "{0} {1}", new Object[]{availableStartTime, availableEndTime});
 
