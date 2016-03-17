@@ -1,6 +1,6 @@
 VoiceIn API Service
 ==
-[![](https://ci.solanolabs.com:443/lockys/Voice/badges/branches/codepipeline?badge_token=e818d8f4436139a1cdaba32067da033a18f4dc03)](https://ci.solanolabs.com:443/lockys/Voice/suites/405780)
+[![](https://ci.solanolabs.com:443/lockys/voicein-web-service/badges/branches/master?badge_token=ccb38a2563b0d1ec633a806eaba81fe508bd60db)](https://ci.solanolabs.com:443/lockys/voicein-web-service/suites/411996)  
 VoiceIn API Web Service using jersey on Beanstalk.  
 https://voicein-web-service.us-west-2.elasticbeanstalk.com
 Prerequisite
