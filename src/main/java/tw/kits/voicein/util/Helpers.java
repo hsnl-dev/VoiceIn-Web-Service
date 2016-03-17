@@ -7,13 +7,14 @@ package tw.kits.voicein.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.core.SecurityContext;
 import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.User;
-    
+
 /**
  *
  * @author Henry
@@ -33,6 +34,10 @@ public class Helpers {
     public static boolean isAllowedToCall(Contact contact) {
         String availableStartTime;
         String availableEndTime;
+        ConsoleHandler consoleHandler = new ConsoleHandler();
+        consoleHandler.setLevel(Level.CONFIG);
+        LOGGER.addHandler(consoleHandler);
+
         User provider = contact.getUser();
         boolean isEnable = contact.getIsEnable();
 
@@ -48,14 +53,14 @@ public class Helpers {
         Date currentTimeStamp = new Date();
         // In 24 type.
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+
         String currentTimeInString = sdf.format(currentTimeStamp);
 
+        // timeA.compareTo(timeB) timeA > timeB; return 1; timeA = time B; return 0; timeA < timeB; return -1;
         boolean isAfter = currentTimeInString.compareTo(availableStartTime) >= 0;
-        boolean isBefore = currentTimeInString.compareTo(availableEndTime) < 0;
-        
-        ConsoleHandler consoleHandler = new ConsoleHandler();
-        consoleHandler.setLevel(Level.CONFIG);
-        LOGGER.addHandler(consoleHandler);    
+        boolean isBefore = currentTimeInString.compareTo(availableEndTime) <= 0;
+
         LOGGER.setLevel(Level.ALL);
         LOGGER.log(Level.CONFIG, "{0} {1}", new Object[]{availableStartTime, availableEndTime});
 
