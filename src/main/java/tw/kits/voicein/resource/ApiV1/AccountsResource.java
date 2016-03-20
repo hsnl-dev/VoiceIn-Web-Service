@@ -20,6 +20,7 @@ import javax.validation.Valid;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
+import tw.kits.voicein.model.Icon;
 
 import tw.kits.voicein.util.Helpers;
 
@@ -120,6 +121,54 @@ public class AccountsResource {
         LOGGER.log(Level.CONFIG, "Delete User u{0}", uuid);
 
         return Response.ok().build();
+    }
+
+    /***
+     * this method is to call to icon cutstomer
+     * 
+     * 401 permission denied
+     * 403 icon is not available
+     * 500 internal error kit server may suffer downtime
+     * 201 success
+     * 
+     * @param userUuid
+     * @param iconUuid
+     * @return
+     * 
+     *      
+     */
+    @POST
+    @Path("/accounts/{uuid}/iconCalls/{iconUuid}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @TokenRequired
+    public Response makeIconCall(@PathParam("uuid") String userUuid, @PathParam("iconUuid") String iconUuid) {
+        Icon target = dataStoreObject.get(Icon.class, iconUuid);
+        User user = dataStoreObject.get(User.class, userUuid);
+        String endPoint = Parameter.API_ROOT + Parameter.API_VER + "Call/test01/generalCallRequest/";
+        if (!Helpers.isUserMatchToken(userUuid, context)) {
+            return Response.status(Status.UNAUTHORIZED).build();
+        }
+        if (!userUuid.equals(target.getProvider().getUuid())) {
+            return Response.status(Status.UNAUTHORIZED).build();
+        }
+        if (!Helpers.isAllowedToCall(target)) {
+            return Response.status(Status.FORBIDDEN).build();
+        }
+        String caller = user.getPhoneNumber();
+        String callee = target.getPhoneNumber();
+        String payload = "{\"caller\":\"%s\",\"callee\":\"%s\",\"check\":false}";
+
+        Http http = new Http();
+        System.out.println(payload);
+        try {
+            System.out.println(http.post(endPoint, String.format(payload, caller, callee)));
+        } catch (IOException ex) {
+            Logger.getLogger(AccountsResource.class.getName()).log(Level.SEVERE, null, ex);
+            return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        }
+        return Response.status(Status.CREATED).build();
+
     }
 
     /**

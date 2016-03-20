@@ -75,40 +75,115 @@ public class IconCreateBean {
         this.customer.setPhoneNumber(phoneNumber);
     }
 
-}
+    public class Customer {
 
-class Customer {
+        private String name;
+        @NotNull
+        private String phoneNumber;
+        private String location;
+        private String company;
+        private String availableStartTime;
+        private String availableEndTime;
+        private Boolean isEnable;
+        /**
+         * @return the name
+         */
+        public String getName() {
+            return name;
+        }
 
-    @NotNull
-    private String name;
-    @NotNull
-    private String phoneNumber;
+        /**
+         * @param name the name to set
+         */
+        public void setName(String name) {
+            this.name = name;
+        }
 
-    /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
+        /**
+         * @return the phoneNumber
+         */
+        public String getPhoneNumber() {
+            return phoneNumber;
+        }
+
+        /**
+         * @param phoneNumber the phoneNumber to set
+         */
+        public void setPhoneNumber(String phoneNumber) {
+            this.phoneNumber = phoneNumber;
+        }
+
+        /**
+         * @return the location
+         */
+        public String getLocation() {
+            return location;
+        }
+
+        /**
+         * @param location the location to set
+         */
+        public void setLocation(String location) {
+            this.location = location;
+        }
+
+        /**
+         * @return the company
+         */
+        public String getCompany() {
+            return company;
+        }
+
+        /**
+         * @param company the company to set
+         */
+        public void setCompany(String company) {
+            this.company = company;
+        }
+
+        /**
+         * @return the availableStartTime
+         */
+        public String getAvailableStartTime() {
+            return availableStartTime;
+        }
+
+        /**
+         * @param availableStartTime the availableStartTime to set
+         */
+        public void setAvailableStartTime(String availableStartTime) {
+            this.availableStartTime = availableStartTime;
+        }
+
+        /**
+         * @return the availableEndTime
+         */
+        public String getAvailableEndTime() {
+            return availableEndTime;
+        }
+
+        /**
+         * @param availableEndTime the availableEndTime to set
+         */
+        public void setAvailableEndTime(String availableEndTime) {
+            this.availableEndTime = availableEndTime;
+        }
+
+        /**
+         * @return the isEnable
+         */
+        public Boolean getIsEnable() {
+            return isEnable;
+        }
+
+        /**
+         * @param isEnable the isEnable to set
+         */
+        public void setIsEnable(Boolean isEnable) {
+            this.isEnable = isEnable;
+        }
+
+     
     }
 
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * @return the phoneNumber
-     */
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    /**
-     * @param phoneNumber the phoneNumber to set
-     */
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
 }
