@@ -27,9 +27,12 @@ import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.Icon;
 import tw.kits.voicein.model.QRcode;
 import tw.kits.voicein.model.User;
+import tw.kits.voicein.util.ContactConstants;
+import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.Http;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.Parameter;
+
 
 /**
  * *
@@ -55,22 +58,33 @@ public class IconResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/icons")
     public Response genIcon(@Valid @NotNull IconCreateBean icb) {
-        List<User> users = dsObj.createQuery(User.class).field("qrCodeUuid").equal(icb.getProviderUuid()).asList();
-        if (users.size() != 1) {
+        QRcode code = dsObj.get(QRcode.class, icb.getProviderUuid());
+        if (code==null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         //set icon
         LOGGER.info("setting icon");
         Icon icon = new Icon();
         icon.setIconId(UUID.randomUUID().toString());
-        icon.setProvider(users.get(0));
+        icon.setProvider(code.getProvider());
         icon.setName(icb.getName());
         icon.setPhoneNumber(icb.getPhoneNumber());
+        icon.setAvailableStartTime(icb.getCustomer().getAvailableStartTime());
+        icon.setAvailableEndTime(icb.getCustomer().getAvailableEndTime());
+        icon.setCompany(icb.getCustomer().getCompany());
+        icon.setLocation(icb.getCustomer().getLocation());
+        icon.setIsEnable(icb.getCustomer().getIsEnable()==null? true : icb.getCustomer().getIsEnable());
         dsObj.save(icon);
         LOGGER.info("add to user contact");
+        
+        //provider!
         Contact contact = new Contact();
-        contact.setUser(users.get(0));
         contact.setCustomerIcon(icon);
+        contact.setChargeType(ContactConstants.TYPE_ICON);
+        contact.setIsEnable(true);
+        contact.setIsHigherPriorityThanGlobal(false);
+        contact.setAvailableEndTime("23:59");
+        contact.setAvailableStartTime("00:00");
         dsObj.save(contact);
         HashMap<String, String> res = new HashMap<String, String>();
         res.put("iconId", icon.getIconId());
@@ -100,6 +114,12 @@ public class IconResource {
         if (iub.getPhoneNumber() != null) {
             icon.setPhoneNumber(iub.getPhoneNumber());
         }
+        icon.setAvailableEndTime(uuid);
+        icon.setAvailableStartTime(uuid);
+        icon.setCompany(uuid);
+        icon.setIsEnable(Boolean.FALSE);
+        icon.setLocation(uuid);
+        dsObj.save(icon);
         return Response.ok().build();
     }
 
@@ -143,13 +163,27 @@ public class IconResource {
     @Path("/icons/{iconId}/calls")
     public Response callAfterConfirm(@PathParam("iconId") String iconId) throws IOException {
         Icon icon = dsObj.get(Icon.class, iconId);
-        if (icon == null) {
-            return Response.status(Status.NOT_FOUND).build();
+         if (icon == null) {
+             ErrorMessageBean erb = new ErrorMessageBean("icon is not found");
+            return Response.status(Status.NOT_FOUND).entity(erb).build();
         }
+        List<Contact> target = dsObj.createQuery(Contact.class).field("customerIcon").equal(icon).asList();
+        if(target.size()!=1){
+            ErrorMessageBean erb = new ErrorMessageBean("contact is not found");
+            return Response.status(Status.NOT_FOUND).entity(erb).build();
+        }
+        if(!Helpers.isAllowedToCall(target.get(0))){
+            ErrorMessageBean erb = new ErrorMessageBean("Call is not allowed");
+            return Response.status(Status.FORBIDDEN).entity(erb).build();
+        }
+        
+       
         String endPoint = Parameter.API_ROOT + Parameter.API_VER + "Call/test01/generalCallRequest/";
         HashMap<String, Object> sendToObj = new HashMap<String, Object>();
-        sendToObj.put("callee", icon.getPhoneNumber());
-        sendToObj.put("caller", icon.getProvider().getPhoneNumber());
+        
+        
+        sendToObj.put("caller", icon.getPhoneNumber());
+        sendToObj.put("callee", target.get(0).getUser().getPhoneNumber());
         sendToObj.put("check", false);
         LOGGER.info(String.format("Starting calling %s", endPoint));
         Http http = new Http();
