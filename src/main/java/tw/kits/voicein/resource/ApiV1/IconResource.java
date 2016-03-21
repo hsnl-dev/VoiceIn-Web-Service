@@ -79,6 +79,7 @@ public class IconResource {
 
         //provider!
         Contact contact = new Contact();
+        contact.setUser(code.getProvider());
         contact.setCustomerIcon(icon);
         contact.setChargeType(ContactConstants.TYPE_ICON);
         contact.setIsEnable(true);
