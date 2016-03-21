@@ -35,18 +35,21 @@ import tw.kits.voicein.util.TokenRequired;
 @MultipartConfig(maxFileSize = 1024 * 1024 * 1)
 @Path("/api/v1")
 public class AccountContactsResource {
+
     @Context
     SecurityContext mContext;
     static final Logger LOGGER = Logger.getLogger(AccountContactsResource.class.getName());
     ConsoleHandler consoleHandler = new ConsoleHandler();
     MongoManager mongoManager = MongoManager.getInstatnce();
     Datastore dataStoreObject = mongoManager.getDs();
+
     private void initLogger() {
         LOGGER.setLevel(Level.ALL);
         consoleHandler.setLevel(Level.CONFIG);
         LOGGER.addHandler(consoleHandler);
     }
-      /**
+
+    /**
      * This API allows user to get their contact list. API By Calvin
      *
      * @param uuid
@@ -72,18 +75,27 @@ public class AccountContactsResource {
         for (Contact contact : contactList) {
             userContactBean = new UserContactBean();
             User provider = contact.getProviderUser();
-            Contact providerContact = dataStoreObject.find(Contact.class).filter("user =", provider).filter("qrCodeUuid =", contact.getQrCodeUuid()).get();
+            if (provider != null) {
+                Contact providerContact = dataStoreObject.find(Contact.class).filter("user =", provider).filter("qrCodeUuid =", contact.getQrCodeUuid()).get();
+                userContactBean.setCompany(provider.getCompany());
+                userContactBean.setUserName(provider.getUserName());
+                userContactBean.setLocation(provider.getLocation());
+                userContactBean.setCompany(provider.getCompany());
+                userContactBean.setProfile(provider.getProfile());
+                userContactBean.setPhoneNumber(provider.getPhoneNumber());
+                LOGGER.log(Level.CONFIG, "Contact Length {0}", Helpers.isAllowedToCall(providerContact));
+                userContactBean.setProviderIsEnable(Helpers.isAllowedToCall(providerContact));
+                userContactBean.setProfilePhotoId(provider.getProfilePhotoId());
+                if (providerContact.getIsHigherPriorityThanGlobal()) {
+                    userContactBean.setProviderAvailableEndTime(providerContact.getAvailableEndTime());
+                    userContactBean.setProviderAvailableStartTime(providerContact.getAvailableStartTime());
+                } else {
+                    userContactBean.setProviderAvailableEndTime(provider.getAvailableEndTime());
+                    userContactBean.setProviderAvailableStartTime(provider.getAvailableStartTime());
+                }
 
-            userContactBean.setCompany(provider.getCompany());
-            userContactBean.setUserName(provider.getUserName());
-            userContactBean.setLocation(provider.getLocation());
-            userContactBean.setCompany(provider.getCompany());
-            userContactBean.setProfile(provider.getProfile());
-            userContactBean.setPhoneNumber(provider.getPhoneNumber());
-            LOGGER.log(Level.CONFIG, "Contact Length {0}", Helpers.isAllowedToCall(providerContact));
-            userContactBean.setProviderIsEnable(Helpers.isAllowedToCall(providerContact));
-            userContactBean.setProfilePhotoId(provider.getProfilePhotoId());
-            
+            }
+
             userContactBean.setAvailableEndTime(contact.getAvailableEndTime());
             userContactBean.setAvailableStartTime(contact.getAvailableStartTime());
             userContactBean.setChargeType(contact.getChargeType());
@@ -93,21 +105,12 @@ public class AccountContactsResource {
             userContactBean.setQrCodeUuid(contact.getQrCodeUuid());
             userContactBean.setIsHigherPriorityThanGlobal(contact.getIsHigherPriorityThanGlobal());
 
-            if (providerContact.getIsHigherPriorityThanGlobal()) {
-                userContactBean.setProviderAvailableEndTime(providerContact.getAvailableEndTime());
-                userContactBean.setProviderAvailableStartTime(providerContact.getAvailableStartTime());
-            } else {
-                userContactBean.setProviderAvailableEndTime(provider.getAvailableEndTime());
-                userContactBean.setProviderAvailableStartTime(provider.getAvailableStartTime());
-            }
-
             userList.add(userContactBean);
         }
 
         return Response.ok(userList).build();
     }
-    
-    
+
     /**
      * This API allows user to add a contact. API By Calvin
      *
