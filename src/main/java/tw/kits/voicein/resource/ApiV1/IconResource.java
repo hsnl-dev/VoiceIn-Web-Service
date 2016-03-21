@@ -149,7 +149,22 @@ public class IconResource {
         prb.setState(code.getState());
         return Response.ok(prb).build();
     }
-
+    /**
+     * Get icon info!!!!
+     * 200 OK
+     * 404 NOT found!
+     * @param iconId
+     * @return 
+     */
+    @GET
+    @Path("/icons/{iconId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getIconInfo(@PathParam("iconId") String iconId) {
+        Icon icon = dsObj.get(Icon.class, iconId); 
+        if(icon == null)
+            return Response.status(Status.NOT_FOUND).build();
+        return Response.ok(icon).build();
+    }
     /**
      * This API allows customer to call provider after confirm button click.
      * API By Henry
