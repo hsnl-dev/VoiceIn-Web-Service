@@ -24,6 +24,7 @@ import tw.kits.voicein.bean.UserContactBean;
 import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.Icon;
 import tw.kits.voicein.model.User;
+import tw.kits.voicein.util.ContactConstants;
 import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.TokenRequired;
@@ -201,10 +202,16 @@ public class AccountContactsResource {
  
         User provider = payContact.getProviderUser();
         String qrCodeUuid = payContact.getQrCodeUuid();
-        Contact freeContact = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", provider).get();
+        if(payContact.getChargeType()!=ContactConstants.TYPE_ICON){
+            Contact freeContact = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", provider).get();
+            dataStoreObject.delete(freeContact);
+        }else {
+            dataStoreObject.delete(payContact.getCustomerIcon());
+        }
+       
 
         dataStoreObject.delete(payContact);
-        dataStoreObject.delete(freeContact);
+        
         return Response.ok().build();
     }
 }
