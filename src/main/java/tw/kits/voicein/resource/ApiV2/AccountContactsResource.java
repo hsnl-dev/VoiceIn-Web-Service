@@ -97,9 +97,7 @@ public class AccountContactsResource {
             userContactBean.setChargeType(contact.getChargeType());
             userContactBean.setIsEnable(contact.getIsEnable());
             userContactBean.setCustomerIcon(contact.getCustomerIcon());
-            userContactBean.setNickName(contact.getNickName());
-            
-            // NOTE: It's not usefull.
+            userContactBean.setNickName(contact.getNickName());            
             userContactBean.setQrCodeUuid(contact.getQrCodeUuid());
             
             // return unique object id
