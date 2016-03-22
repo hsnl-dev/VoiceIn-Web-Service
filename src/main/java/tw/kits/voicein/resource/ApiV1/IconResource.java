@@ -38,7 +38,7 @@ public class IconResource {
 
     MongoManager mongoManager = MongoManager.getInstatnce();
     Datastore dsObj = mongoManager.getDs();
-    private final Logger LOGGER = Logger.getLogger(IconResource.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(IconResource.class.getName());
 
     /**
      * Get icon info!!!! 200 OK 404 NOT found!

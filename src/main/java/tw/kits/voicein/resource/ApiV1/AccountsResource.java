@@ -39,12 +39,6 @@ public class AccountsResource {
     MongoManager mongoManager = MongoManager.getInstatnce();
     Datastore dataStoreObject = mongoManager.getDs();
 
-    private void initLogger() {
-        LOGGER.setLevel(Level.ALL);
-        consoleHandler.setLevel(Level.CONFIG);
-        LOGGER.addHandler(consoleHandler);
-    }
-
     /**
      * This API allows client to retrieve user's full informations. API By
      * Calvin
@@ -62,11 +56,7 @@ public class AccountsResource {
         if (user == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-
-        initLogger();
-
         LOGGER.log(Level.CONFIG, "Get User u{0}", uuid);
-
         return Response.ok(user).build();
     }
 
@@ -91,9 +81,7 @@ public class AccountsResource {
 
         dataStoreObject.save(user);
 
-        initLogger();
         LOGGER.log(Level.CONFIG, "Update User u{0}", user);
-
         return Response.ok().build();
     }
 
@@ -111,11 +99,8 @@ public class AccountsResource {
     @TokenRequired
     public Response deleteUserAccount(@PathParam("uuid") String uuid) {
         dataStoreObject.delete(User.class, uuid);
-
-        initLogger();
-
+        
         LOGGER.log(Level.CONFIG, "Delete User u{0}", uuid);
-
         return Response.ok().build();
     }
 
@@ -140,8 +125,6 @@ public class AccountsResource {
     ) throws IOException {
         String endPoint = Parameter.API_ROOT + Parameter.API_VER + "Call/test01/generalCallRequest/";
         User user = dataStoreObject.get(User.class, uuid);
-
-        initLogger();
 
         Contact contactToCall = dataStoreObject.createQuery(Contact.class).filter("user =", user).filter("qrCodeUuid", qrCodeUuid).get();
         contactToCall = dataStoreObject.createQuery(Contact.class)
