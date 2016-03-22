@@ -80,7 +80,7 @@ public class AccountQRcodesResource {
         String s3FilePath = String.format("qrCode/%s.png", qrCodeUuid);
 
         // Generate QRCode Image and Upload to S3.
-        File qrCodeImage = QRCode.from(qrCodeUuid).to(ImageType.PNG).withSize(250, 250).file();
+        File qrCodeImage = QRCode.from(Parameter.WEB_SITE_QRCODE+qrCodeUuid).to(ImageType.PNG).withSize(250, 250).file();
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
         s3Client.putObject(new PutObjectRequest(s3Bucket, s3FilePath, qrCodeImage));
         u.setQrCodeUuid(qrCodeUuid);
@@ -154,7 +154,7 @@ public class AccountQRcodesResource {
         String s3FilePath = String.format("qrCode/%s.png", qrCodeUuid);
 
         // Generate QRCode Image and Upload to S3.
-        File qrCodeImage = QRCode.from(qrCodeUuid).to(ImageType.PNG).withSize(250, 250).file();
+        File qrCodeImage = QRCode.from(Parameter.WEB_SITE_QRCODE+qrCodeUuid).to(ImageType.PNG).withSize(250, 250).file();
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
         s3Client.putObject(new PutObjectRequest(s3Bucket, s3FilePath, qrCodeImage));
 

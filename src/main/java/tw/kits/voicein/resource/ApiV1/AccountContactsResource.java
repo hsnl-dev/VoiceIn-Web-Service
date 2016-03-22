@@ -27,6 +27,7 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import tw.kits.voicein.bean.UserContactBean;
 import tw.kits.voicein.model.Contact;
+import tw.kits.voicein.model.Icon;
 import tw.kits.voicein.model.User;
 import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.MongoManager;
@@ -71,10 +72,12 @@ public class AccountContactsResource {
 
         List<UserContactBean> userList = new ArrayList();
         UserContactBean userContactBean;
-
+        
         for (Contact contact : contactList) {
             userContactBean = new UserContactBean();
             User provider = contact.getProviderUser();
+            Icon icon = contact.getCustomerIcon();
+            userContactBean.setId(userContactBean.getId());
             if (provider != null) {
                 Contact providerContact = dataStoreObject.find(Contact.class).filter("user =", provider).filter("qrCodeUuid =", contact.getQrCodeUuid()).get();
                 userContactBean.setCompany(provider.getCompany());
@@ -93,6 +96,17 @@ public class AccountContactsResource {
                     userContactBean.setProviderAvailableEndTime(provider.getAvailableEndTime());
                     userContactBean.setProviderAvailableStartTime(provider.getAvailableStartTime());
                 }
+
+            } else if (icon != null) {
+                userContactBean.setCompany(icon.getCompany());
+                userContactBean.setUserName(icon.getName());
+                userContactBean.setLocation(icon.getLocation());
+                userContactBean.setCompany(icon.getCompany());
+                userContactBean.setPhoneNumber(icon.getPhoneNumber());
+                LOGGER.log(Level.CONFIG, "Contact Length {0}", Helpers.isAllowedToCall(icon));
+                userContactBean.setProviderIsEnable(Helpers.isAllowedToCall(icon));
+                userContactBean.setProviderAvailableEndTime(icon.getAvailableEndTime());
+                userContactBean.setProviderAvailableStartTime(icon.getAvailableStartTime());
 
             }
 

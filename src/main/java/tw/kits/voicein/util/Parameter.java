@@ -12,4 +12,5 @@ public interface Parameter {
     public static final String DB_NAME = System.getenv("DB_NAME") == null ? "voicein" : System.getenv("DB_NAME");
     public final static String DB_URI = System.getenv("DB_URI") == null ? "mongodb://hsnl-dev:hsnl33564hsnl33564@ds013908.mongolab.com:13908/voicein" : System.getenv("DB_URI");
     public static final Boolean IS_SANDBOX = false;
+    public static final String WEB_SITE_QRCODE= "https://voice-in.herokuapp.com/qrcode?id=";
 }
