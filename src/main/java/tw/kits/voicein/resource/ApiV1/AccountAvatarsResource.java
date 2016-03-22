@@ -62,7 +62,7 @@ public class AccountAvatarsResource {
     ConsoleHandler consoleHandler = new ConsoleHandler();
     MongoManager mongoManager = MongoManager.getInstatnce();
     Datastore dataStoreObject = mongoManager.getDs();
-       /**
+     /**
      * This API allows client to delete a contact. API By Calvin
      *
      * @param uuid

@@ -5,6 +5,7 @@
  */
 package tw.kits.voicein.bean;
 
+import org.bson.types.ObjectId;
 import tw.kits.voicein.model.Icon;
 
 /**
@@ -14,6 +15,7 @@ import tw.kits.voicein.model.Icon;
 public class UserContactBean {
 
     //Field
+    private String id; 
     private String userName;
     private String phoneNumber;
     private String location;
@@ -272,6 +274,20 @@ public class UserContactBean {
      */
     public void setIsHigherPriorityThanGlobal(Boolean isHigherPriorityThanGlobal) {
         this.isHigherPriorityThanGlobal = isHigherPriorityThanGlobal;
+    }
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(String id) {
+        this.id = id;
     }
 
 }
