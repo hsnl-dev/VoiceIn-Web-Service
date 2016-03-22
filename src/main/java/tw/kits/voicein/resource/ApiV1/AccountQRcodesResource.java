@@ -312,7 +312,7 @@ public class AccountQRcodesResource {
     @Produces("image/png")
     public Response getQRCodeImgById(@PathParam("uuid") String uuid) throws IOException {
         byte[] qrCodeData;
-        QRcode code = dsObj.get(QRcode.class, uuid);
+        QRcode code = dataStoreObject.get(QRcode.class, uuid);
         if (code == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
