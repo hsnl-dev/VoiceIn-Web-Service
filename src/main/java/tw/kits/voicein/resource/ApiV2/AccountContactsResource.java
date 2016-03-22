@@ -22,6 +22,7 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import tw.kits.voicein.bean.UserContactBean;
 import tw.kits.voicein.model.Contact;
+import tw.kits.voicein.model.Icon;
 import tw.kits.voicein.model.User;
 import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.MongoManager;
@@ -70,6 +71,7 @@ public class AccountContactsResource {
         for (Contact contact : contactList) {
             userContactBean = new UserContactBean();
             User provider = contact.getProviderUser();
+            Icon icon = contact.getCustomerIcon();
             
             if (provider != null) {
                 Contact providerContact = dataStoreObject.find(Contact.class).filter("user =", provider).filter("qrCodeUuid =", contact.getQrCodeUuid()).get();
@@ -90,6 +92,16 @@ public class AccountContactsResource {
                     userContactBean.setProviderAvailableStartTime(provider.getAvailableStartTime());
                 }
 
+            } else if (icon != null) {
+                userContactBean.setCompany(icon.getCompany());
+                userContactBean.setUserName(icon.getName());
+                userContactBean.setLocation(icon.getLocation());
+                userContactBean.setPhoneNumber(icon.getPhoneNumber());
+                
+                LOGGER.log(Level.CONFIG, "Contact Length {0}", Helpers.isAllowedToCall(icon));
+                userContactBean.setProviderIsEnable(true);
+                userContactBean.setProviderAvailableEndTime("00:00");
+                userContactBean.setProviderAvailableStartTime("23:59");
             }
 
             userContactBean.setAvailableEndTime(contact.getAvailableEndTime());
