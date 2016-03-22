@@ -72,11 +72,12 @@ public class AccountContactsResource {
 
         List<UserContactBean> userList = new ArrayList();
         UserContactBean userContactBean;
-
+        
         for (Contact contact : contactList) {
             userContactBean = new UserContactBean();
             User provider = contact.getProviderUser();
             Icon icon = contact.getCustomerIcon();
+            userContactBean.setId(userContactBean.getId());
             if (provider != null) {
                 Contact providerContact = dataStoreObject.find(Contact.class).filter("user =", provider).filter("qrCodeUuid =", contact.getQrCodeUuid()).get();
                 userContactBean.setCompany(provider.getCompany());
