@@ -26,11 +26,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.Key;
 import tw.kits.voicein.bean.AccountCallBean;
 import tw.kits.voicein.bean.AccountDialBean;
 import tw.kits.voicein.bean.ErrorMessageBean;
 import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.Icon;
+import tw.kits.voicein.model.User;
 import tw.kits.voicein.util.ContactConstants;
 import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.Http;
@@ -74,8 +76,9 @@ public class AccountsResource {
         }
         if (contact.getChargeType() != ContactConstants.TYPE_ICON) {
             int targetType = contact.getChargeType() == ContactConstants.TYPE_FREE ? ContactConstants.TYPE_CHARGE : ContactConstants.TYPE_FREE;
+            Key<User> key = new Key(User.class,"accounts",contact.getUser().getUuid());
             List<Contact> targets = dataStoreObject.createQuery(Contact.class)
-                    .field("providerUser").equal(contact.getUser().getUuid())
+                    .field("providerUser").equal(key)
                     .field("chargeType").equal(targetType)
                     .asList();
             if (targets.size() != 1) {
