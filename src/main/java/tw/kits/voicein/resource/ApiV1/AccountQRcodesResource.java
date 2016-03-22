@@ -299,4 +299,30 @@ public class AccountQRcodesResource {
 
         return Response.ok().build();
     }
+    
+    /**
+     * This API allows client to retrieve their QRCode API By Calvin
+     *
+     * @param uuid
+     * @return
+     * @throws java.io.IOException
+     */
+    @GET
+    @Path("/qrcodes/{uuid}/image")
+    @Produces("image/png")
+    public Response getQRCodeImgById(@PathParam("uuid") String uuid) throws IOException {
+        byte[] qrCodeData;
+        QRcode code = dsObj.get(QRcode.class, uuid);
+        if (code == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
+        String s3Bucket = "voice-in";
+        String file = String.format("qrCode/%s.png", uuid);
+        GetObjectRequest request = new GetObjectRequest(s3Bucket, file);
+        S3Object object = s3Client.getObject(request);
+        qrCodeData = IOUtils.toByteArray(object.getObjectContent());
+
+        return Response.ok(qrCodeData).build();
+    }
 }
