@@ -14,6 +14,7 @@ import javax.servlet.annotation.MultipartConfig;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -72,7 +73,7 @@ public class AccountContactsResource {
 
         List<UserContactBean> userList = new ArrayList();
         UserContactBean userContactBean;
-        
+
         for (Contact contact : contactList) {
             userContactBean = new UserContactBean();
             User provider = contact.getProviderUser();
@@ -190,5 +191,30 @@ public class AccountContactsResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
+    }
+
+    /**
+     * This API allows client to delete a contact. API By Calvin
+     * depreciated.
+     * @param uuid
+     * @param qrCodeUuid
+     * @return
+     */
+    @DELETE
+    @Path("/accounts/{uuid}/contacts/{qrCodeUuid}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @TokenRequired
+    public Response deleteAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid) {
+        User user = dataStoreObject.get(User.class, uuid);
+
+        Contact payContact = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", user).get();
+
+        User provider = payContact.getProviderUser();
+        Contact freeContact = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", provider).get();
+
+        dataStoreObject.delete(Contact.class, payContact.getId());
+        dataStoreObject.delete(Contact.class, freeContact.getId());
+        return Response.ok().build();
     }
 }

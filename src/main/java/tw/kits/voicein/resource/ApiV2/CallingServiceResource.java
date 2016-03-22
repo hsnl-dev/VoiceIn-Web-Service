@@ -5,7 +5,6 @@
  */
 package tw.kits.voicein.resource.ApiV2;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.HashMap;
@@ -24,10 +23,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Key;
-import tw.kits.voicein.bean.AccountCallBean;
 import tw.kits.voicein.bean.AccountDialBean;
 import tw.kits.voicein.bean.ErrorMessageBean;
 import tw.kits.voicein.model.Contact;
@@ -42,11 +39,15 @@ import tw.kits.voicein.util.TokenRequired;
 
 @MultipartConfig(maxFileSize = 1024 * 1024 * 1)
 @Path("/api/v2")
-public class AccountsResource {
+/**
+ *
+ * @author Calvin
+ */
+public class CallingServiceResource {
 
     @Context
     SecurityContext context;
-    static final Logger LOGGER = Logger.getLogger(AccountsResource.class.getName());
+    static final Logger LOGGER = Logger.getLogger(CallingServiceResource.class.getName());
 //    private String tokenUser = context.getUserPrincipal().getName(); //user id of token
     ConsoleHandler consoleHandler = new ConsoleHandler();
     MongoManager mongoManager = MongoManager.getInstatnce();
@@ -71,12 +72,12 @@ public class AccountsResource {
     ) throws IOException {
 
         Contact contact = dataStoreObject.get(Contact.class, info.getContactId());
-        if(contact == null){
+        if (contact == null) {
             return Response.status(Response.Status.NOT_FOUND).entity(new ErrorMessageBean("contact not found")).build();
         }
         if (contact.getChargeType() != ContactConstants.TYPE_ICON) {
             int targetType = contact.getChargeType() == ContactConstants.TYPE_FREE ? ContactConstants.TYPE_CHARGE : ContactConstants.TYPE_FREE;
-            Key<User> key = new Key(User.class,"accounts",contact.getUser().getUuid());
+            Key<User> key = new Key(User.class, "accounts", contact.getUser().getUuid());
             List<Contact> targets = dataStoreObject.createQuery(Contact.class)
                     .field("providerUser").equal(key)
                     .field("chargeType").equal(targetType)

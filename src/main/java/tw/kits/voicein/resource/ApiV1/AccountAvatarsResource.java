@@ -24,7 +24,6 @@ import javax.imageio.ImageIO;
 import javax.servlet.annotation.MultipartConfig;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -41,17 +40,16 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Key;
 import org.mongodb.morphia.query.UpdateOperations;
 import tw.kits.voicein.bean.ErrorMessageBean;
-import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.User;
 import tw.kits.voicein.util.ImageProceesor;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.Parameter;
 import tw.kits.voicein.util.TokenRequired;
 
-
 @MultipartConfig(maxFileSize = 1024 * 1024 * 1)
 @Path("/api/v1")
 public class AccountAvatarsResource {
+
     private static final int AVATAR_LARGE = 256;
     private static final int AVATAR_MID = 128;
     private static final int AVATAR_SMALL = 64;
@@ -62,32 +60,6 @@ public class AccountAvatarsResource {
     ConsoleHandler consoleHandler = new ConsoleHandler();
     MongoManager mongoManager = MongoManager.getInstatnce();
     Datastore dataStoreObject = mongoManager.getDs();
-     /**
-     * This API allows client to delete a contact. API By Calvin
-     *
-     * @param uuid
-     * @param qrCodeUuid
-     * @return
-     */
-    @DELETE
-    @Path("/accounts/{uuid}/contacts/{qrCodeUuid}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @TokenRequired
-    public Response deleteAcontactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid) {
-        User user = dataStoreObject.get(User.class, uuid);
-
-        Contact payContact = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", user).get();
-
-        User provider = payContact.getProviderUser();
-        Contact freeContact = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", provider).get();
-
-        dataStoreObject.delete(Contact.class, payContact.getId());
-        dataStoreObject.delete(Contact.class, freeContact.getId());
-        return Response.ok().build();
-    }
-    
-   
 
     /**
      * This API allows user to upload avatar API By Henry
@@ -147,7 +119,7 @@ public class AccountAvatarsResource {
             if (oldId != null) {
                 //delete old
                 for (int size : imageSizes) {
-                    LOGGER.log(Level.INFO, "Delete" + oldId + "-" + size + ".jpg");
+                    LOGGER.log(Level.INFO, "Delete{0}-{1}.jpg", new Object[]{oldId, size});
                     s3client.deleteObject("voice-in", "userPhotos/" + oldId + "-" + size + ".jpg");
 
                 }
@@ -168,7 +140,8 @@ public class AccountAvatarsResource {
         }
         return Response.ok().build();
     }
-      /**
+
+    /**
      * This API allows user to retrieve user's avatar by UUID of avatar. API By
      * Henry
      *
@@ -209,6 +182,7 @@ public class AccountAvatarsResource {
         S3Object object = s3Client.getObject(request);
         return IOUtils.toByteArray(object.getObjectContent());
     }
+
     /**
      * This API allows user to retrieve user's avatar by user's UUID. API By
      * Henry
