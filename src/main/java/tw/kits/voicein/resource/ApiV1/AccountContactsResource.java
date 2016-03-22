@@ -67,8 +67,6 @@ public class AccountContactsResource {
 
         List<Contact> contactList = dataStoreObject.find(Contact.class).field("user").equal(user).asList();
 
-        initLogger();
-
         LOGGER.log(Level.CONFIG, "Contact Length {0}", contactList.size());
 
         List<UserContactBean> userList = new ArrayList();
@@ -142,8 +140,6 @@ public class AccountContactsResource {
     public Response createNewContactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, @NotNull @Valid Contact contact) {
         User owner = dataStoreObject.get(User.class, uuid);
         List<User> providers = dataStoreObject.createQuery(User.class).field("qrCodeUuid").equal(qrCodeUuid).asList();
-
-        initLogger();
 
         LOGGER.log(Level.CONFIG, "Save A Contact.");
 
