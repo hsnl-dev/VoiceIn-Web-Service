@@ -84,11 +84,11 @@ public class IconResource {
         if (iub.getPhoneNumber() != null) {
             icon.setPhoneNumber(iub.getPhoneNumber());
         }
-        icon.setAvailableEndTime(uuid);
-        icon.setAvailableStartTime(uuid);
-        icon.setCompany(uuid);
+        icon.setAvailableEndTime(iub.getAvailableEndTime());
+        icon.setAvailableStartTime(iub.getAvailableStartTime());
+        icon.setCompany(iub.getCompany());
         icon.setIsEnable(Boolean.FALSE);
-        icon.setLocation(uuid);
+        icon.setLocation(iub.getLocation());
         dsObj.save(icon);
         return Response.ok().build();
     }
