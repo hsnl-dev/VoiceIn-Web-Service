@@ -87,7 +87,7 @@ public class IconResource {
         icon.setAvailableEndTime(iub.getAvailableEndTime());
         icon.setAvailableStartTime(iub.getAvailableStartTime());
         icon.setCompany(iub.getCompany());
-        icon.setIsEnable(Boolean.FALSE);
+        icon.setIsEnable(iub.getIsEnable());
         icon.setLocation(iub.getLocation());
         dsObj.save(icon);
         return Response.ok().build();
