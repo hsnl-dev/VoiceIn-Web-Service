@@ -106,7 +106,7 @@ public class AccountsResource {
 
     /**
      * Call When user click the calling button. API By Calvin
-     * depreciated.
+     * =========== This is depreciated! ===========
      * @param uuid
      * @param qrCodeUuid
      * @param callBean

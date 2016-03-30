@@ -53,7 +53,7 @@ public class AccountContactsResource {
 
     /**
      * This API allows user to get their contact list. API By Calvin
-     *
+     * =========== This is depreciated! ===========
      * @param uuid
      * @return
      */
@@ -85,7 +85,7 @@ public class AccountContactsResource {
                 userContactBean.setCompany(provider.getCompany());
                 userContactBean.setProfile(provider.getProfile());
                 userContactBean.setPhoneNumber(provider.getPhoneNumber());
-                LOGGER.log(Level.CONFIG, "Contact Length {0}", Helpers.isAllowedToCall(providerContact));
+                LOGGER.log(Level.CONFIG, "Provider is available {0}", Helpers.isAllowedToCall(providerContact));
                 userContactBean.setProviderIsEnable(Helpers.isAllowedToCall(providerContact));
                 userContactBean.setProfilePhotoId(provider.getProfilePhotoId());
                 if (providerContact.getIsHigherPriorityThanGlobal()) {
@@ -102,7 +102,7 @@ public class AccountContactsResource {
                 userContactBean.setLocation(icon.getLocation());
                 userContactBean.setCompany(icon.getCompany());
                 userContactBean.setPhoneNumber(icon.getPhoneNumber());
-                LOGGER.log(Level.CONFIG, "Contact Length {0}", Helpers.isAllowedToCall(icon));
+                LOGGER.log(Level.CONFIG, "Icon is available {0}", Helpers.isAllowedToCall(icon));
                 userContactBean.setProviderIsEnable(Helpers.isAllowedToCall(icon));
                 userContactBean.setProviderAvailableEndTime(icon.getAvailableEndTime());
                 userContactBean.setProviderAvailableStartTime(icon.getAvailableStartTime());
@@ -191,7 +191,7 @@ public class AccountContactsResource {
 
     /**
      * This API allows client to delete a contact. API By Calvin
-     * depreciated.
+     * =========== This is depreciated! ===========
      * @param uuid
      * @param qrCodeUuid
      * @return

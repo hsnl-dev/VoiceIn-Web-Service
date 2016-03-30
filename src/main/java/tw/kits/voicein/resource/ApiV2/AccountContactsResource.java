@@ -82,7 +82,7 @@ public class AccountContactsResource {
                 userContactBean.setCompany(provider.getCompany());
                 userContactBean.setProfile(provider.getProfile());
                 userContactBean.setPhoneNumber(provider.getPhoneNumber());
-                LOGGER.log(Level.CONFIG, "Contact Length {0}", Helpers.isAllowedToCall(providerContact));
+                LOGGER.log(Level.CONFIG, "Provider is available: {0}", Helpers.isAllowedToCall(providerContact));
                 userContactBean.setProviderIsEnable(Helpers.isAllowedToCall(providerContact));
                 userContactBean.setProfilePhotoId(provider.getProfilePhotoId());
                 if (providerContact.getIsHigherPriorityThanGlobal()) {
@@ -99,10 +99,10 @@ public class AccountContactsResource {
                 userContactBean.setLocation(icon.getLocation());
                 userContactBean.setPhoneNumber(icon.getPhoneNumber());
                 
-                LOGGER.log(Level.CONFIG, "Contact Length {0}", Helpers.isAllowedToCall(icon));
-                userContactBean.setProviderIsEnable(true);
-                userContactBean.setProviderAvailableEndTime("00:00");
-                userContactBean.setProviderAvailableStartTime("23:59");
+                LOGGER.log(Level.CONFIG, "Icon is available: {0}", Helpers.isAllowedToCall(icon));
+                userContactBean.setProviderIsEnable(Helpers.isAllowedToCall(icon));
+                userContactBean.setProviderAvailableEndTime(icon.getAvailableEndTime());
+                userContactBean.setProviderAvailableStartTime(icon.getAvailableStartTime());
             }
 
             userContactBean.setAvailableEndTime(contact.getAvailableEndTime());
