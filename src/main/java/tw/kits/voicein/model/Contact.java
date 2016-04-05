@@ -34,6 +34,7 @@ public class Contact {
     @Reference
     private Icon customerIcon;
     private Boolean isHigherPriorityThanGlobal;
+    private Boolean isLike;
 
     public Contact() {
         this.isHigherPriorityThanGlobal = false;
@@ -193,6 +194,20 @@ public class Contact {
      */
     public void setIsHigherPriorityThanGlobal(Boolean isHigherPriorityThanGlobal) {
         this.isHigherPriorityThanGlobal = isHigherPriorityThanGlobal;
+    }
+
+    /**
+     * @return the isLike
+     */
+    public Boolean getIsLike() {
+        return isLike;
+    }
+
+    /**
+     * @param isLike the isLike to set
+     */
+    public void setIsLike(Boolean isLike) {
+        this.isLike = isLike;
     }
 
 }
