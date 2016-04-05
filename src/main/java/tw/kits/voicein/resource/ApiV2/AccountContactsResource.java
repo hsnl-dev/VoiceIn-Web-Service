@@ -63,11 +63,22 @@ public class AccountContactsResource {
             @QueryParam("filter") String filter
     ) {
         User user = dataStoreObject.get(User.class, uuid);
-        
+
         // Return the contact you like or not.
-        List<Contact> contactList = filter.equalsIgnoreCase("like") ? 
-                dataStoreObject.find(Contact.class).field("user").equal(user).field("isLike").equal(Boolean.TRUE).asList():
-                dataStoreObject.find(Contact.class).field("user").equal(user).asList();
+        List<Contact> contactList = null;
+
+        if (filter != null) {
+            switch (filter) {
+                case "like":
+                    contactList = dataStoreObject.find(Contact.class).field("user").equal(user).field("isLike").equal(Boolean.TRUE).asList();
+                    break;
+                default:
+                    contactList = dataStoreObject.find(Contact.class).field("user").equal(user).asList();
+
+            }
+        } else {
+            contactList = dataStoreObject.find(Contact.class).field("user").equal(user).asList();
+        }
 
         initLogger();
 
@@ -80,7 +91,7 @@ public class AccountContactsResource {
             userContactBean = new UserContactBean();
             User provider = contact.getProviderUser();
             Icon icon = contact.getCustomerIcon();
-            
+
             if (provider != null) {
                 Contact providerContact = dataStoreObject.find(Contact.class).filter("user =", provider).filter("qrCodeUuid =", contact.getQrCodeUuid()).get();
                 userContactBean.setCompany(provider.getCompany());
@@ -105,7 +116,7 @@ public class AccountContactsResource {
                 userContactBean.setUserName(icon.getName());
                 userContactBean.setLocation(icon.getLocation());
                 userContactBean.setPhoneNumber(icon.getPhoneNumber());
-                
+
                 LOGGER.log(Level.CONFIG, "Icon is available: {0}", Helpers.isAllowedToCall(icon));
                 userContactBean.setProviderIsEnable(Helpers.isAllowedToCall(icon));
                 userContactBean.setProviderAvailableEndTime(icon.getAvailableEndTime());
@@ -117,9 +128,9 @@ public class AccountContactsResource {
             userContactBean.setChargeType(contact.getChargeType());
             userContactBean.setIsEnable(contact.getIsEnable());
             userContactBean.setCustomerIcon(contact.getCustomerIcon());
-            userContactBean.setNickName(contact.getNickName());            
+            userContactBean.setNickName(contact.getNickName());
             userContactBean.setQrCodeUuid(contact.getQrCodeUuid());
-            
+
             // return unique object id
             userContactBean.setId(contact.getId().toString());
             userContactBean.setIsHigherPriorityThanGlobal(contact.getIsHigherPriorityThanGlobal());
@@ -129,7 +140,7 @@ public class AccountContactsResource {
 
         return Response.ok(userList).build();
     }
-    
+
     /**
      * This API allows client user to update a contact. API By Calvin
      *
@@ -166,12 +177,12 @@ public class AccountContactsResource {
             modifiedContact.setNickName(nickName);
         }
 
-        if (isEnable != null) { 
+        if (isEnable != null) {
             modifiedContact.setIsEnable(Boolean.parseBoolean(isEnable));
         }
 
         if (isHigherPriorityThanGlobal != null) {
-            modifiedContact.setIsHigherPriorityThanGlobal(Boolean.parseBoolean(isHigherPriorityThanGlobal));   
+            modifiedContact.setIsHigherPriorityThanGlobal(Boolean.parseBoolean(isHigherPriorityThanGlobal));
         }
 
         if (availableStartTime != null) {
@@ -181,7 +192,7 @@ public class AccountContactsResource {
         if (availableEndTime != null) {
             modifiedContact.setAvailableEndTime(availableEndTime);
         }
-        
+
         if (like != null) {
             modifiedContact.setIsLike(Boolean.parseBoolean(like));
         }
@@ -189,7 +200,7 @@ public class AccountContactsResource {
         dataStoreObject.save(modifiedContact);
         return Response.ok().build();
     }
-    
+
     /**
      * This API allows client to delete a contact. API By Calvin
      *
@@ -203,21 +214,18 @@ public class AccountContactsResource {
     @TokenRequired
     public Response deleteAcontactOfAnUser(@PathParam("contactId") String contactId) {
         Contact payContact = dataStoreObject.get(Contact.class, new ObjectId(contactId));
- 
+
         User provider = payContact.getProviderUser();
         String qrCodeUuid = payContact.getQrCodeUuid();
-        if(payContact.getChargeType()!=ContactConstants.TYPE_ICON){
+        if (payContact.getChargeType() != ContactConstants.TYPE_ICON) {
             Contact freeContact = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", provider).get();
             dataStoreObject.delete(freeContact);
-        }else {
+        } else {
             dataStoreObject.delete(payContact.getCustomerIcon());
         }
-       
 
         dataStoreObject.delete(payContact);
-        
+
         return Response.ok().build();
     }
 }
-
-
