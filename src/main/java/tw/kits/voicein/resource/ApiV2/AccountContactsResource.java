@@ -50,6 +50,7 @@ public class AccountContactsResource {
      * This API allows user to get their contact list. API By Calvin
      *
      * @param uuid
+     * @param filter
      * @return
      */
     @GET
@@ -57,10 +58,16 @@ public class AccountContactsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
-    public Response getContactListOfAnUser(@PathParam("uuid") String uuid) {
+    public Response getContactListOfAnUser(
+            @PathParam("uuid") String uuid,
+            @QueryParam("filter") String filter
+    ) {
         User user = dataStoreObject.get(User.class, uuid);
-
-        List<Contact> contactList = dataStoreObject.find(Contact.class).field("user").equal(user).asList();
+        
+        // Return the contact you like or not.
+        List<Contact> contactList = filter.equalsIgnoreCase("like") ? 
+                dataStoreObject.find(Contact.class).field("user").equal(user).field("isLike").equal(Boolean.TRUE).asList():
+                dataStoreObject.find(Contact.class).field("user").equal(user).asList();
 
         initLogger();
 
@@ -132,6 +139,7 @@ public class AccountContactsResource {
      * @param availableEndTime
      * @param isEnable
      * @param isHigherPriorityThanGlobal
+     * @param like
      * @return
      */
     @PUT
@@ -145,7 +153,8 @@ public class AccountContactsResource {
             @QueryParam("availableStartTime") String availableStartTime,
             @QueryParam("availableEndTime") String availableEndTime,
             @QueryParam("isEnable") String isEnable,
-            @QueryParam("isHigherPriorityThanGlobal") String isHigherPriorityThanGlobal
+            @QueryParam("isHigherPriorityThanGlobal") String isHigherPriorityThanGlobal,
+            @QueryParam("like") String like
     ) {
         Contact modifiedContact = dataStoreObject.get(Contact.class, new ObjectId(contactId));
 
@@ -157,21 +166,12 @@ public class AccountContactsResource {
             modifiedContact.setNickName(nickName);
         }
 
-        if (isEnable != null) {
-            if (isEnable.equalsIgnoreCase("true")) {
-                modifiedContact.setIsEnable(true);
-            } else {
-                modifiedContact.setIsEnable(false);
-            }
-
+        if (isEnable != null) { 
+            modifiedContact.setIsEnable(Boolean.parseBoolean(isEnable));
         }
 
         if (isHigherPriorityThanGlobal != null) {
-            if (isHigherPriorityThanGlobal.equalsIgnoreCase("true")) {
-                modifiedContact.setIsHigherPriorityThanGlobal(true);
-            } else {
-                modifiedContact.setIsHigherPriorityThanGlobal(false);
-            }
+            modifiedContact.setIsHigherPriorityThanGlobal(Boolean.parseBoolean(isHigherPriorityThanGlobal));   
         }
 
         if (availableStartTime != null) {
@@ -180,6 +180,10 @@ public class AccountContactsResource {
 
         if (availableEndTime != null) {
             modifiedContact.setAvailableEndTime(availableEndTime);
+        }
+        
+        if (like != null) {
+            modifiedContact.setIsLike(Boolean.parseBoolean(like));
         }
 
         dataStoreObject.save(modifiedContact);
