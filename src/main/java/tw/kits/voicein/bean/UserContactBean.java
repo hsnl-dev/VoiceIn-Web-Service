@@ -33,6 +33,7 @@ public class UserContactBean {
     private Boolean providerIsEnable;
     private String qrCodeUuid;
     private Icon customerIcon;
+    private Boolean isLike;
 
     public UserContactBean() {
 
@@ -288,6 +289,20 @@ public class UserContactBean {
      */
     public void setId(String id) {
         this.id = id;
+    }
+
+    /**
+     * @return the isLike
+     */
+    public Boolean getIsLike() {
+        return isLike;
+    }
+
+    /**
+     * @param isLike the isLike to set
+     */
+    public void setIsLike(Boolean isLike) {
+        this.isLike = isLike;
     }
 
 }

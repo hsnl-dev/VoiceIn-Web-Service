@@ -130,7 +130,8 @@ public class AccountContactsResource {
             userContactBean.setCustomerIcon(contact.getCustomerIcon());
             userContactBean.setNickName(contact.getNickName());
             userContactBean.setQrCodeUuid(contact.getQrCodeUuid());
-
+            userContactBean.setIsLike(contact.getIsLike());
+            
             // return unique object id
             userContactBean.setId(contact.getId().toString());
             userContactBean.setIsHigherPriorityThanGlobal(contact.getIsHigherPriorityThanGlobal());
