@@ -18,6 +18,7 @@ public class Icon {
 
     @Reference
     private User provider;
+    private String qrCodeId;
     private String name;
     private String phoneNumber;
     private String location;
@@ -153,6 +154,20 @@ public class Icon {
      */
     public void setIsEnable(Boolean isEnable) {
         this.isEnable = isEnable;
+    }
+
+    /**
+     * @return the qrCodeId
+     */
+    public String getQrCodeId() {
+        return qrCodeId;
+    }
+
+    /**
+     * @param qrCodeId the qrCodeId to set
+     */
+    public void setQrCodeId(String qrCodeId) {
+        this.qrCodeId = qrCodeId;
     }
 
 
