@@ -1,9 +1,13 @@
 package tw.kits.voicein.model;
 
+import com.google.i18n.phonenumbers.NumberParseException;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
+import tw.kits.voicein.util.Helpers;
 
 /**
  *
@@ -77,7 +81,12 @@ public class QRcode {
      * @param phoneNumber the phoneNumber to set
      */
     public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+        try {
+            this.phoneNumber = Helpers.normalizePhoneNum(phoneNumber);
+        } catch (NumberParseException ex) {
+            Logger.getLogger(Icon.class.getName()).log(Level.SEVERE, null, ex);
+            this.phoneNumber = phoneNumber;
+        }
     }
 
     /**
