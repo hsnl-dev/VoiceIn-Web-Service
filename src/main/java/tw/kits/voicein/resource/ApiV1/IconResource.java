@@ -26,6 +26,7 @@ import tw.kits.voicein.model.Icon;
 import tw.kits.voicein.model.QRcode;
 import tw.kits.voicein.util.ContactConstants;
 import tw.kits.voicein.util.MongoManager;
+import tw.kits.voicein.util.QRcodeType;
 
 /**
  * *
@@ -110,8 +111,39 @@ public class IconResource {
         }
         //set icon
         LOGGER.info("setting icon");
-        Icon icon = new Icon();
-        icon.setIconId(UUID.randomUUID().toString());
+        Icon icon = null;
+        if(code.getType().equals(QRcodeType.TYPE_SPECIAL)){
+            List<Icon> existedIcons = dsObj.createQuery(Icon.class).field("qrCodeId").equal(code.getId()).asList();
+            if(existedIcons.size()>0){
+                icon = existedIcons.get(0);
+                saveNewIcon(icon, code, icb);
+            }else{
+                icon = new Icon();
+                icon.setIconId(UUID.randomUUID().toString());
+                saveNewIcon(icon, code, icb);
+                linkNewContact(code, icon);
+            }
+        }else{
+            icon = new Icon();
+            icon.setIconId(UUID.randomUUID().toString());
+            saveNewIcon(icon, code, icb);
+            linkNewContact(code, icon);
+        }
+
+        LOGGER.info("add to user contact");
+        HashMap<String, String> res = new HashMap<String, String>();
+        res.put("iconId", icon.getIconId());
+        return Response.status(Response.Status.CREATED).entity(res).build();
+
+    }
+    /**
+     * save icon
+     * @param icon
+     * @param code
+     * @param icb 
+     */
+    private void saveNewIcon(Icon icon, QRcode code, IconCreateBean icb){
+        icon.setQrCodeId(code.getId());
         icon.setProvider(code.getProvider());
         icon.setName(icb.getName());
         icon.setPhoneNumber(icb.getPhoneNumber());
@@ -121,9 +153,15 @@ public class IconResource {
         icon.setLocation(icb.getCustomer().getLocation());
         icon.setIsEnable(icb.getCustomer().getIsEnable() == null ? true : icb.getCustomer().getIsEnable());
         dsObj.save(icon);
-        LOGGER.info("add to user contact");
-
-        //provider!
+    }
+    /***
+     * link provider contact to icon
+     * @param code
+     * @param icon
+     * @return 
+     */
+    private Contact linkNewContact(QRcode code, Icon icon){
+      //provider!
         Contact contact = new Contact();
         contact.setUser(code.getProvider());
         contact.setCustomerIcon(icon);
@@ -133,9 +171,6 @@ public class IconResource {
         contact.setAvailableEndTime("23:59");
         contact.setAvailableStartTime("00:00");
         dsObj.save(contact);
-        HashMap<String, String> res = new HashMap<String, String>();
-        res.put("iconId", icon.getIconId());
-        return Response.status(Response.Status.CREATED).entity(res).build();
-
+        return contact;
     }
 }

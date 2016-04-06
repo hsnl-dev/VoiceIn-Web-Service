@@ -5,8 +5,10 @@
  */
 package tw.kits.voicein.bean;
 
+import javax.validation.constraints.NotNull;
 import org.bson.types.ObjectId;
 import tw.kits.voicein.model.Icon;
+import tw.kits.voicein.util.PhoneNum;
 
 /**
  *
@@ -15,8 +17,10 @@ import tw.kits.voicein.model.Icon;
 public class UserContactBean {
 
     //Field
+    @NotNull
     private String id; 
     private String userName;
+    @PhoneNum
     private String phoneNumber;
     private String location;
     private String profile;

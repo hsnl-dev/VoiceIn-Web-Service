@@ -5,6 +5,9 @@
  */
 package tw.kits.voicein.util;
 
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -23,6 +26,15 @@ import tw.kits.voicein.model.User;
 public class Helpers {
 
     static final Logger LOGGER = Logger.getLogger(Helpers.class.getName());
+
+    public static String normalizePhoneNum(String phoneNumber) throws NumberParseException {
+
+        PhoneNumberUtil util = PhoneNumberUtil.getInstance();
+        Phonenumber.PhoneNumber phone = util.parse(phoneNumber, "ZZ");
+
+        return util.format(phone, PhoneNumberUtil.PhoneNumberFormat.E164);
+
+    }
 
     public static boolean isUserMatchToken(String userUuid, SecurityContext sc) {
         String tokenUserUuid = sc.getUserPrincipal().getName();
@@ -75,8 +87,7 @@ public class Helpers {
             return isEnable;
         }
     }
-    
-    
+
     public static boolean isAllowedToCall(Icon target) {
         String availableStartTime;
         String availableEndTime;
@@ -85,7 +96,6 @@ public class Helpers {
         consoleHandler.setLevel(Level.CONFIG);
         LOGGER.addHandler(consoleHandler);
 
-       
         availableStartTime = target.getAvailableStartTime();
         availableEndTime = target.getAvailableEndTime();
         enable = target.getIsEnable();
