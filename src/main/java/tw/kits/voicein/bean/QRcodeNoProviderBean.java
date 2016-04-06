@@ -2,6 +2,8 @@ package tw.kits.voicein.bean;
 
 import tw.kits.voicein.model.*;
 import java.util.Date;
+import javax.validation.constraints.NotNull;
+import tw.kits.voicein.util.PhoneNum;
 
 /**
  *
@@ -9,8 +11,11 @@ import java.util.Date;
  */
 public class QRcodeNoProviderBean {
    
+    @NotNull
     private String id;
     private String userName;
+    @NotNull
+    @PhoneNum
     private String phoneNumber;
     private String state;
     private Date createdAt;

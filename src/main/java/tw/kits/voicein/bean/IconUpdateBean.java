@@ -7,6 +7,7 @@ package tw.kits.voicein.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import javax.validation.constraints.NotNull;
+import tw.kits.voicein.util.PhoneNum;
 
 /**
  * *
@@ -20,6 +21,7 @@ public class IconUpdateBean {
     @NotNull
     private String name;
     @NotNull
+    @PhoneNum
     private String phoneNumber;
     @NotNull
     private String availableEndTime;

@@ -6,6 +6,7 @@
 package tw.kits.voicein.bean;
 
 import javax.validation.constraints.NotNull;
+import tw.kits.voicein.util.PhoneNum;
 
 
 /**
@@ -15,6 +16,7 @@ import javax.validation.constraints.NotNull;
 public class CustomQRcodeCreateBean {
     private String name;
     @NotNull
+    @PhoneNum
     private String phoneNumber;
     private String company;
     private String location;
