@@ -15,6 +15,7 @@ import tw.kits.voicein.util.Helpers;
  */
 @Entity("qrcodes")
 public class QRcode {
+
     @Id
     private String id;
     @Reference
@@ -74,7 +75,13 @@ public class QRcode {
      * @return the phoneNumber
      */
     public String getPhoneNumber() {
-        return phoneNumber;
+        try {
+            return Helpers.transferRawPhoneNumberToNationalFormat(phoneNumber, "");
+        } catch (NumberParseException ex) {
+            Logger.getLogger(QRcode.class.getName()).log(Level.SEVERE, null, ex);
+            return phoneNumber;
+        }
+
     }
 
     /**
@@ -84,7 +91,7 @@ public class QRcode {
         try {
             this.phoneNumber = Helpers.normalizePhoneNum(phoneNumber);
         } catch (NumberParseException ex) {
-            Logger.getLogger(Icon.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(QRcode.class.getName()).log(Level.SEVERE, null, ex);
             this.phoneNumber = phoneNumber;
         }
     }
@@ -172,6 +179,5 @@ public class QRcode {
     public void setCompany(String company) {
         this.company = company;
     }
-    
-    
+
 }

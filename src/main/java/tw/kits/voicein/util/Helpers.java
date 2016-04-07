@@ -5,11 +5,10 @@
  */
 package tw.kits.voicein.util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.Phonenumber;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,6 +29,8 @@ import tw.kits.voicein.model.User;
  *
  * @author Henry
  */
+
+
 public class Helpers {
 
     static final Logger LOGGER = Logger.getLogger(Helpers.class.getName());
@@ -38,10 +39,15 @@ public class Helpers {
     public static String normalizePhoneNum(String phoneNumber) throws NumberParseException {
 
         PhoneNumberUtil util = PhoneNumberUtil.getInstance();
-        Phonenumber.PhoneNumber phone = util.parse(phoneNumber, "ZZ");
+        PhoneNumber phone = util.parse(phoneNumber, "ZZ");
 
         return util.format(phone, PhoneNumberUtil.PhoneNumberFormat.E164);
+    }
 
+    public static String transferRawPhoneNumberToNationalFormat(String phoneNumber, String defaultContry) throws NumberParseException {
+        PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
+        PhoneNumber number = phoneNumberUtil.parse(phoneNumber, defaultContry);
+        return phoneNumberUtil.format(number, PhoneNumberUtil.PhoneNumberFormat.NATIONAL).replaceAll("\\s", "");
     }
 
     public static boolean isUserMatchToken(String userUuid, SecurityContext sc) {
@@ -85,15 +91,7 @@ public class Helpers {
         LOGGER.setLevel(Level.ALL);
         LOGGER.log(Level.CONFIG, "{0} {1}", new Object[]{availableStartTime, availableEndTime});
 
-        if (isEnable) {
-            // If the contact is isEnable, check the available time.
-            LOGGER.log(Level.CONFIG, "{0}-{1}", new Object[]{isAfter, isAfter});
-            return isAfter && isBefore;
-        } else {
-            // If the contact is Disable, the call is not allowed.
-            LOGGER.log(Level.CONFIG, "{0}", isEnable);
-            return isEnable;
-        }
+        return isEnable && isAfter && isBefore;
     }
 
     public static Response makeCall(String caller, String callee, Contact contact, Datastore dsobj) throws IOException {
@@ -116,14 +114,15 @@ public class Helpers {
         return http.postResponse(SIP_URL, reqStr);
 
     }
+
     public static Response makeCall(String caller, String callee, Icon icon, Datastore dsobj) throws IOException {
-        
+
         Record cdr = new Record();
         cdr.setInitCall(caller, callee);
         cdr.setIsViaIcon(true);
         cdr.setViaIcon(icon);
         dsobj.save(cdr);
-        
+
         InitPhoneCallBean ipcb = new InitPhoneCallBean();
         ipcb.setCalleeNumber(callee);
         ipcb.setCallerNumber(caller);
@@ -137,6 +136,7 @@ public class Helpers {
         return http.postResponse(SIP_URL, reqStr);
 
     }
+
     public static boolean isAllowedToCall(Icon target) {
         String availableStartTime;
         String availableEndTime;
