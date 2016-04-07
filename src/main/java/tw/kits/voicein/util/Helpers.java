@@ -5,29 +5,36 @@
  */
 package tw.kits.voicein.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
-
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.TimeZone;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.core.SecurityContext;
+import okhttp3.Response;
+import org.mongodb.morphia.Datastore;
+import tw.kits.voicein.bean.InitPhoneCallBean;
 import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.Icon;
+import tw.kits.voicein.model.Record;
 import tw.kits.voicein.model.User;
 
 /**
  *
  * @author Henry
  */
+
+
 public class Helpers {
 
     static final Logger LOGGER = Logger.getLogger(Helpers.class.getName());
+    static final String SIP_URL = "http://210.71.198.42:33564/sip/SingleCall";
 
     public static String normalizePhoneNum(String phoneNumber) throws NumberParseException {
 
@@ -36,7 +43,7 @@ public class Helpers {
 
         return util.format(phone, PhoneNumberUtil.PhoneNumberFormat.E164);
     }
-    
+
     public static String transferRawPhoneNumberToNationalFormat(String phoneNumber, String defaultContry) throws NumberParseException {
         PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
         PhoneNumber number = phoneNumberUtil.parse(phoneNumber, defaultContry);
@@ -85,6 +92,49 @@ public class Helpers {
         LOGGER.log(Level.CONFIG, "{0} {1}", new Object[]{availableStartTime, availableEndTime});
 
         return isEnable && isAfter && isBefore;
+    }
+
+    public static Response makeCall(String caller, String callee, Contact contact, Datastore dsobj) throws IOException {
+        LOGGER.info(contact.toString());
+        Record cdr = new Record();
+        cdr.setInitCall(caller, callee);
+        cdr.setIsViaIcon(false);
+        cdr.setViaContact(contact);
+        dsobj.save(cdr);
+        InitPhoneCallBean ipcb = new InitPhoneCallBean();
+        ipcb.setCalleeNumber(callee);
+        ipcb.setCallerNumber(caller);
+        ipcb.setCallerid("vi$" + cdr.getId());
+        ipcb.setHisuid("vi$" + cdr.getId());
+
+        Http http = new Http();
+        ObjectMapper mapper = new ObjectMapper();
+        String reqStr;
+        reqStr = mapper.writeValueAsString(ipcb);
+        return http.postResponse(SIP_URL, reqStr);
+
+    }
+
+    public static Response makeCall(String caller, String callee, Icon icon, Datastore dsobj) throws IOException {
+
+        Record cdr = new Record();
+        cdr.setInitCall(caller, callee);
+        cdr.setIsViaIcon(true);
+        cdr.setViaIcon(icon);
+        dsobj.save(cdr);
+
+        InitPhoneCallBean ipcb = new InitPhoneCallBean();
+        ipcb.setCalleeNumber(callee);
+        ipcb.setCallerNumber(caller);
+        ipcb.setCallerid("vi$" + cdr.getId());
+        ipcb.setHisuid("vi$" + cdr.getId());
+
+        Http http = new Http();
+        ObjectMapper mapper = new ObjectMapper();
+        String reqStr;
+        reqStr = mapper.writeValueAsString(ipcb);
+        return http.postResponse(SIP_URL, reqStr);
+
     }
 
     public static boolean isAllowedToCall(Icon target) {

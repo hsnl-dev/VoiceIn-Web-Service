@@ -33,6 +33,8 @@ public class User {
     @NotNull
     private String availableEndTime;
     
+    private float credit;
+    
 
     /**
      * @param uuid the uuid to set
@@ -182,5 +184,19 @@ public class User {
      */
     public void setAvailableEndTime(String availableEndTime) {
         this.availableEndTime = availableEndTime;
+    }
+
+    /**
+     * @return the credit
+     */
+    public float getCredit() {
+        return credit;
+    }
+
+    /**
+     * @param credit the credit to set
+     */
+    public void setCredit(float credit) {
+        this.credit = credit;
     }
 }
