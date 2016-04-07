@@ -7,8 +7,10 @@ package tw.kits.voicein.resource.ApiV1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.*;
 
 import javax.ws.rs.*;
@@ -25,8 +27,10 @@ import javax.servlet.annotation.MultipartConfig;
 import javax.ws.rs.core.Response.Status;
 import tw.kits.voicein.bean.ErrorMessageBean;
 import tw.kits.voicein.model.Icon;
+import tw.kits.voicein.model.Record;
 
 import tw.kits.voicein.util.Helpers;
+import tw.kits.voicein.constant.RecordConstant;
 
 @MultipartConfig(maxFileSize = 1024 * 1024 * 1)
 @Path("/api/v1")
@@ -38,7 +42,7 @@ public class CallingServiceResource {
 
     /**
      * This API allows customer to call provider after confirm button click. API
-     * By Henry
+     * By Calvin Henry 
      *
      * @param iconId
      * @return
@@ -73,6 +77,12 @@ public class CallingServiceResource {
         LOGGER.info(String.format("Starting calling %s", endPoint));
         Http http = new Http();
         String json = new ObjectMapper().writeValueAsString(sendToObj);
+        Date reqStime = new Date();
+        Record cdr = new Record();
+        cdr.setId(UUID.randomUUID().toString());
+        cdr.setReqTime(reqStime);
+        cdr.setStatus(RecordConstant.REQ_SEND);
+        dsObj.save(cdr);
         okhttp3.Response res = http.postResponse(endPoint, json);
 
         if (res.isSuccessful()) {

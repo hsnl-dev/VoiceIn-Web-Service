@@ -30,7 +30,7 @@ import tw.kits.voicein.bean.ErrorMessageBean;
 import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.Icon;
 import tw.kits.voicein.model.User;
-import tw.kits.voicein.util.ContactConstants;
+import tw.kits.voicein.constant.ContactConstant;
 import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.Http;
 import tw.kits.voicein.util.MongoManager;
@@ -75,8 +75,8 @@ public class CallingServiceResource {
         if (contact == null) {
             return Response.status(Response.Status.NOT_FOUND).entity(new ErrorMessageBean("contact not found")).build();
         }
-        if (contact.getChargeType() != ContactConstants.TYPE_ICON) {
-            int targetType = contact.getChargeType() == ContactConstants.TYPE_FREE ? ContactConstants.TYPE_CHARGE : ContactConstants.TYPE_FREE;
+        if (contact.getChargeType() != ContactConstant.TYPE_ICON) {
+            int targetType = contact.getChargeType() == ContactConstant.TYPE_FREE ? ContactConstant.TYPE_CHARGE : ContactConstant.TYPE_FREE;
             Key<User> key = new Key(User.class, "accounts", contact.getUser().getUuid());
             List<Contact> targets = dataStoreObject.createQuery(Contact.class)
                     .field("providerUser").equal(key)

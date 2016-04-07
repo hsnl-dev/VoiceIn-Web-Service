@@ -24,7 +24,7 @@ import tw.kits.voicein.bean.IconUpdateBean;
 import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.Icon;
 import tw.kits.voicein.model.QRcode;
-import tw.kits.voicein.util.ContactConstants;
+import tw.kits.voicein.constant.ContactConstant;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.QRcodeType;
 
@@ -165,7 +165,7 @@ public class IconResource {
         Contact contact = new Contact();
         contact.setUser(code.getProvider());
         contact.setCustomerIcon(icon);
-        contact.setChargeType(ContactConstants.TYPE_ICON);
+        contact.setChargeType(ContactConstant.TYPE_ICON);
         contact.setIsEnable(true);
         contact.setIsHigherPriorityThanGlobal(false);
         contact.setAvailableEndTime("23:59");
