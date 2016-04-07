@@ -72,7 +72,7 @@ public class CallingServiceResource {
             return Response.status(Status.FORBIDDEN).entity(erb).build();
         }
         
-        okhttp3.Response res = Helpers.makeCall(icon.getPhoneNumber(), target.get(0).getUser().getPhoneNumber(), dsObj);
+        okhttp3.Response res = Helpers.makeCall(icon.getPhoneNumber(), target.get(0).getUser().getPhoneNumber(),icon,dsObj);
 
         if (res.isSuccessful()) {
             return Response.status(Response.Status.CREATED).entity(res).build();

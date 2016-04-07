@@ -2,18 +2,23 @@ package tw.kits.voicein.model;
 
 import java.util.Date;
 import java.util.UUID;
+import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Reference;
 import tw.kits.voicein.constant.RecordConstant;
 
 /**
  *
  * @author Henry
  */
+@Entity("record")
 public class Record {
     @Id
     private String id;
     private boolean isViaIcon;
+    @Reference
     private Contact viaContact;
+    @Reference
     private Icon viaIcon;
     private Date reqTime;
     private Date startTime;

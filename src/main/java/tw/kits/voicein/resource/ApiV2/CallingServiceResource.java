@@ -32,6 +32,7 @@ import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.Icon;
 import tw.kits.voicein.model.User;
 import tw.kits.voicein.constant.ContactConstant;
+import tw.kits.voicein.constant.RecordConstant;
 import tw.kits.voicein.model.Record;
 import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.MongoManager;
@@ -79,7 +80,10 @@ public class CallingServiceResource {
             record.setStartTime(new Date(form.getStartTime()));
             record.setIsAnswer(false);
             record.setChargeDollar(0.0f);
+            
         }
+        record.setStatus(RecordConstant.HANGUP);
+        dataStoreObject.save(record);
         return Response.status(Response.Status.OK).build();
     }
 
@@ -105,22 +109,23 @@ public class CallingServiceResource {
         if (contact == null) {
             return Response.status(Response.Status.NOT_FOUND).entity(new ErrorMessageBean("contact not found")).build();
         }
-        if (contact.getProviderUser().getCredit() <= 0) {
-            return Response.status(Response.Status.PAYMENT_REQUIRED).entity(new ErrorMessageBean("credit <= 0")).build();
-        }
+//        if (contact.getProviderUser().getCredit() <= 0) {
+//            return Response.status(Response.Status.PAYMENT_REQUIRED).entity(new ErrorMessageBean("credit <= 0")).build();
+//        }
         if (contact.getChargeType() != ContactConstant.TYPE_ICON) {
             int targetType = contact.getChargeType() == ContactConstant.TYPE_FREE ? ContactConstant.TYPE_CHARGE : ContactConstant.TYPE_FREE;
-            Key<User> key = new Key(User.class, "accounts", contact.getUser().getUuid());
             List<Contact> targets = dataStoreObject.createQuery(Contact.class)
-                    .field("providerUser").equal(key)
+                    .field("providerUser").equal(contact.getUser())
+                    .field("user").equal(contact.getProviderUser())
                     .field("chargeType").equal(targetType)
                     .asList();
+            LOGGER.info(targets.get(0).getId() + "");
             if (targets.size() != 1) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
             if (Helpers.isAllowedToCall(targets.get(0))) {
-                Helpers.makeCall(contact.getUser().getPhoneNumber(),
-                        targets.get(0).getUser().getPhoneNumber(),
+                Helpers.makeCall(contact.getUser().getPhoneNumber(),targets.get(0).getUser().getPhoneNumber(),
+                        contact,
                         dataStoreObject);
                 return Response.ok().build();
             } else {
@@ -129,7 +134,7 @@ public class CallingServiceResource {
         } else {
             Icon icon = contact.getCustomerIcon();
             if (Helpers.isAllowedToCall(icon)) {
-                Helpers.makeCall(contact.getUser().getPhoneNumber(), icon.getPhoneNumber(), dataStoreObject);
+                Helpers.makeCall(contact.getUser().getPhoneNumber(), icon.getPhoneNumber(), contact, dataStoreObject);
                 return Response.ok().build();
             } else {
                 return Response.status(Response.Status.FORBIDDEN).build();
