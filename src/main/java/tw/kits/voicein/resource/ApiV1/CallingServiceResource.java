@@ -26,6 +26,7 @@ import tw.kits.voicein.util.Parameter;
 import javax.servlet.annotation.MultipartConfig;
 import javax.ws.rs.core.Response.Status;
 import tw.kits.voicein.bean.ErrorMessageBean;
+import tw.kits.voicein.bean.HangupNotifyBean;
 import tw.kits.voicein.model.Icon;
 import tw.kits.voicein.model.Record;
 
@@ -39,7 +40,7 @@ public class CallingServiceResource {
     MongoManager mongoManager = MongoManager.getInstatnce();
     Datastore dsObj = mongoManager.getDs();
     private static final Logger LOGGER = Logger.getLogger(CallingServiceResource.class.getName());
-
+    
     /**
      * This API allows customer to call provider after confirm button click. API
      * By Calvin Henry 
@@ -77,12 +78,6 @@ public class CallingServiceResource {
         LOGGER.info(String.format("Starting calling %s", endPoint));
         Http http = new Http();
         String json = new ObjectMapper().writeValueAsString(sendToObj);
-        Date reqStime = new Date();
-        Record cdr = new Record();
-        cdr.setId(UUID.randomUUID().toString());
-        cdr.setReqTime(reqStime);
-        cdr.setStatus(RecordConstant.REQ_SEND);
-        dsObj.save(cdr);
         okhttp3.Response res = http.postResponse(endPoint, json);
 
         if (res.isSuccessful()) {

@@ -19,6 +19,8 @@ public class Record {
     private float chargeDollar;
     private boolean isAnswer;
     private int status;
+    private String callerPhone;
+    private String calleePhone;
 
     /**
      * @return the id
@@ -158,6 +160,34 @@ public class Record {
      */
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    /**
+     * @return the callerPhone
+     */
+    public String getCallerPhone() {
+        return callerPhone;
+    }
+
+    /**
+     * @param callerPhone the callerPhone to set
+     */
+    public void setCallerPhone(String callerPhone) {
+        this.callerPhone = callerPhone;
+    }
+
+    /**
+     * @return the calleePhone
+     */
+    public String getCalleePhone() {
+        return calleePhone;
+    }
+
+    /**
+     * @param calleePhone the calleePhone to set
+     */
+    public void setCalleePhone(String calleePhone) {
+        this.calleePhone = calleePhone;
     }
     
 }
