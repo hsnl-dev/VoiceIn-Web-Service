@@ -5,12 +5,9 @@
  */
 package tw.kits.voicein.resource.ApiV2;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Logger;
 import javax.servlet.annotation.MultipartConfig;
@@ -35,12 +32,9 @@ import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.Icon;
 import tw.kits.voicein.model.User;
 import tw.kits.voicein.constant.ContactConstant;
-import tw.kits.voicein.constant.RecordConstant;
 import tw.kits.voicein.model.Record;
 import tw.kits.voicein.util.Helpers;
-import tw.kits.voicein.util.Http;
 import tw.kits.voicein.util.MongoManager;
-import tw.kits.voicein.util.Parameter;
 import tw.kits.voicein.util.TokenRequired;
 
 @MultipartConfig(maxFileSize = 1024 * 1024 * 1)
@@ -58,12 +52,14 @@ public class CallingServiceResource {
     ConsoleHandler consoleHandler = new ConsoleHandler();
     MongoManager mongoManager = MongoManager.getInstatnce();
     Datastore dataStoreObject = mongoManager.getDs();
-/**
- * receive call from sip server 
- * @param id
- * @param form
- * @return 
- */
+
+    /**
+     * receive call from sip server
+     *
+     * @param id
+     * @param form
+     * @return
+     */
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -73,18 +69,18 @@ public class CallingServiceResource {
         if (record == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        if(form.isSuccess()){
-            float pay = 2*0.8f*(form.getEndTime() - form.getStartTime());
+        if (form.isSuccess()) {
+            float pay = 2 * 0.8f * (form.getEndTime() - form.getStartTime());
             record.setChargeDollar(pay);
             record.setIsAnswer(true);
             record.setStartTime(new Date(form.getStartTime()));
             record.setEndTime(new Date(form.getEndTime()));
-        }else{
+        } else {
             record.setStartTime(new Date(form.getStartTime()));
             record.setIsAnswer(false);
             record.setChargeDollar(0.0f);
         }
-        return  Response.status(Response.Status.OK).build();
+        return Response.status(Response.Status.OK).build();
     }
 
     /**
@@ -109,6 +105,9 @@ public class CallingServiceResource {
         if (contact == null) {
             return Response.status(Response.Status.NOT_FOUND).entity(new ErrorMessageBean("contact not found")).build();
         }
+        if (contact.getProviderUser().getCredit() <= 0) {
+            return Response.status(Response.Status.PAYMENT_REQUIRED).entity(new ErrorMessageBean("credit <= 0")).build();
+        }
         if (contact.getChargeType() != ContactConstant.TYPE_ICON) {
             int targetType = contact.getChargeType() == ContactConstant.TYPE_FREE ? ContactConstant.TYPE_CHARGE : ContactConstant.TYPE_FREE;
             Key<User> key = new Key(User.class, "accounts", contact.getUser().getUuid());
@@ -120,7 +119,9 @@ public class CallingServiceResource {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
             if (Helpers.isAllowedToCall(targets.get(0))) {
-                makeCall(contact.getUser().getPhoneNumber(), targets.get(0).getUser().getPhoneNumber());
+                Helpers.makeCall(contact.getUser().getPhoneNumber(),
+                        targets.get(0).getUser().getPhoneNumber(),
+                        dataStoreObject);
                 return Response.ok().build();
             } else {
                 return Response.status(Response.Status.FORBIDDEN).build();
@@ -128,7 +129,7 @@ public class CallingServiceResource {
         } else {
             Icon icon = contact.getCustomerIcon();
             if (Helpers.isAllowedToCall(icon)) {
-                makeCall(contact.getUser().getPhoneNumber(), icon.getPhoneNumber());
+                Helpers.makeCall(contact.getUser().getPhoneNumber(), icon.getPhoneNumber(), dataStoreObject);
                 return Response.ok().build();
             } else {
                 return Response.status(Response.Status.FORBIDDEN).build();
@@ -137,28 +138,4 @@ public class CallingServiceResource {
         }
 
     }
-
-    private void makeCall(String caller, String callee) throws IOException {
-        String endPoint = Parameter.API_ROOT + Parameter.API_VER + "Call/test01/generalCallRequest/";
-        HashMap<String, Object> req = new HashMap();
-
-        req.put("caller", caller);
-        req.put("callee", callee);
-        req.put("check", false);
-        String reqStr = new ObjectMapper().writeValueAsString(req);
-        Date reqStime = new Date();
-
-        Record cdr = new Record();
-        cdr.setId(UUID.randomUUID().toString());
-        cdr.setReqTime(reqStime);
-        cdr.setStatus(RecordConstant.REQ_SEND);
-        cdr.setCallerPhone(caller);
-        cdr.setCalleePhone(callee);
-        dataStoreObject.save(cdr);
-        Http http = new Http();
-        LOGGER.info(reqStr);
-        LOGGER.info(http.post(endPoint, reqStr));
-
-    }
-
 }

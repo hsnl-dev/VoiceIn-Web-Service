@@ -59,6 +59,9 @@ public class CallingServiceResource {
             ErrorMessageBean erb = new ErrorMessageBean("icon is not found");
             return Response.status(Status.NOT_FOUND).entity(erb).build();
         }
+        if (icon.getProvider().getCredit()<=0){
+            return Response.status(Response.Status.PAYMENT_REQUIRED).entity(new ErrorMessageBean("credit <= 0")).build();
+        }
         List<Contact> target = dsObj.createQuery(Contact.class).field("customerIcon").equal(icon).asList();
         if (target.size() != 1) {
             ErrorMessageBean erb = new ErrorMessageBean("contact is not found");
@@ -68,17 +71,8 @@ public class CallingServiceResource {
             ErrorMessageBean erb = new ErrorMessageBean("Call is not allowed");
             return Response.status(Status.FORBIDDEN).entity(erb).build();
         }
-
-        String endPoint = Parameter.API_ROOT + Parameter.API_VER + "Call/test01/generalCallRequest/";
-        HashMap<String, Object> sendToObj = new HashMap<String, Object>();
-
-        sendToObj.put("caller", icon.getPhoneNumber());
-        sendToObj.put("callee", target.get(0).getUser().getPhoneNumber());
-        sendToObj.put("check", false);
-        LOGGER.info(String.format("Starting calling %s", endPoint));
-        Http http = new Http();
-        String json = new ObjectMapper().writeValueAsString(sendToObj);
-        okhttp3.Response res = http.postResponse(endPoint, json);
+        
+        okhttp3.Response res = Helpers.makeCall(icon.getPhoneNumber(), target.get(0).getUser().getPhoneNumber(), dsObj);
 
         if (res.isSuccessful()) {
             return Response.status(Response.Status.CREATED).entity(res).build();

@@ -1,7 +1,9 @@
 package tw.kits.voicein.model;
 
 import java.util.Date;
+import java.util.UUID;
 import org.mongodb.morphia.annotations.Id;
+import tw.kits.voicein.constant.RecordConstant;
 
 /**
  *
@@ -21,7 +23,13 @@ public class Record {
     private int status;
     private String callerPhone;
     private String calleePhone;
-
+    public void setInitCall(String caller, String callee){
+        this.setId(UUID.randomUUID().toString());
+        this.setReqTime(new Date());
+        this.setStatus(RecordConstant.REQ_SEND);
+        this.setCallerPhone(caller);
+        this.setCalleePhone(callee);
+    }
     /**
      * @return the id
      */
