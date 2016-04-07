@@ -68,7 +68,12 @@ public class Icon {
      * @return the phoneNumber
      */
     public String getPhoneNumber() {
-        return phoneNumber;
+        try {
+            return Helpers.transferRawPhoneNumberToNationalFormat(phoneNumber, "");
+        } catch (NumberParseException ex) {
+            Logger.getLogger(QRcode.class.getName()).log(Level.SEVERE, null, ex);
+            return phoneNumber;
+        }
     }
 
     /**
