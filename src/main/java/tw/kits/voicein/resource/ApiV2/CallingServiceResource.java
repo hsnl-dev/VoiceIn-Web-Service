@@ -71,16 +71,31 @@ public class CallingServiceResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         if (form.isSuccess()) {
-            float pay = 2 * 0.8f * (form.getEndTime() - form.getStartTime());
+            float pay = 2 * 0.8f * (form.getEndTime() - form.getStartTime()) / 1000;
             record.setChargeDollar(pay);
             record.setIsAnswer(true);
             record.setStartTime(new Date(form.getStartTime()));
             record.setEndTime(new Date(form.getEndTime()));
+            User chargeTarget = null;
+            if (!record.isIsViaIcon()) {
+                Contact used = record.getViaContact();
+                if (used.getChargeType() == ContactConstant.TYPE_FREE) {
+                    chargeTarget = used.getProviderUser();
+                } else {
+                    chargeTarget = used.getUser();
+                }
+            } else {
+                chargeTarget = record.getViaIcon().getProvider();
+            }
+            float curCredit = chargeTarget.getCredit() - pay;
+            chargeTarget.setCredit(curCredit);
+            dataStoreObject.save(chargeTarget);
+
         } else {
             record.setStartTime(new Date(form.getStartTime()));
             record.setIsAnswer(false);
             record.setChargeDollar(0.0f);
-            
+
         }
         record.setStatus(RecordConstant.HANGUP);
         dataStoreObject.save(record);
@@ -124,7 +139,7 @@ public class CallingServiceResource {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
             if (Helpers.isAllowedToCall(targets.get(0))) {
-                Helpers.makeCall(contact.getUser().getPhoneNumber(),targets.get(0).getUser().getPhoneNumber(),
+                Helpers.makeCall(contact.getUser().getPhoneNumber(), targets.get(0).getUser().getPhoneNumber(),
                         contact,
                         dataStoreObject);
                 return Response.ok().build();
