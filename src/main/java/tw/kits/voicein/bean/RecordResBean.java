@@ -21,7 +21,7 @@ public class RecordResBean {
     private long endTime;
     private boolean answer;
     private String type;
-    private long intervalMills;
+    private long durationMills;
     private String anotherUserId;
     private boolean anotherIsIcon;
     private String anotherIconId;
@@ -38,6 +38,7 @@ public class RecordResBean {
         this.id = res.getId();
         this.startTime = res.getStartTime() == null ? -1 : res.getStartTime().getTime();
         this.endTime = res.getEndTime() == null ? -1 : res.getEndTime().getTime();
+        this.durationMills = endTime - startTime;
         this.answer = res.isIsAnswer();
     }
 
@@ -143,15 +144,15 @@ public class RecordResBean {
     /**
      * @return the intervalMills
      */
-    public long getIntervalMills() {
-        return intervalMills;
+    public long getDurationMills() {
+        return durationMills;
     }
 
     /**
      * @param intervalMills the intervalMills to set
      */
-    public void setIntervalMills(long intervalMills) {
-        this.intervalMills = intervalMills;
+    public void setDurationMills(long durationMills) {
+        this.durationMills = durationMills;
     }
 
     /**
