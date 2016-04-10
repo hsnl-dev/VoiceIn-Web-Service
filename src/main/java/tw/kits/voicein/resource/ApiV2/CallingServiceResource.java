@@ -77,16 +77,21 @@ public class CallingServiceResource {
             record.setStartTime(new Date(form.getStartTime()));
             record.setEndTime(new Date(form.getEndTime()));
             User chargeTarget = null;
-            if (!record.isIsViaIcon()) {
-                Contact used = record.getViaContact();
-                if (used.getChargeType() == ContactConstant.TYPE_FREE) {
-                    chargeTarget = used.getProviderUser();
-                } else {
-                    chargeTarget = used.getUser();
-                }
-            } else {
-                chargeTarget = record.getViaIcon().getProvider();
+            
+            switch(record.getType()){
+                case RecordConstant.APP_TO_APP_CHARGE_CALLER:
+                     chargeTarget = record.getCaller();
+                    break;
+                case RecordConstant.APP_TO_APP_CHARGE_CALLEE:
+                    chargeTarget = record.getCallee();
+                    break;
+                case RecordConstant.APP_TO_ICON:
+                    chargeTarget = record.getCaller();
+                    break;
+                case RecordConstant.ICON_TO_APP:
+                    chargeTarget = record.getCallee();    
             }
+           
             float curCredit = chargeTarget.getCredit() - pay;
             chargeTarget.setCredit(curCredit);
             dataStoreObject.save(chargeTarget);
@@ -139,7 +144,7 @@ public class CallingServiceResource {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
             if (Helpers.isAllowedToCall(targets.get(0))) {
-                Helpers.makeCall(contact.getUser().getPhoneNumber(), targets.get(0).getUser().getPhoneNumber(),
+                Helpers.makeCall(contact.getUser(), targets.get(0).getUser(),
                         contact,
                         dataStoreObject);
                 return Response.ok().build();
@@ -149,7 +154,7 @@ public class CallingServiceResource {
         } else {
             Icon icon = contact.getCustomerIcon();
             if (Helpers.isAllowedToCall(icon)) {
-                Helpers.makeCall(contact.getUser().getPhoneNumber(), icon.getPhoneNumber(), contact, dataStoreObject);
+                Helpers.makeAsymmeticCall(contact.getUser(), icon, true, contact, dataStoreObject);
                 return Response.ok().build();
             } else {
                 return Response.status(Response.Status.FORBIDDEN).build();

@@ -73,6 +73,10 @@ public class User {
             return phoneNumber;
         }
     }
+    
+    public String getOriginNumber(){
+        return phoneNumber;
+    }
 
     /**
      * @return the location

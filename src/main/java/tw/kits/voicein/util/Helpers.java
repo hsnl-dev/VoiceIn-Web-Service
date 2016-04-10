@@ -94,16 +94,14 @@ public class Helpers {
         return isEnable && isAfter && isBefore;
     }
 
-    public static Response makeCall(String caller, String callee, Contact contact, Datastore dsobj) throws IOException {
+    public static Response makeCall(User caller, User callee, Contact contact, Datastore dsobj) throws IOException {
         LOGGER.info(contact.toString());
         Record cdr = new Record();
-        cdr.setInitCall(caller, callee);
-        cdr.setIsViaIcon(false);
-        cdr.setViaContact(contact);
+        cdr.setInitCall(caller, callee, contact);
         dsobj.save(cdr);
         InitPhoneCallBean ipcb = new InitPhoneCallBean();
-        ipcb.setCalleeNumber(callee);
-        ipcb.setCallerNumber(caller);
+        ipcb.setCalleeNumber(cdr.getCalleePhone());
+        ipcb.setCallerNumber(cdr.getCallerPhone());
         ipcb.setCallerid("vi$" + cdr.getId());
         ipcb.setHisuid("vi$" + cdr.getId());
 
@@ -115,19 +113,15 @@ public class Helpers {
 
     }
 
-    public static Response makeCall(String caller, String callee, Icon icon, Datastore dsobj) throws IOException {
-
-        Record cdr = new Record();
-        cdr.setInitCall(caller, callee);
-        cdr.setIsViaIcon(true);
-        cdr.setViaIcon(icon);
-        dsobj.save(cdr);
-
+    public static Response makeAsymmeticCall(User account,Icon icon,boolean isCallByAccount,Contact callerContact, Datastore dsobj) throws IOException {
+        Record record = new Record();
+        record.setAsymetricCall(account, icon, true, callerContact);
+        dsobj.save(record);
         InitPhoneCallBean ipcb = new InitPhoneCallBean();
-        ipcb.setCalleeNumber(callee);
-        ipcb.setCallerNumber(caller);
-        ipcb.setCallerid("vi$" + cdr.getId());
-        ipcb.setHisuid("vi$" + cdr.getId());
+        ipcb.setCalleeNumber(record.getCalleePhone());
+        ipcb.setCallerNumber(record.getCallerPhone());
+        ipcb.setCallerid("vi$" + record.getId());
+        ipcb.setHisuid("vi$" + record.getId());
 
         Http http = new Http();
         ObjectMapper mapper = new ObjectMapper();

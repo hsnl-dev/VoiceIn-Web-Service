@@ -19,6 +19,7 @@ import javax.validation.Valid;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
+import tw.kits.voicein.model.Record;
 import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.TokenRequired;
 
@@ -147,5 +148,17 @@ public class AccountsResource {
             return Response.status(Status.FORBIDDEN).build();
         }
     }
-
+    @POST
+    @Path("/api/v1/accounts/{userUuid}/history")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @TokenRequired
+    public Response getHistory(@PathParam("uuid") String uid, @QueryParam("before")long timestamp){
+        User user = dataStoreObject.get(User.class, uid);
+        if(user==null){
+            return Response.noContent().build();
+        }
+       return Response.accepted().build();
+    
+    }
 }
