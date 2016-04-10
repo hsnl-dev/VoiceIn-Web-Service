@@ -59,6 +59,7 @@ public class IconResource {
         if (contact.size() != 1) {
             return Response.status(Status.NOT_FOUND).entity(new ErrorMessageBean("contact is not found")).build();
         }
+        
         return Response.ok(new IconInfoBean(icon, contact.get(0))).build();
     }
 
@@ -112,18 +113,18 @@ public class IconResource {
         //set icon
         LOGGER.info("setting icon");
         Icon icon = null;
-        if(code.getType().equals(QRcodeType.TYPE_SPECIAL)){
+        if (code.getType().equals(QRcodeType.TYPE_SPECIAL)) {
             List<Icon> existedIcons = dsObj.createQuery(Icon.class).field("qrCodeId").equal(code.getId()).asList();
-            if(existedIcons.size()>0){
+            if (existedIcons.size() > 0) {
                 icon = existedIcons.get(0);
                 saveNewIcon(icon, code, icb);
-            }else{
+            } else {
                 icon = new Icon();
                 icon.setIconId(UUID.randomUUID().toString());
                 saveNewIcon(icon, code, icb);
                 linkNewContact(code, icon);
             }
-        }else{
+        } else {
             icon = new Icon();
             icon.setIconId(UUID.randomUUID().toString());
             saveNewIcon(icon, code, icb);
@@ -136,13 +137,15 @@ public class IconResource {
         return Response.status(Response.Status.CREATED).entity(res).build();
 
     }
+
     /**
      * save icon
+     *
      * @param icon
      * @param code
-     * @param icb 
+     * @param icb
      */
-    private void saveNewIcon(Icon icon, QRcode code, IconCreateBean icb){
+    private void saveNewIcon(Icon icon, QRcode code, IconCreateBean icb) {
         icon.setQrCodeId(code.getId());
         icon.setProvider(code.getProvider());
         icon.setName(icb.getName());
@@ -154,14 +157,17 @@ public class IconResource {
         icon.setIsEnable(icb.getCustomer().getIsEnable() == null ? true : icb.getCustomer().getIsEnable());
         dsObj.save(icon);
     }
-    /***
+
+    /**
+     * *
      * link provider contact to icon
+     *
      * @param code
      * @param icon
-     * @return 
+     * @return
      */
-    private Contact linkNewContact(QRcode code, Icon icon){
-      //provider!
+    private Contact linkNewContact(QRcode code, Icon icon) {
+        //provider!
         Contact contact = new Contact();
         contact.setUser(code.getProvider());
         contact.setCustomerIcon(icon);

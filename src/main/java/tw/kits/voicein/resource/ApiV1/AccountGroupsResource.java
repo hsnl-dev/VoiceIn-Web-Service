@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -23,9 +24,13 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import tw.kits.voicein.bean.AccountAllGroupBean;
 import tw.kits.voicein.bean.AccountGroupUpdateBean;
+import tw.kits.voicein.bean.UserContactBean;
 import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.Group;
+import tw.kits.voicein.model.Icon;
 import tw.kits.voicein.model.User;
+import static tw.kits.voicein.resource.ApiV1.AccountContactsResource.LOGGER;
+import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.TokenRequired;
 
@@ -64,22 +69,90 @@ public class AccountGroupsResource {
         AccountAllGroupBean accountAllGroupBean = new AccountAllGroupBean();
         
         for (Group group : groups) {
-            ArrayList<String> contactsId = group.getContacts();
-            ArrayList<Contact> contactEntities = new ArrayList();
             HashMap<String, Object> groupEntity = new HashMap();
             
             groupEntity.put("groupName", group.getGroupName());
-            
-            for (String contactId : contactsId) {
-                Contact contact = dataStoreObject.get(Contact.class, new ObjectId(contactId));
-                contactEntities.add(contact);
-            }
-            groupEntity.put("contacts", contactEntities);
+            groupEntity.put("groupId", group.getId());            
             groupsEntities.add(groupEntity);
         }
         
         accountAllGroupBean.setGroups(groupsEntities);
         return Response.ok(accountAllGroupBean).build();
+    }
+    
+    /**
+     *
+     * @param uuid
+     * @param groupId
+     * @return
+     */
+    @GET
+    @Path("/accounts/{uuid}/groups/{groupId}/contacts")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @TokenRequired
+    @SuppressWarnings("empty-statement")
+    public Response getGroupContacts(
+            @PathParam("uuid") String uuid,
+            @PathParam("groupId") String groupId
+    ) {
+        Group groups = dataStoreObject.get(Group.class, groupId);
+        ArrayList<String> contacts = groups.getContacts();
+        List<UserContactBean> userList = new ArrayList();
+        UserContactBean userContactBean;
+        
+        for (String contactId : contacts) {
+            Contact contact = dataStoreObject.get(Contact.class, new ObjectId(contactId));
+            userContactBean = new UserContactBean();
+            User provider = contact.getProviderUser();
+            Icon icon = contact.getCustomerIcon();
+            userContactBean.setId(userContactBean.getId());
+            
+            if (provider != null) {
+                Contact providerContact = dataStoreObject.find(Contact.class).filter("user =", provider).filter("qrCodeUuid =", contact.getQrCodeUuid()).get();
+                userContactBean.setCompany(provider.getCompany());
+                userContactBean.setUserName(provider.getUserName());
+                userContactBean.setLocation(provider.getLocation());
+                userContactBean.setCompany(provider.getCompany());
+                userContactBean.setProfile(provider.getProfile());
+                userContactBean.setPhoneNumber(provider.getPhoneNumber());
+                LOGGER.log(Level.CONFIG, "Provider is available {0}", Helpers.isAllowedToCall(providerContact));
+                userContactBean.setProviderIsEnable(Helpers.isAllowedToCall(providerContact));
+                userContactBean.setProfilePhotoId(provider.getProfilePhotoId());
+                if (providerContact.getIsHigherPriorityThanGlobal()) {
+                    userContactBean.setProviderAvailableEndTime(providerContact.getAvailableEndTime());
+                    userContactBean.setProviderAvailableStartTime(providerContact.getAvailableStartTime());
+                } else {
+                    userContactBean.setProviderAvailableEndTime(provider.getAvailableEndTime());
+                    userContactBean.setProviderAvailableStartTime(provider.getAvailableStartTime());
+                }
+
+            } else if (icon != null) {
+                userContactBean.setCompany(icon.getCompany());
+                userContactBean.setUserName(icon.getName());
+                userContactBean.setLocation(icon.getLocation());
+                userContactBean.setCompany(icon.getCompany());
+                userContactBean.setPhoneNumber(icon.getPhoneNumber());
+                LOGGER.log(Level.CONFIG, "Icon is available {0}", Helpers.isAllowedToCall(icon));
+                userContactBean.setProviderIsEnable(Helpers.isAllowedToCall(icon));
+                userContactBean.setProviderAvailableEndTime(icon.getAvailableEndTime());
+                userContactBean.setProviderAvailableStartTime(icon.getAvailableStartTime());
+
+            }
+
+            userContactBean.setAvailableEndTime(contact.getAvailableEndTime());
+            userContactBean.setAvailableStartTime(contact.getAvailableStartTime());
+            userContactBean.setChargeType(contact.getChargeType());
+            userContactBean.setIsEnable(contact.getIsEnable());
+            userContactBean.setCustomerIcon(contact.getCustomerIcon());
+            userContactBean.setNickName(contact.getNickName());
+            userContactBean.setQrCodeUuid(contact.getQrCodeUuid());
+            userContactBean.setIsHigherPriorityThanGlobal(contact.getIsHigherPriorityThanGlobal());
+
+            userList.add(userContactBean);
+        }
+        
+        return Response.ok(userList).build();
     }
 
     /**
