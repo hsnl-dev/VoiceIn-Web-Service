@@ -45,6 +45,8 @@ public class Record {
         this.setCalleePhone(callee.getOriginNumber());
         this.setCaller(caller);
         this.setCallee(callee);
+        this.setCallerContactId(contact.getId());
+        
         switch (contact.getChargeType()) {
             case ContactConstant.TYPE_FREE:
                 this.setType(RecordConstant.APP_TO_APP_CHARGE_CALLEE);

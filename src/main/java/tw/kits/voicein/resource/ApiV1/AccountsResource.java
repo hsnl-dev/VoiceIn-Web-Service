@@ -1,6 +1,9 @@
 package tw.kits.voicein.resource.ApiV1;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.logging.*;
 
 import javax.ws.rs.*;
@@ -19,6 +22,10 @@ import javax.validation.Valid;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
+import org.mongodb.morphia.query.Query;
+import tw.kits.voicein.bean.RecordResBean;
+import tw.kits.voicein.constant.ContactConstant;
+import tw.kits.voicein.constant.RecordConstant;
 import tw.kits.voicein.model.Record;
 import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.TokenRequired;
@@ -100,14 +107,15 @@ public class AccountsResource {
     @TokenRequired
     public Response deleteUserAccount(@PathParam("uuid") String uuid) {
         dataStoreObject.delete(User.class, uuid);
-        
+
         LOGGER.log(Level.CONFIG, "Delete User u{0}", uuid);
         return Response.ok().build();
     }
 
     /**
-     * Call When user click the calling button. API By Calvin
-     * =========== This is depreciated! ===========
+     * Call When user click the calling button. API By Calvin =========== This
+     * is depreciated! ===========
+     *
      * @param uuid
      * @param qrCodeUuid
      * @param callBean
@@ -148,17 +156,66 @@ public class AccountsResource {
             return Response.status(Status.FORBIDDEN).build();
         }
     }
-    @POST
-    @Path("/api/v1/accounts/{userUuid}/history")
+
+    @GET
+    @Path("/accounts/{userUuid}/history")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
-    public Response getHistory(@PathParam("uuid") String uid, @QueryParam("before")long timestamp){
+    public Response getHistory(@PathParam("userUuid") String uid, @QueryParam("before") long timestamp) {
         User user = dataStoreObject.get(User.class, uid);
-        if(user==null){
-            return Response.noContent().build();
+        if (user == null) {
+            return Response.status(Status.NOT_FOUND).build();
         }
-       return Response.accepted().build();
-    
+        Query<Record> query = dataStoreObject.createQuery(Record.class);
+        
+        query.or(
+                query.criteria("caller").equal(user),
+                query.criteria("callee").equal(user));
+        List<Record> invs;
+        if(timestamp!=0){
+           invs =  query.field("reqTime").lessThanOrEq(new Date(timestamp)).asList();
+        }else{
+           invs = query.order("reqTime").asList();    
+        }
+        
+        List<RecordResBean> res = new ArrayList<RecordResBean>();
+        for (Record one : invs) {
+            RecordResBean rrb = null;
+            String type = one.getType();
+            if (type.equals(RecordConstant.APP_TO_APP_CHARGE_CALLEE) || 
+                    type.equals(RecordConstant.APP_TO_APP_CHARGE_CALLER)) {
+                if (uid.equals(one.getCaller().getUuid())) {
+                    Contact contact = dataStoreObject.get(Contact.class, one.getCallerContactId());
+                    rrb = new RecordResBean(one.getCallee(), one, contact);
+                    rrb.setType("outgoing");
+                } else if (uid.equals(one.getCallee().getUuid())) {
+                    Contact contact = dataStoreObject.get(Contact.class, one.getCallerContactId());
+                    int contactType;
+                    if (one.getType().equals(RecordConstant.APP_TO_APP_CHARGE_CALLEE)) {
+                        contactType = ContactConstant.TYPE_CHARGE;
+                    } else {
+                        contactType = ContactConstant.TYPE_FREE;
+                    }
+                    Contact another = dataStoreObject.createQuery(Contact.class)
+                            .field("user").equal(contact.getProviderUser())
+                            .field("providerUser").equal(contact.getUser())
+                            .field("chargeType").equal(contactType).get();
+                    rrb = new RecordResBean(one.getCallee(), one, another);
+                    rrb.setType("incoming");
+                }
+            } else if (one.getCalleeIcon() != null) {
+                Contact contact = dataStoreObject.get(Contact.class, one.getCallerContactId());
+                rrb = new RecordResBean(one.getCalleeIcon(), one, contact);
+                rrb.setType("outgoing");
+            } else if (one.getCallerIcon() != null) {
+                Contact another = dataStoreObject.createQuery(Contact.class).field("customerIcon").equal(one.getCallerIcon()).get();
+                rrb = new RecordResBean(one.getCallerIcon(), one, another);
+            }
+            res.add(rrb);
+        }
+        return Response.accepted(res)
+                .build();
+
     }
 }
