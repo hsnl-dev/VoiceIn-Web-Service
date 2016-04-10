@@ -96,8 +96,8 @@ public class AccountGroupsResource {
             @PathParam("uuid") String uuid,
             @PathParam("groupId") String groupId
     ) {
-        Group groups = dataStoreObject.get(Group.class, groupId);
-        ArrayList<String> contacts = groups.getContacts();
+        Group group = dataStoreObject.get(Group.class, new ObjectId(groupId));
+        ArrayList<String> contacts = group.getContacts();
         List<UserContactBean> userList = new ArrayList();
         UserContactBean userContactBean;
         
