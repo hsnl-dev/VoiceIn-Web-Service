@@ -72,7 +72,7 @@ public class AccountGroupsResource {
             HashMap<String, Object> groupEntity = new HashMap();
             
             groupEntity.put("groupName", group.getGroupName());
-            groupEntity.put("groupId", group.getId());            
+            groupEntity.put("groupId", group.getId().toString());            
             groupsEntities.add(groupEntity);
         }
         
@@ -106,8 +106,7 @@ public class AccountGroupsResource {
             userContactBean = new UserContactBean();
             User provider = contact.getProviderUser();
             Icon icon = contact.getCustomerIcon();
-            userContactBean.setId(userContactBean.getId());
-            
+
             if (provider != null) {
                 Contact providerContact = dataStoreObject.find(Contact.class).filter("user =", provider).filter("qrCodeUuid =", contact.getQrCodeUuid()).get();
                 userContactBean.setCompany(provider.getCompany());
@@ -116,7 +115,7 @@ public class AccountGroupsResource {
                 userContactBean.setCompany(provider.getCompany());
                 userContactBean.setProfile(provider.getProfile());
                 userContactBean.setPhoneNumber(provider.getPhoneNumber());
-                LOGGER.log(Level.CONFIG, "Provider is available {0}", Helpers.isAllowedToCall(providerContact));
+                LOGGER.log(Level.CONFIG, "Provider is available: {0}", Helpers.isAllowedToCall(providerContact));
                 userContactBean.setProviderIsEnable(Helpers.isAllowedToCall(providerContact));
                 userContactBean.setProfilePhotoId(provider.getProfilePhotoId());
                 if (providerContact.getIsHigherPriorityThanGlobal()) {
@@ -131,13 +130,12 @@ public class AccountGroupsResource {
                 userContactBean.setCompany(icon.getCompany());
                 userContactBean.setUserName(icon.getName());
                 userContactBean.setLocation(icon.getLocation());
-                userContactBean.setCompany(icon.getCompany());
                 userContactBean.setPhoneNumber(icon.getPhoneNumber());
-                LOGGER.log(Level.CONFIG, "Icon is available {0}", Helpers.isAllowedToCall(icon));
+
+                LOGGER.log(Level.CONFIG, "Icon is available: {0}", Helpers.isAllowedToCall(icon));
                 userContactBean.setProviderIsEnable(Helpers.isAllowedToCall(icon));
                 userContactBean.setProviderAvailableEndTime(icon.getAvailableEndTime());
                 userContactBean.setProviderAvailableStartTime(icon.getAvailableStartTime());
-
             }
 
             userContactBean.setAvailableEndTime(contact.getAvailableEndTime());
@@ -147,6 +145,10 @@ public class AccountGroupsResource {
             userContactBean.setCustomerIcon(contact.getCustomerIcon());
             userContactBean.setNickName(contact.getNickName());
             userContactBean.setQrCodeUuid(contact.getQrCodeUuid());
+            userContactBean.setIsLike(contact.getIsLike());
+            
+            // return unique object id
+            userContactBean.setId(contact.getId().toString());
             userContactBean.setIsHigherPriorityThanGlobal(contact.getIsHigherPriorityThanGlobal());
 
             userList.add(userContactBean);
