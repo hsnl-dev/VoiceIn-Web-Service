@@ -251,7 +251,7 @@ public class AccountGroupsResource {
             @PathParam("uuid") String uuid,
             @PathParam("groupUuid") String groupUuid
     ) {
-        Group groupToDelete = dataStoreObject.get(Group.class, groupUuid);
+        Group groupToDelete = dataStoreObject.get(Group.class, new ObjectId(groupUuid));
 
         if (groupToDelete != null) {
             dataStoreObject.delete(groupToDelete);
