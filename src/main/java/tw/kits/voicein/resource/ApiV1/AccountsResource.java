@@ -3,6 +3,7 @@ package tw.kits.voicein.resource.ApiV1;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.*;
 
@@ -174,11 +175,12 @@ public class AccountsResource {
                 query.criteria("callee").equal(user));
         List<Record> invs;
         if(timestamp!=0){
-           invs =  query.field("reqTime").lessThanOrEq(new Date(timestamp)).asList();
+           invs =  query.field("reqTime").lessThanOrEq(new Date(timestamp)).limit(100).order("-reqTime").asList();
         }else{
-           invs = query.order("reqTime").asList();    
+           invs = query.order("reqTime").limit(100).asList();    
         }
         
+        Date last = null;
         List<RecordResBean> res = new ArrayList<RecordResBean>();
         for (Record one : invs) {
             RecordResBean rrb = null;
@@ -213,8 +215,15 @@ public class AccountsResource {
                 rrb = new RecordResBean(one.getCallerIcon(), one, another);
             }
             res.add(rrb);
+            last = one.getReqTime();
         }
-        return Response.accepted(res)
+        
+        //retrieve last res;
+        
+        HashMap<String, Object> output = new HashMap<>();
+        output.put("record", res);
+//        output.put("nextMills",last);
+        return Response.ok(output)
                 .build();
 
     }
