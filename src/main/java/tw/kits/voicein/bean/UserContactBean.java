@@ -6,8 +6,10 @@
 package tw.kits.voicein.bean;
 
 import javax.validation.constraints.NotNull;
-import org.bson.types.ObjectId;
+import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.Icon;
+import tw.kits.voicein.model.User;
+import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.PhoneNum;
 
 /**
@@ -18,7 +20,7 @@ public class UserContactBean {
 
     //Field
     @NotNull
-    private String id; 
+    private String id;
     private String userName;
     @PhoneNum
     private String phoneNumber;
@@ -40,6 +42,54 @@ public class UserContactBean {
     private Boolean isLike;
 
     public UserContactBean() {
+
+    }
+
+    public UserContactBean(Contact contact,Contact providerContact) {
+
+        User provider = contact.getProviderUser();
+        Icon icon = contact.getCustomerIcon();
+
+        if (provider != null) {
+           
+            this.company = provider.getCompany();
+            this.userName = provider.getUserName();
+            this.location = (provider.getLocation());
+            this.company = (provider.getCompany());
+            this.profile = (provider.getProfile());
+            this.phoneNumber = (provider.getPhoneNumber());
+            this.providerIsEnable  = (Helpers.isAllowedToCall(providerContact));
+            this.profilePhotoId = (provider.getProfilePhotoId());
+            if (providerContact.getIsHigherPriorityThanGlobal()) {
+                this.providerAvailableEndTime = (providerContact.getAvailableEndTime());
+                this.providerAvailableStartTime=(providerContact.getAvailableStartTime());
+            } else {
+                this.providerAvailableEndTime=(provider.getAvailableEndTime());
+                this.providerAvailableStartTime=(provider.getAvailableStartTime());
+            }
+
+        } else if (icon != null) {
+            this.company=(icon.getCompany());
+            this.userName=(icon.getName());
+            this.location=(icon.getLocation());
+            this.phoneNumber=(icon.getPhoneNumber());
+            this.providerIsEnable=(Helpers.isAllowedToCall(icon));
+            this.providerAvailableEndTime=(icon.getAvailableEndTime());
+            this.providerAvailableStartTime=(icon.getAvailableStartTime());
+        }
+
+        this.availableEndTime=(contact.getAvailableEndTime());
+        this.availableStartTime=(contact.getAvailableStartTime());
+        this.chargeType=(contact.getChargeType());
+        this.isEnable=(contact.getIsEnable());
+        this.customerIcon=(contact.getCustomerIcon());
+        this.nickName=(contact.getNickName());
+        this.qrCodeUuid = (contact.getQrCodeUuid());
+        this.isLike = (contact.getIsLike());
+
+        // return unique object id
+        this.id = (contact.getId().toString());
+        this.isHigherPriorityThanGlobal = (contact.getIsHigherPriorityThanGlobal());
 
     }
 
