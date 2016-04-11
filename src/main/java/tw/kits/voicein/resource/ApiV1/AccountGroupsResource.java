@@ -161,7 +161,6 @@ public class AccountGroupsResource {
      *
      * @param uuid
      * @param groupUuid
-     * @param action - expected parameters are delete or add.
      * @param contactsToUpdate
      * @return
      */
@@ -182,6 +181,7 @@ public class AccountGroupsResource {
             // The group is found!
             group.setContacts(contactsToModified);
             dataStoreObject.save(group);
+            return Response.ok().build();
         } else {
             // The aimed group is not found.
             return Response.status(Status.NOT_FOUND).build();
