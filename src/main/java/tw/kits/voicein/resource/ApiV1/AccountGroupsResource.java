@@ -67,19 +67,19 @@ public class AccountGroupsResource {
         List<Group> groups = dataStoreObject.createQuery(Group.class).field("user").equal(owner).asList();
         ArrayList<HashMap<String, Object>> groupsEntities = new ArrayList();
         AccountAllGroupBean accountAllGroupBean = new AccountAllGroupBean();
-        
+
         for (Group group : groups) {
             HashMap<String, Object> groupEntity = new HashMap();
-            
+
             groupEntity.put("groupName", group.getGroupName());
-            groupEntity.put("groupId", group.getId().toString());            
+            groupEntity.put("groupId", group.getId().toString());
             groupsEntities.add(groupEntity);
         }
-        
+
         accountAllGroupBean.setGroups(groupsEntities);
         return Response.ok(accountAllGroupBean).build();
     }
-    
+
     /**
      *
      * @param uuid
@@ -100,7 +100,7 @@ public class AccountGroupsResource {
         ArrayList<String> contacts = group.getContacts();
         List<UserContactBean> userList = new ArrayList();
         UserContactBean userContactBean;
-        
+
         for (String contactId : contacts) {
             Contact contact = dataStoreObject.get(Contact.class, new ObjectId(contactId));
             userContactBean = new UserContactBean();
@@ -146,14 +146,14 @@ public class AccountGroupsResource {
             userContactBean.setNickName(contact.getNickName());
             userContactBean.setQrCodeUuid(contact.getQrCodeUuid());
             userContactBean.setIsLike(contact.getIsLike());
-            
+
             // return unique object id
             userContactBean.setId(contact.getId().toString());
             userContactBean.setIsHigherPriorityThanGlobal(contact.getIsHigherPriorityThanGlobal());
 
             userList.add(userContactBean);
         }
-        
+
         return Response.ok(userList).build();
     }
 
@@ -173,39 +173,15 @@ public class AccountGroupsResource {
     public Response updateContactInFGroup(
             @PathParam("uuid") String uuid,
             @PathParam("groupUuid") String groupUuid,
-            @QueryParam("action") String action,
             AccountGroupUpdateBean contactsToUpdate
     ) {
         ArrayList<String> contactsToModified = contactsToUpdate.getContacts();
-        Group group = dataStoreObject.get(Group.class, groupUuid);
-        ArrayList<String> existedContacts = group.getContacts();
+        Group group = dataStoreObject.get(Group.class, new ObjectId(groupUuid));
 
         if (group != null) {
             // The group is found!
-            switch (action) {
-                case "add":
-
-                    for (String contact : contactsToModified) {
-                        existedContacts.add(contact);
-                    }
-
-                    group.setContacts(existedContacts);
-                    dataStoreObject.save(group);
-
-                    return Response.ok().build();
-                case "delete":
-                    for (String contact : contactsToModified) {
-                        existedContacts.remove(contact);
-                    }
-
-                    group.setContacts(existedContacts);
-                    dataStoreObject.save(group);
-
-                    return Response.ok().build();
-                default:
-                    return Response.status(Status.NOT_ACCEPTABLE).build();
-
-            }
+            group.setContacts(contactsToModified);
+            dataStoreObject.save(group);
         } else {
             // The aimed group is not found.
             return Response.status(Status.NOT_FOUND).build();
