@@ -100,6 +100,9 @@ public class AccountContactsResource {
                 userContactBean.setCompany(provider.getCompany());
                 userContactBean.setProfile(provider.getProfile());
                 userContactBean.setPhoneNumber(provider.getPhoneNumber());
+                userContactBean.setEmail(provider.getEmail());
+                userContactBean.setJobTitle(provider.getJobTitle());
+                
                 LOGGER.log(Level.CONFIG, "Provider is available: {0}", Helpers.isAllowedToCall(providerContact));
                 userContactBean.setProviderIsEnable(Helpers.isAllowedToCall(providerContact));
                 userContactBean.setProfilePhotoId(provider.getProfilePhotoId());
@@ -116,7 +119,8 @@ public class AccountContactsResource {
                 userContactBean.setUserName(icon.getName());
                 userContactBean.setLocation(icon.getLocation());
                 userContactBean.setPhoneNumber(icon.getPhoneNumber());
-
+                userContactBean.setEmail("尚未設定");
+                userContactBean.setJobTitle("尚未設定");
                 LOGGER.log(Level.CONFIG, "Icon is available: {0}", Helpers.isAllowedToCall(icon));
                 userContactBean.setProviderIsEnable(Helpers.isAllowedToCall(icon));
                 userContactBean.setProviderAvailableEndTime(icon.getAvailableEndTime());

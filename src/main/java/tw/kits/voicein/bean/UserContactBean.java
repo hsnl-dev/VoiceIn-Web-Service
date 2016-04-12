@@ -29,6 +29,8 @@ public class UserContactBean {
     private String company;
     private String profilePhotoId;
     private String nickName;
+    private String jobTitle;
+    private String email;
     private int chargeType;
     private String availableStartTime;
     private String availableEndTime;
@@ -357,6 +359,34 @@ public class UserContactBean {
      */
     public void setIsLike(Boolean isLike) {
         this.isLike = isLike;
+    }
+
+    /**
+     * @return the jobTitle
+     */
+    public String getJobTitle() {
+        return jobTitle;
+    }
+
+    /**
+     * @param jobTitle the jobTitle to set
+     */
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
+    }
+
+    /**
+     * @return the email
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * @param email the email to set
+     */
+    public void setEmail(String email) {
+        this.email = email;
     }
 
 }
