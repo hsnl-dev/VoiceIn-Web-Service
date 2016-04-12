@@ -162,6 +162,7 @@ public class AccountGroupsResource {
      *
      * @param uuid
      * @param groupUuid
+     * @param groupName
      * @param contactsToUpdate
      * @return
      */
@@ -173,6 +174,7 @@ public class AccountGroupsResource {
     public Response updateContactInFGroup(
             @PathParam("uuid") String uuid,
             @PathParam("groupUuid") String groupUuid,
+            @QueryParam("groupName") String groupName,
             AccountGroupUpdateBean contactsToUpdate
     ) {
         ArrayList<String> contactsToModified = contactsToUpdate.getContacts();
@@ -180,6 +182,10 @@ public class AccountGroupsResource {
 
         if (group != null) {
             // The group is found!
+            if (groupName != null) {
+                group.setGroupName(groupName);
+            }
+        
             group.setContacts(contactsToModified);
             dataStoreObject.save(group);
             return Response.ok().build();
