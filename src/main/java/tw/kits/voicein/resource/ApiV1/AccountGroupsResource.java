@@ -185,8 +185,11 @@ public class AccountGroupsResource {
             if (groupName != null) {
                 group.setGroupName(groupName);
             }
-        
-            group.setContacts(contactsToModified);
+            
+            if (contactsToUpdate != null) {
+                group.setContacts(contactsToModified);
+            }
+            
             dataStoreObject.save(group);
             return Response.ok().build();
         } else {
