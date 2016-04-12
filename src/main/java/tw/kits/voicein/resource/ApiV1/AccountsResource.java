@@ -175,9 +175,9 @@ public class AccountsResource {
                 query.criteria("callee").equal(user));
         List<Record> invs;
         if(timestamp!=0){
-           invs =  query.field("reqTime").lessThanOrEq(new Date(timestamp)).limit(100).order("-reqTime").asList();
+           invs =  query.field("-reqTime").lessThanOrEq(new Date(timestamp)).limit(100).order("-reqTime").asList();
         }else{
-           invs = query.order("reqTime").limit(100).asList();    
+           invs = query.order("-reqTime").limit(100).asList();    
         }
         
         Date last = null;
@@ -203,7 +203,7 @@ public class AccountsResource {
                             .field("user").equal(contact.getProviderUser())
                             .field("providerUser").equal(contact.getUser())
                             .field("chargeType").equal(contactType).get();
-                    rrb = new RecordResBean(one.getCallee(), one, another);
+                    rrb = new RecordResBean(one.getCaller(), one, another);
                     rrb.setType("incoming");
                 }
             } else if (one.getCalleeIcon() != null) {
