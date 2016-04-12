@@ -177,7 +177,6 @@ public class AccountGroupsResource {
             @QueryParam("groupName") String groupName,
             AccountGroupUpdateBean contactsToUpdate
     ) {
-        ArrayList<String> contactsToModified = contactsToUpdate.getContacts();
         Group group = dataStoreObject.get(Group.class, new ObjectId(groupUuid));
 
         if (group != null) {
@@ -187,6 +186,7 @@ public class AccountGroupsResource {
             }
             
             if (contactsToUpdate != null) {
+                ArrayList<String> contactsToModified = contactsToUpdate.getContacts();
                 group.setContacts(contactsToModified);
             }
             
