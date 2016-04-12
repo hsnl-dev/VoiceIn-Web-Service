@@ -26,6 +26,8 @@ public class User {
     private String profile;
     @NotNull
     private String company;
+    private String jobTitle;
+    private String email;
     private String profilePhotoId;
     private String qrCodeUuid;
     @NotNull
@@ -207,5 +209,33 @@ public class User {
      */
     public void setCredit(float credit) {
         this.credit = credit;
+    }
+
+    /**
+     * @return the jobTitle
+     */
+    public String getJobTitle() {
+        return jobTitle;
+    }
+
+    /**
+     * @param jobTitle the jobTitle to set
+     */
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
+    }
+
+    /**
+     * @return the email
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * @param email the email to set
+     */
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

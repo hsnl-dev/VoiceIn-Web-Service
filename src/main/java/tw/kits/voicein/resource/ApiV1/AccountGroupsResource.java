@@ -73,6 +73,7 @@ public class AccountGroupsResource {
 
             groupEntity.put("groupName", group.getGroupName());
             groupEntity.put("groupId", group.getId().toString());
+            groupEntity.put("contactCount", group.getContacts().size());
             groupsEntities.add(groupEntity);
         }
 
