@@ -115,7 +115,7 @@ public class Helpers {
 
     public static Response makeAsymmeticCall(User account,Icon icon,boolean isCallByAccount,Contact callerContact, Datastore dsobj) throws IOException {
         Record record = new Record();
-        record.setAsymetricCall(account, icon, true, callerContact);
+        record.setAsymetricCall(account, icon, isCallByAccount, callerContact);
         dsobj.save(record);
         InitPhoneCallBean ipcb = new InitPhoneCallBean();
         ipcb.setCalleeNumber(record.getCalleePhone());
