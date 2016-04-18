@@ -62,14 +62,14 @@ public class Record {
         this.setReqTime(new Date());
         this.setStatus(RecordConstant.REQ_SEND);
         if (isCallByAccount) {
-            this.setCallerPhone(account.getPhoneNumber());
-            this.setCalleePhone(icon.getPhoneNumber());
+            this.setCallerPhone(account.getOriginNumber());
+            this.setCalleePhone(icon.getOriginPhoneNumber());
             this.setCaller(account);
             this.setCalleeIcon(icon);
             this.setType(RecordConstant.APP_TO_ICON);
             this.setCallerContactId(callerContact.getId());
         } else {
-            this.setCallerPhone(icon.getPhoneNumber());
+            this.setCallerPhone(icon.getOriginPhoneNumber());
             this.setCalleePhone(account.getOriginNumber());
             this.setCallee(account);
             this.setCallerIcon(icon);
