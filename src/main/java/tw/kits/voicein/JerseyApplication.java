@@ -21,7 +21,6 @@ public class JerseyApplication extends ResourceConfig {
         property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true);
         packages("tw.kits.voicein.resource.ApiV1");
         packages("tw.kits.voicein.resource.ApiV2");
-        System.out.println(System.getenv("ProgramFiles")+"------");
 
     }
 }

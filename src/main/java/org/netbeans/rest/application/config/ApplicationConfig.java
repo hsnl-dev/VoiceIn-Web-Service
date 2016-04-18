@@ -36,8 +36,16 @@ public class ApplicationConfig extends Application {
         resources.add(tw.kits.voicein.resource.ApiV1.SandboxResource.class);
         resources.add(tw.kits.voicein.resource.ApiV1.TokenResource.class);
         resources.add(tw.kits.voicein.resource.ApiV1.WelcomeResource.class);
+        resources.add(tw.kits.voicein.resource.ApiV2.AccountAvatarsResource.class);
         resources.add(tw.kits.voicein.resource.ApiV2.AccountContactsResource.class);
+        resources.add(tw.kits.voicein.resource.ApiV2.AccountGroupsResource.class);
+        resources.add(tw.kits.voicein.resource.ApiV2.AccountQRcodesResource.class);
+        resources.add(tw.kits.voicein.resource.ApiV2.AccountsResource.class);
         resources.add(tw.kits.voicein.resource.ApiV2.CallingServiceResource.class);
+        resources.add(tw.kits.voicein.resource.ApiV2.IconResource.class);
+        resources.add(tw.kits.voicein.resource.ApiV2.SandboxResource.class);
+        resources.add(tw.kits.voicein.resource.ApiV2.TokenResource.class);
+        resources.add(tw.kits.voicein.resource.ApiV2.WelcomeResource.class);
     }
     
 }

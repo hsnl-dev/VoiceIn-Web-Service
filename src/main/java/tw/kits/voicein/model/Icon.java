@@ -75,6 +75,9 @@ public class Icon {
             return phoneNumber;
         }
     }
+      public String getOriginPhoneNumber() {
+            return phoneNumber;
+    }
 
     /**
      * @param phoneNumber the phoneNumber to set

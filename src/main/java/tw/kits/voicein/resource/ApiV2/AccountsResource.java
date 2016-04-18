@@ -1,5 +1,6 @@
-package tw.kits.voicein.resource.ApiV1;
+package tw.kits.voicein.resource.ApiV2;
 
+import tw.kits.voicein.resource.ApiV1.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
