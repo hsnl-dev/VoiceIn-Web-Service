@@ -63,6 +63,9 @@ public class TokenResource {
             u = new User();
             u.setUuid(UUID.randomUUID().toString());
             u.setPhoneNumber(phone.getPhoneNumber());
+            u.setAvailableStartTime("00:00");
+            u.setAvailableEndTime("23:59");
+            u.setCredit(3000);
         } else {
             //if code exist for userid delete it !!!
             Query<Code> codeQ = ds.createQuery(Code.class);

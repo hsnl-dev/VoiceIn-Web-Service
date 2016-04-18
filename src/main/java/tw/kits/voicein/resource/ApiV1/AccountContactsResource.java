@@ -26,8 +26,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.Query;
 import tw.kits.voicein.bean.UserContactBean;
 import tw.kits.voicein.model.Contact;
+import tw.kits.voicein.model.Group;
 import tw.kits.voicein.model.Icon;
 import tw.kits.voicein.model.User;
 import tw.kits.voicein.util.Helpers;
@@ -210,7 +212,7 @@ public class AccountContactsResource {
         Contact freeContact = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", provider).get();
 
         dataStoreObject.delete(Contact.class, payContact.getId());
-        dataStoreObject.delete(Contact.class, freeContact.getId());
+        dataStoreObject.delete(Contact.class, freeContact.getId());        
         return Response.ok().build();
     }
 }

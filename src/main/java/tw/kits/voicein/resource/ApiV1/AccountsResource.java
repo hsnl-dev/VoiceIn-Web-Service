@@ -164,47 +164,54 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response getHistory(@PathParam("userUuid") String uid, @QueryParam("before") long timestamp) {
+        
         User user = dataStoreObject.get(User.class, uid);
         if (user == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        Query<Record> query = dataStoreObject.createQuery(Record.class);
-        
+        Query<Record> query = dataStoreObject.createQuery(Record.class).disableValidation();
+
         query.or(
                 query.criteria("caller").equal(user),
                 query.criteria("callee").equal(user));
         List<Record> invs;
-        if(timestamp!=0){
-           invs =  query.field("-reqTime").lessThanOrEq(new Date(timestamp)).limit(100).order("-reqTime").asList();
-        }else{
-           invs = query.order("-reqTime").limit(100).asList();    
+        if (timestamp != 0) {
+            invs = query.field("-reqTime").lessThanOrEq(new Date(timestamp)).limit(100).order("-reqTime").asList();
+        } else {
+            invs = query.order("-reqTime").limit(100).asList();
         }
-        
+
         Date last = null;
         List<RecordResBean> res = new ArrayList<RecordResBean>();
         for (Record one : invs) {
             RecordResBean rrb = null;
             String type = one.getType();
-            if (type.equals(RecordConstant.APP_TO_APP_CHARGE_CALLEE) || 
-                    type.equals(RecordConstant.APP_TO_APP_CHARGE_CALLER)) {
+            if (type.equals(RecordConstant.APP_TO_APP_CHARGE_CALLEE)
+                    || type.equals(RecordConstant.APP_TO_APP_CHARGE_CALLER)) {
                 if (uid.equals(one.getCaller().getUuid())) {
                     Contact contact = dataStoreObject.get(Contact.class, one.getCallerContactId());
                     rrb = new RecordResBean(one.getCallee(), one, contact);
                     rrb.setType("outgoing");
                 } else if (uid.equals(one.getCallee().getUuid())) {
                     Contact contact = dataStoreObject.get(Contact.class, one.getCallerContactId());
-                    int contactType;
-                    if (one.getType().equals(RecordConstant.APP_TO_APP_CHARGE_CALLEE)) {
-                        contactType = ContactConstant.TYPE_CHARGE;
+                    if (contact == null) {
+                        rrb = new RecordResBean(one.getCaller(), one, null);
+                        rrb.setType("incoming");
                     } else {
-                        contactType = ContactConstant.TYPE_FREE;
+                        int contactType;
+                        if (one.getType().equals(RecordConstant.APP_TO_APP_CHARGE_CALLEE)) {
+                            contactType = ContactConstant.TYPE_CHARGE;
+                        } else {
+                            contactType = ContactConstant.TYPE_FREE;
+                        }
+                        Contact another = dataStoreObject.createQuery(Contact.class)
+                                .field("user").equal(contact.getProviderUser())
+                                .field("providerUser").equal(contact.getUser())
+                                .field("chargeType").equal(contactType).get();
+                        rrb = new RecordResBean(one.getCaller(), one, another);
+                        rrb.setType("incoming");
                     }
-                    Contact another = dataStoreObject.createQuery(Contact.class)
-                            .field("user").equal(contact.getProviderUser())
-                            .field("providerUser").equal(contact.getUser())
-                            .field("chargeType").equal(contactType).get();
-                    rrb = new RecordResBean(one.getCaller(), one, another);
-                    rrb.setType("incoming");
+
                 }
             } else if (one.getCalleeIcon() != null) {
                 Contact contact = dataStoreObject.get(Contact.class, one.getCallerContactId());
@@ -217,9 +224,8 @@ public class AccountsResource {
             res.add(rrb);
             last = one.getReqTime();
         }
-        
+
         //retrieve last res;
-        
         HashMap<String, Object> output = new HashMap<>();
         output.put("record", res);
 //        output.put("nextMills",last);
