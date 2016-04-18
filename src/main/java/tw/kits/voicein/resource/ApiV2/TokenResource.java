@@ -1,6 +1,5 @@
 package tw.kits.voicein.resource.ApiV2;
 
-import tw.kits.voicein.resource.ApiV1.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -34,7 +33,7 @@ import tw.kits.voicein.util.Http;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.Parameter;
 
-@Path("/api/v1")
+@Path("/api/v2")
 public class TokenResource {
 
     private final Logger LOGGER = Logger.getLogger(TokenResource.class.getName());
