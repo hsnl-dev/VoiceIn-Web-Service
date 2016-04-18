@@ -1,6 +1,7 @@
 package tw.kits.voicein.resource.ApiV2;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -20,11 +21,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.Query;
 import tw.kits.voicein.bean.UserContactBean;
 import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.Icon;
 import tw.kits.voicein.model.User;
 import tw.kits.voicein.constant.ContactConstant;
+import tw.kits.voicein.model.Group;
 import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.TokenRequired;
@@ -102,7 +105,7 @@ public class AccountContactsResource {
                 userContactBean.setPhoneNumber(provider.getPhoneNumber());
                 userContactBean.setEmail(provider.getEmail());
                 userContactBean.setJobTitle(provider.getJobTitle());
-                
+
                 LOGGER.log(Level.CONFIG, "Provider is available: {0}", Helpers.isAllowedToCall(providerContact));
                 userContactBean.setProviderIsEnable(Helpers.isAllowedToCall(providerContact));
                 userContactBean.setProfilePhotoId(provider.getProfilePhotoId());
@@ -135,7 +138,7 @@ public class AccountContactsResource {
             userContactBean.setNickName(contact.getNickName());
             userContactBean.setQrCodeUuid(contact.getQrCodeUuid());
             userContactBean.setIsLike(contact.getIsLike());
-            
+
             // return unique object id
             userContactBean.setId(contact.getId().toString());
             userContactBean.setIsHigherPriorityThanGlobal(contact.getIsHigherPriorityThanGlobal());
@@ -222,14 +225,33 @@ public class AccountContactsResource {
 
         User provider = payContact.getProviderUser();
         String qrCodeUuid = payContact.getQrCodeUuid();
+        Query<Group> query = dataStoreObject.createQuery(Group.class);
+        
         if (payContact.getChargeType() != ContactConstant.TYPE_ICON) {
             Contact freeContact = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", provider).get();
+            LOGGER.info("ssss"+freeContact.getId().toString());
+            List<String> contacts = Arrays.asList(freeContact.getId().toString(),payContact.getId().toString());
+            List<Group> groupList = query.field("contacts").hasAnyOf(contacts).asList();
+           
+            for (Group group : groupList) {
+                group.getContacts().remove(payContact.getId().toString());
+                group.getContacts().remove(freeContact.getId().toString());
+                dataStoreObject.save(group);
+            }
             dataStoreObject.delete(freeContact);
         } else {
+            //remove dependency;
+            List<String> contacts = Arrays.asList(payContact.getId().toString());
+            List<Group> groupList = query.field("contacts").hasAnyOf(contacts).asList();
+            for (Group group : groupList) {
+                group.getContacts().remove(payContact.getId().toString());
+                dataStoreObject.save(group);
+            }
             dataStoreObject.delete(payContact.getCustomerIcon());
         }
 
         dataStoreObject.delete(payContact);
+        //clean dependency
 
         return Response.ok().build();
     }

@@ -17,6 +17,7 @@ import tw.kits.voicein.model.User;
 public class RecordResBean {
 
     private String id;
+    private long reqTime;
     private long startTime;
     private long endTime;
     private boolean answer;
@@ -40,6 +41,7 @@ public class RecordResBean {
         this.endTime = res.getEndTime() == null ? -1 : res.getEndTime().getTime();
         this.durationMills = endTime - startTime;
         this.answer = res.isIsAnswer();
+        this.setReqTime(res.getReqTime().getTime());
     }
 
     public RecordResBean(User another, Record res, Contact contact) {
@@ -49,7 +51,7 @@ public class RecordResBean {
         this.anotherUserId = another.getUuid();
         this.anotherName = another.getUserName();
         if (contact != null) {
-            this.anotherNickName = contact.getNickName();
+            this.anotherNickName = "123";
             this.contactId = contact.getId().toString();
         }
 
@@ -265,6 +267,20 @@ public class RecordResBean {
      */
     public void setContactId(String contactId) {
         this.contactId = contactId;
+    }
+
+    /**
+     * @return the reqTime
+     */
+    public long getReqTime() {
+        return reqTime;
+    }
+
+    /**
+     * @param reqTime the reqTime to set
+     */
+    public void setReqTime(long reqTime) {
+        this.reqTime = reqTime;
     }
 
 }
