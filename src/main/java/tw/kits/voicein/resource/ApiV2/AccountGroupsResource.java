@@ -37,7 +37,7 @@ import tw.kits.voicein.util.TokenRequired;
  *
  * @author Calvin
  */
-@Path("/api/v1")
+@Path("/api/v2")
 public class AccountGroupsResource {
 
     // For mongodb.

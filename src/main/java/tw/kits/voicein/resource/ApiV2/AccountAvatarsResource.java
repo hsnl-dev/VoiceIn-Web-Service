@@ -5,7 +5,6 @@
  */
 package tw.kits.voicein.resource.ApiV2;
 
-import tw.kits.voicein.resource.ApiV1.*;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GetObjectRequest;

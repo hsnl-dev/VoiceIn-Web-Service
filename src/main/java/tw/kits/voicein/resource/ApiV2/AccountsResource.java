@@ -1,6 +1,5 @@
 package tw.kits.voicein.resource.ApiV2;
 
-import tw.kits.voicein.resource.ApiV1.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,7 +37,7 @@ import tw.kits.voicein.util.TokenRequired;
  * @author Calvin
  */
 @MultipartConfig(maxFileSize = 1024 * 1024 * 1)
-@Path("/api/v1")
+@Path("/api/v2")
 public class AccountsResource {
 
     @Context

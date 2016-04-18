@@ -1,7 +1,6 @@
 package tw.kits.voicein.resource.ApiV2;
 
 import java.io.IOException;
-import tw.kits.voicein.resource.ApiV1.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -37,7 +36,7 @@ import tw.kits.voicein.util.QRcodeType;
  *
  * @author Henry
  */
-@Path("/api/v1")
+@Path("/api/v2")
 public class IconResource {
 
     MongoManager mongoManager = MongoManager.getInstatnce();
