@@ -190,12 +190,12 @@ public class AccountsResource {
                     || type.equals(RecordConstant.APP_TO_APP_CHARGE_CALLER)) {
                 if (uid.equals(one.getCaller().getUuid())) {
                     Contact contact = dataStoreObject.get(Contact.class, one.getCallerContactId());
-                    rrb = new RecordResBean(one.getCallee(), one, contact);
+                    rrb = new RecordResBean(one.getCallee(), one, contact,one.getCalleePhone());
                     rrb.setType("outgoing");
                 } else if (uid.equals(one.getCallee().getUuid())) {
                     Contact contact = dataStoreObject.get(Contact.class, one.getCallerContactId());
                     if (contact == null) {
-                        rrb = new RecordResBean(one.getCaller(), one, null);
+                        rrb = new RecordResBean(one.getCaller(), one, null,one.getCallerPhone());
                         rrb.setType("incoming");
                     } else {
                         int contactType;
@@ -208,18 +208,21 @@ public class AccountsResource {
                                 .field("user").equal(contact.getProviderUser())
                                 .field("providerUser").equal(contact.getUser())
                                 .field("chargeType").equal(contactType).get();
-                        rrb = new RecordResBean(one.getCaller(), one, another);
+                        rrb = new RecordResBean(one.getCaller(), one, another, one.getCallerPhone());
                         rrb.setType("incoming");
                     }
 
                 }
-            } else if (one.getCalleeIcon() != null) {
+            } else if (type.equals(RecordConstant.APP_TO_ICON)) {
                 Contact contact = dataStoreObject.get(Contact.class, one.getCallerContactId());
-                rrb = new RecordResBean(one.getCalleeIcon(), one, contact);
+                rrb = new RecordResBean(one.getCalleeIcon(), one, contact,one.getCalleePhone());
                 rrb.setType("outgoing");
-            } else if (one.getCallerIcon() != null) {
+            } else if (type.equals(RecordConstant.ICON_TO_APP)) {
                 Contact another = dataStoreObject.createQuery(Contact.class).field("customerIcon").equal(one.getCallerIcon()).get();
-                rrb = new RecordResBean(one.getCallerIcon(), one, another);
+                rrb = new RecordResBean(one.getCallerIcon(), one, another,one.getCallerPhone());
+                rrb.setType("imcoming");
+            }else{
+                
             }
             res.add(rrb);
             last = one.getReqTime();

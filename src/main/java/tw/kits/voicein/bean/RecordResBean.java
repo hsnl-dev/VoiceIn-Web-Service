@@ -44,32 +44,32 @@ public class RecordResBean {
         this.setReqTime(res.getReqTime().getTime());
     }
 
-    public RecordResBean(User another, Record res, Contact contact) {
+    public RecordResBean(User another, Record res, Contact contact,String anotherPhoneNum) {
         setByRecord(res);
         this.answer = res.isIsAnswer();
         this.anotherAvatarId = another.getProfilePhotoId();
         this.anotherUserId = another.getUuid();
         this.anotherName = another.getUserName();
         if (contact != null) {
-            this.anotherNickName = "123";
+            this.anotherNickName = contact.getNickName();
             this.contactId = contact.getId().toString();
         }
-
-        this.anotherNum = another.getPhoneNumber();
+        this.anotherNum = anotherPhoneNum;
         this.anotherIsIcon = false;
     }
 
-    public RecordResBean(Icon another, Record res, Contact contact) {
+    public RecordResBean(Icon another, Record res, Contact contact,String anotherPhoneNum) {
         setByRecord(res);
         this.answer = res.isIsAnswer();
         this.anotherAvatarId = null;
         this.anotherUserId = null;
-        this.anotherName = another.getName();
+        if(another!=null)
+            this.anotherName = another.getName();
         if (contact != null) {
             this.anotherNickName = contact.getNickName();
             this.contactId = contact.getId().toString();
         }
-        this.anotherNum = another.getPhoneNumber();
+        this.anotherNum = anotherPhoneNum;
         this.anotherIsIcon = true;
     }
 
