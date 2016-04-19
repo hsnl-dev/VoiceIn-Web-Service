@@ -1,5 +1,8 @@
 package tw.kits.voicein.resource.ApiV2;
 
+import com.notnoop.apns.APNS;
+import com.notnoop.apns.ApnsService;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +35,7 @@ import tw.kits.voicein.model.User;
 import tw.kits.voicein.constant.ContactConstant;
 import tw.kits.voicein.model.Group;
 import tw.kits.voicein.model.Notification;
+import static tw.kits.voicein.resource.ApiV2.CallingServiceResource.LOGGER;
 import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.TokenRequired;
@@ -217,6 +221,20 @@ public class AccountContactsResource {
             notification.setNotificationContent(owner.getUserName() + " 已經加入您為聯絡人");
             notification.setContactId(contact.getId().toString());
             dataStoreObject.save(notification);
+
+            // Push notification to the caller.
+            ClassLoader classLoader = getClass().getClassLoader();
+            File file = new File(classLoader.getResource("apn-key.p12").getFile());
+            LOGGER.info(file.getAbsolutePath());
+            
+            ApnsService service
+                    = APNS.newService()
+                    .withCert(file.getAbsolutePath(), "hsnl33564")
+                    .withSandboxDestination()
+                    .build();
+            String payload = APNS.newPayload().alertBody(owner.getUserName() + " 已經加入您為聯絡人").build();
+            String token = contact.getUser().getDeviceKey();
+            service.push(token, payload);
 
             return Response.ok().build();
         } else {

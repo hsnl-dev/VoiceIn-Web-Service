@@ -111,9 +111,15 @@
         </dependency>
         <!-- Phone validation -->
         <dependency>
-                <groupId>com.googlecode.libphonenumber</groupId>
-                <artifactId>libphonenumber</artifactId>
-                <version>7.2.8</version>
+            <groupId>com.googlecode.libphonenumber</groupId>
+            <artifactId>libphonenumber</artifactId>
+            <version>7.2.8</version>
+        </dependency>
+        <!-- APN -->
+        <dependency>
+            <groupId>com.notnoop.apns</groupId>
+            <artifactId>apns</artifactId>
+            <version>1.0.0.Beta6</version>
         </dependency>
 
         <!-- Test Dependencies -->

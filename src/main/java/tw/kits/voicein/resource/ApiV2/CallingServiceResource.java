@@ -5,10 +5,14 @@
  */
 package tw.kits.voicein.resource.ApiV2;
 
+import com.notnoop.apns.APNS;
+import com.notnoop.apns.ApnsService;
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.annotation.MultipartConfig;
 import javax.validation.Valid;
@@ -33,6 +37,7 @@ import tw.kits.voicein.model.User;
 import tw.kits.voicein.constant.ContactConstant;
 import tw.kits.voicein.constant.RecordConstant;
 import tw.kits.voicein.model.Record;
+import static tw.kits.voicein.resource.ApiV2.AccountGroupsResource.LOGGER;
 import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.TokenRequired;
@@ -76,10 +81,10 @@ public class CallingServiceResource {
             record.setStartTime(new Date(form.getStartTime()));
             record.setEndTime(new Date(form.getEndTime()));
             User chargeTarget = null;
-            
-            switch(record.getType()){
+
+            switch (record.getType()) {
                 case RecordConstant.APP_TO_APP_CHARGE_CALLER:
-                     chargeTarget = record.getCaller();
+                    chargeTarget = record.getCaller();
                     break;
                 case RecordConstant.APP_TO_APP_CHARGE_CALLEE:
                     chargeTarget = record.getCallee();
@@ -88,9 +93,9 @@ public class CallingServiceResource {
                     chargeTarget = record.getCaller();
                     break;
                 case RecordConstant.ICON_TO_APP:
-                    chargeTarget = record.getCallee();    
+                    chargeTarget = record.getCallee();
             }
-           
+
             float curCredit = chargeTarget.getCredit() - pay;
             chargeTarget.setCredit(curCredit);
             dataStoreObject.save(chargeTarget);
@@ -133,27 +138,62 @@ public class CallingServiceResource {
         }
         if (contact.getChargeType() != ContactConstant.TYPE_ICON) {
             int targetType = contact.getChargeType() == ContactConstant.TYPE_FREE ? ContactConstant.TYPE_CHARGE : ContactConstant.TYPE_FREE;
+
             List<Contact> targets = dataStoreObject.createQuery(Contact.class)
                     .field("providerUser").equal(contact.getUser())
                     .field("user").equal(contact.getProviderUser())
                     .field("chargeType").equal(targetType)
                     .asList();
-            LOGGER.info(targets.get(0).getId() + "");
+            
+            LOGGER.log(Level.INFO, "{0}", targets.get(0).getId());
+
             if (targets.size() != 1) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
+
             if (Helpers.isAllowedToCall(targets.get(0))) {
                 Helpers.makeCall(contact.getUser(), targets.get(0).getUser(),
                         contact,
                         dataStoreObject);
+                
+                // Push notification to the caller.
+                ClassLoader classLoader = getClass().getClassLoader();
+                File file = new File(classLoader.getResource("apn-key.p12").getFile());
+                LOGGER.info(file.getAbsolutePath());
+
+                ApnsService service
+                        = APNS.newService()
+                        .withCert(file.getAbsolutePath(), "hsnl33564")
+                        .withSandboxDestination()
+                        .build();
+                String payload = APNS.newPayload().alertBody("提醒: " + targets.get(0).getUser().getUserName() + "即將打電話來，請放心接聽").build();
+                String token = contact.getUser().getDeviceKey();
+                service.push(token, payload);
+
                 return Response.ok().build();
             } else {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
         } else {
             Icon icon = contact.getCustomerIcon();
+
             if (Helpers.isAllowedToCall(icon)) {
                 Helpers.makeAsymmeticCall(contact.getUser(), icon, true, contact, dataStoreObject);
+                
+                // Push notification to the caller.
+                ClassLoader classLoader = getClass().getClassLoader();
+                File file = new File(classLoader.getResource("apn-key.p12").getFile());
+                LOGGER.info(file.getAbsolutePath());
+
+                ApnsService service
+                        = APNS.newService()
+                        .withCert(file.getAbsolutePath(), "hsnl33564")
+                        .withSandboxDestination()
+                        .build();
+                String payload = APNS.newPayload().alertBody("提醒: " + icon.getName() + "即將打電話來，請放心接聽").build();
+                String token = contact.getUser().getDeviceKey();
+                service.push(token, payload);
+                
                 return Response.ok().build();
             } else {
                 return Response.status(Response.Status.FORBIDDEN).build();
