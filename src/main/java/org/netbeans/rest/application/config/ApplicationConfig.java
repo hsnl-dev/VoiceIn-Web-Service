@@ -43,6 +43,7 @@ public class ApplicationConfig extends Application {
         resources.add(tw.kits.voicein.resource.ApiV2.AccountsResource.class);
         resources.add(tw.kits.voicein.resource.ApiV2.CallingServiceResource.class);
         resources.add(tw.kits.voicein.resource.ApiV2.IconResource.class);
+        resources.add(tw.kits.voicein.resource.ApiV2.NotificationResource.class);
         resources.add(tw.kits.voicein.resource.ApiV2.SandboxResource.class);
         resources.add(tw.kits.voicein.resource.ApiV2.TokenResource.class);
         resources.add(tw.kits.voicein.resource.ApiV2.WelcomeResource.class);
