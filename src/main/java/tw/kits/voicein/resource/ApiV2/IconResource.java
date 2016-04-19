@@ -26,6 +26,7 @@ import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.Icon;
 import tw.kits.voicein.model.QRcode;
 import tw.kits.voicein.constant.ContactConstant;
+import tw.kits.voicein.model.Notification;
 import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.QRcodeType;
@@ -82,7 +83,8 @@ public class IconResource {
 
         if (res.isSuccessful()) {
             Helpers helper = new Helpers();
-
+            
+            LOGGER.info(target.get(0).getUser().getUserName());
             if (target.get(0).getUser().getDeviceOS().equalsIgnoreCase("ios")) {
                 helper.pushNotification(icon.getName() + "即將來電，請放心接聽", "ios", target.get(0).getUser().getDeviceKey());
             } else {
@@ -233,6 +235,21 @@ public class IconResource {
         contact.setAvailableEndTime("23:59");
         contact.setAvailableStartTime("00:00");
         dsObj.save(contact);
+        
+        // Create notifications.
+        Notification notification = new Notification();
+        notification.setUser(code.getProvider());
+        notification.setNotificationContent(icon.getName() + " 已經加入您為聯絡人");
+        notification.setContactId(contact.getId().toString());
+        dsObj.save(notification);
+
+        Helpers helper = new Helpers();
+
+        if (code.getProvider().getDeviceOS().equalsIgnoreCase("ios")) {
+            helper.pushNotification(icon.getName() + " 已經加入您為聯絡人", "ios", code.getProvider().getDeviceKey());
+        } else {
+            //android part.
+        }
         return contact;
     }
 }
