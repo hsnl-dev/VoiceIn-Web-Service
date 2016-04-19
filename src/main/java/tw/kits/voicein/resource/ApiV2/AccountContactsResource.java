@@ -7,9 +7,12 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.annotation.MultipartConfig;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -150,6 +153,71 @@ public class AccountContactsResource {
     }
 
     /**
+     * This API allows user to add a contact. API By Calvin
+     *
+     * @param uuid
+     * @param qrCodeUuid
+     * @param contact
+     * @return
+     */
+    @POST
+    @Path("/accounts/{uuid}/contacts/{qrCodeUuid}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @TokenRequired
+    public Response createNewContactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, @NotNull @Valid Contact contact) {
+        User owner = dataStoreObject.get(User.class, uuid);
+        List<User> providers = dataStoreObject.createQuery(User.class).field("qrCodeUuid").equal(qrCodeUuid).asList();
+
+        LOGGER.log(Level.CONFIG, "Save A Contact.");
+
+        List<Contact> contacts = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", owner).asList();
+
+        if (contacts.size() > 0) {
+            // Owner has already add the provider as friend.
+            return Response.notModified().build();
+        }
+
+        // user.size() must be 1.
+        if (providers.size() == 1) {
+            User provider = providers.get(0);
+            if (contact.getChargeType() != 0) {
+                // the contact of the scanner side.
+                contact.setUser(owner);
+                contact.setProviderUser(provider);
+                contact.setQrCodeUuid(qrCodeUuid);
+                contact.setIsEnable(true);
+                contact.setChargeType(1);
+                contact.setAvailableStartTime("00:00");
+                contact.setAvailableEndTime("23:59");
+                dataStoreObject.save(contact);
+
+                // the contact of the provider side.
+                contact.setId(new ObjectId());
+                contact.setUser(provider);
+                contact.setProviderUser(owner);
+                contact.setNickName("");
+                contact.setChargeType(2);
+
+                dataStoreObject.save(contact);
+            } else {
+                // icon
+                contact.setUser(provider);
+                contact.setProviderUser(owner);
+                contact.setQrCodeUuid(qrCodeUuid);
+                contact.setIsEnable(true);
+                contact.setChargeType(0);
+                dataStoreObject.save(contact);
+            }
+
+            return Response.ok().build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+    }
+
+    /**
      * This API allows client user to update a contact. API By Calvin
      *
      * @param contactId
@@ -226,13 +294,13 @@ public class AccountContactsResource {
         User provider = payContact.getProviderUser();
         String qrCodeUuid = payContact.getQrCodeUuid();
         Query<Group> query = dataStoreObject.createQuery(Group.class);
-        
+
         if (payContact.getChargeType() != ContactConstant.TYPE_ICON) {
             Contact freeContact = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", provider).get();
-            LOGGER.info("ssss"+freeContact.getId().toString());
-            List<String> contacts = Arrays.asList(freeContact.getId().toString(),payContact.getId().toString());
+            LOGGER.info("ssss" + freeContact.getId().toString());
+            List<String> contacts = Arrays.asList(freeContact.getId().toString(), payContact.getId().toString());
             List<Group> groupList = query.field("contacts").hasAnyOf(contacts).asList();
-           
+
             for (Group group : groupList) {
                 group.getContacts().remove(payContact.getId().toString());
                 group.getContacts().remove(freeContact.getId().toString());
