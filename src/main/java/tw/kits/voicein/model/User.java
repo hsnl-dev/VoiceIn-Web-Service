@@ -34,9 +34,9 @@ public class User {
     private String availableStartTime;
     @NotNull
     private String availableEndTime;
-    @NotNull
+    
     private String deviceOS;
-    @NotNull
+    
     private String deviceKey;
     
     private float credit;
