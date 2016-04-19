@@ -90,6 +90,7 @@ public class AccountsResource {
         user.setQrCodeUuid(modifiedUser.getQrCodeUuid());
         user.setDeviceOS(modifiedUser.getDeviceOS());
         user.setDeviceKey(modifiedUser.getDeviceKey());
+        user.setCredit(modifiedUser.getCredit());
 
         dataStoreObject.save(user);
 
