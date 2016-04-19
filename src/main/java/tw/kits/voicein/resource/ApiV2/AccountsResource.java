@@ -88,12 +88,21 @@ public class AccountsResource {
         user.setUuid(uuid);
         user.setProfilePhotoId(modifiedUser.getProfilePhotoId());
         user.setQrCodeUuid(modifiedUser.getQrCodeUuid());
+        user.setDeviceOS(modifiedUser.getDeviceOS());
+        user.setDeviceKey(modifiedUser.getDeviceKey());
 
         dataStoreObject.save(user);
 
         LOGGER.log(Level.CONFIG, "Update User u{0}", user);
         return Response.ok().build();
     }
+    
+    /**
+     *
+     * @param uuid
+     * @param deviceInfo
+     * @return
+     */
     @PUT
     @Path("/accounts/{uuid}/device")
     @Consumes(MediaType.APPLICATION_JSON)
