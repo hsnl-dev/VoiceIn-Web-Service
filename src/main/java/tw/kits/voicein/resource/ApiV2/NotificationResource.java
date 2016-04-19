@@ -1,5 +1,7 @@
 package tw.kits.voicein.resource.ApiV2;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.*;
 
@@ -14,15 +16,18 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 import org.bson.types.ObjectId;
+import tw.kits.voicein.bean.NotificationListBean;
 import tw.kits.voicein.model.Notification;
 import tw.kits.voicein.util.TokenRequired;
+
 /**
  *
  * @author Calvin
  */
 @Path("/api/v2")
 public class NotificationResource {
-   @Context
+
+    @Context
     SecurityContext context;
     static final Logger LOGGER = Logger.getLogger(NotificationResource.class.getName());
     ConsoleHandler consoleHandler = new ConsoleHandler();
@@ -31,7 +36,7 @@ public class NotificationResource {
 
     /**
      * Get all notifications of an user.
-     * 
+     *
      * @param uuid
      * @return User
      */
@@ -43,11 +48,25 @@ public class NotificationResource {
     public Response getUserAccount(@PathParam("uuid") String uuid) {
         User user = dataStoreObject.get(User.class, uuid);
         List<Notification> notifications = dataStoreObject.createQuery(Notification.class).field("user").equal(user).asList();
-        
+        ArrayList<HashMap<String, Object>> notificationEntities = new ArrayList();
+
         if (user == null) {
             return Response.status(Status.NOT_FOUND).build();
         } else {
             LOGGER.log(Level.CONFIG, "Get User u{0}", uuid);
+            NotificationListBean notificationListBean = new NotificationListBean();
+
+            for (Notification notification : notifications) {
+                HashMap<String, Object> notificationEntity = new HashMap();
+
+                notificationEntity.put("notificationContent", notification.getNotificationContent());
+                notificationEntity.put("createdAt", notification.getCreatedAt());
+                notificationEntity.put("contactId", notification.getContactId());
+                notificationEntity.put("id", notification.getId().toString());
+                notificationEntities.add(notificationEntity);
+            }
+
+            notificationListBean.setNotifications(notificationEntities);
             return Response.ok(notifications).build();
         }
     }
@@ -69,5 +88,4 @@ public class NotificationResource {
         return Response.ok().build();
     }
 
-    
 }
