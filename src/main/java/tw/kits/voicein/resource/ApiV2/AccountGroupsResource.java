@@ -75,7 +75,7 @@ public class AccountGroupsResource {
             groupEntity.put("contactCount", group.getContacts().size());
             groupsEntities.add(groupEntity);
         }
-
+     
         accountAllGroupBean.setGroups(groupsEntities);
         return Response.ok(accountAllGroupBean).build();
     }
@@ -183,12 +183,12 @@ public class AccountGroupsResource {
             if (groupName != null) {
                 group.setGroupName(groupName);
             }
-            
+
             if (contactsToUpdate != null) {
                 ArrayList<String> contactsToModified = contactsToUpdate.getContacts();
                 group.setContacts(contactsToModified);
             }
-            
+
             dataStoreObject.save(group);
             return Response.ok().build();
         } else {
