@@ -1,6 +1,7 @@
 package tw.kits.voicein.resource.ApiV2;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.*;
@@ -65,7 +66,8 @@ public class NotificationResource {
                 notificationEntity.put("id", notification.getId().toString());
                 notificationEntities.add(notificationEntity);
             }
-
+            
+            Collections.reverse(notificationEntities);
             notificationListBean.setNotifications(notificationEntities);
             return Response.ok(notificationListBean).build();
         }
