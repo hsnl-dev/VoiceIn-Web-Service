@@ -67,7 +67,7 @@ public class NotificationResource {
             }
 
             notificationListBean.setNotifications(notificationEntities);
-            return Response.ok(notifications).build();
+            return Response.ok(notificationListBean).build();
         }
     }
 
