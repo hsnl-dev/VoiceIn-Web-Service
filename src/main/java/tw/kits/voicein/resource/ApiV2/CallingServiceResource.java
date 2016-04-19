@@ -144,7 +144,7 @@ public class CallingServiceResource {
                     .field("user").equal(contact.getProviderUser())
                     .field("chargeType").equal(targetType)
                     .asList();
-            
+
             LOGGER.log(Level.INFO, "{0}", targets.get(0).getId());
 
             if (targets.size() != 1) {
@@ -155,7 +155,7 @@ public class CallingServiceResource {
                 Helpers.makeCall(contact.getUser(), targets.get(0).getUser(),
                         contact,
                         dataStoreObject);
-                
+
                 // Push notification to the caller.
                 ClassLoader classLoader = getClass().getClassLoader();
                 File file = new File(classLoader.getResource("apn-key.p12").getFile());
@@ -166,8 +166,9 @@ public class CallingServiceResource {
                         .withCert(file.getAbsolutePath(), "hsnl33564")
                         .withSandboxDestination()
                         .build();
-                String payload = APNS.newPayload().alertBody("提醒: " + targets.get(0).getUser().getUserName() + "即將打電話來，請放心接聽").build();
-                String token = contact.getUser().getDeviceKey();
+
+                String payload = APNS.newPayload().alertBody(contact.getNickName() == null ? contact.getUser().getUserName() : contact.getNickName() + "即將來電，請放心接聽。").build();
+                String token = targets.get(0).getUser().getDeviceKey();
                 service.push(token, payload);
 
                 return Response.ok().build();
@@ -179,21 +180,6 @@ public class CallingServiceResource {
 
             if (Helpers.isAllowedToCall(icon)) {
                 Helpers.makeAsymmeticCall(contact.getUser(), icon, true, contact, dataStoreObject);
-                
-                // Push notification to the caller.
-                ClassLoader classLoader = getClass().getClassLoader();
-                File file = new File(classLoader.getResource("apn-key.p12").getFile());
-                LOGGER.info(file.getAbsolutePath());
-
-                ApnsService service
-                        = APNS.newService()
-                        .withCert(file.getAbsolutePath(), "hsnl33564")
-                        .withSandboxDestination()
-                        .build();
-                String payload = APNS.newPayload().alertBody("提醒: " + icon.getName() + "即將打電話來，請放心接聽").build();
-                String token = contact.getUser().getDeviceKey();
-                service.push(token, payload);
-                
                 return Response.ok().build();
             } else {
                 return Response.status(Response.Status.FORBIDDEN).build();
