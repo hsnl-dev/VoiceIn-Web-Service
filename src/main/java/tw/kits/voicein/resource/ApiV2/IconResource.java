@@ -88,7 +88,7 @@ public class IconResource {
             if (target.get(0).getUser().getDeviceOS().equalsIgnoreCase("ios")) {
                 helper.pushNotification(icon.getName() + "即將來電，請放心接聽", "ios", target.get(0).getUser().getDeviceKey());
             } else {
-                //android part.
+                 helper.pushNotification("#call#"+icon.getName() + "即將來電，請放心接聽", "ios", target.get(0).getUser().getDeviceKey());
             }
             return Response.status(Response.Status.CREATED).entity(res).build();
         } else {
@@ -163,7 +163,7 @@ public class IconResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/icons")
-    public Response genIcon(@Valid @NotNull IconCreateBean icb) {
+    public Response genIcon(@Valid @NotNull IconCreateBean icb) throws IOException {
         QRcode code = dsObj.get(QRcode.class, icb.getProviderUuid());
         if (code == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -224,7 +224,7 @@ public class IconResource {
      * @param icon
      * @return
      */
-    private Contact linkNewContact(QRcode code, Icon icon) {
+    private Contact linkNewContact(QRcode code, Icon icon) throws IOException {
         //provider!
         Contact contact = new Contact();
         contact.setUser(code.getProvider());
@@ -248,7 +248,7 @@ public class IconResource {
         if (code.getProvider().getDeviceOS().equalsIgnoreCase("ios")) {
             helper.pushNotification(icon.getName() + " 已經加入您為聯絡人", "ios", code.getProvider().getDeviceKey());
         } else {
-            //android part.
+            helper.pushNotification(icon.getName() + " 已經加入您為聯絡人", "android", code.getProvider().getDeviceKey());
         }
         return contact;
     }
