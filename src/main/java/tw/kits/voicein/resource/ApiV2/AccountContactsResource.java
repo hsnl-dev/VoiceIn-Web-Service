@@ -216,6 +216,7 @@ public class AccountContactsResource {
             notification.setUser(owner);
             notification.setNotificationContent(provider.getUserName() + " 已經加入您為聯絡人");
             notification.setContactId(contact.getId().toString());
+            dataStoreObject.save(notification);
 
             return Response.ok().build();
         } else {
