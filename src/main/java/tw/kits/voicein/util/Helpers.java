@@ -9,6 +9,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
+import com.notnoop.apns.APNS;
+import com.notnoop.apns.ApnsService;
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -157,8 +160,24 @@ public class Helpers {
         LOGGER.log(Level.CONFIG, "{0} {1}", new Object[]{availableStartTime, availableEndTime});
         return (enable & isAfter & isBefore);
     }
-    
-    public static void pushNotification(String content, String os, String deviceToken) {
-        
+
+    public void pushNotification(String content, String os, String deviceToken) {
+        if (os.equalsIgnoreCase("ios")) {
+            // Push notification to the caller.
+            ClassLoader classLoader = getClass().getClassLoader();
+            File file = new File(classLoader.getResource("apn-key.p12").getFile());
+            ApnsService service
+                    = APNS.newService()
+                    .withCert(file.getAbsolutePath(), "hsnl33564")
+                    .withSandboxDestination()
+                    .build();
+
+            String payload = APNS.newPayload().alertBody(content).build();
+            String token = deviceToken;
+            service.push(token, payload);
+        } else {
+            // Android GCM.
+        }
+
     }
 }

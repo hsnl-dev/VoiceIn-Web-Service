@@ -61,18 +61,18 @@ public class IconResource {
             ErrorMessageBean erb = new ErrorMessageBean("icon is not found");
             return Response.status(Status.NOT_FOUND).entity(erb).build();
         }
-        
+
         if (icon.getProvider().getCredit() <= 0) {
             return Response.status(Response.Status.PAYMENT_REQUIRED).entity(new ErrorMessageBean("credit <= 0")).build();
         }
-        
+
         List<Contact> target = dsObj.createQuery(Contact.class).field("customerIcon").equal(icon).asList();
-        
+
         if (target.size() != 1) {
             ErrorMessageBean erb = new ErrorMessageBean("contact is not found");
             return Response.status(Status.NOT_FOUND).entity(erb).build();
         }
-        
+
         if (!Helpers.isAllowedToCall(target.get(0))) {
             ErrorMessageBean erb = new ErrorMessageBean("Call is not allowed");
             return Response.status(Status.FORBIDDEN).entity(erb).build();
@@ -81,6 +81,13 @@ public class IconResource {
         okhttp3.Response res = Helpers.makeAsymmeticCall(target.get(0).getUser(), icon, false, null, dsObj);
 
         if (res.isSuccessful()) {
+            Helpers helper = new Helpers();
+
+            if (target.get(0).getUser().getDeviceOS().equalsIgnoreCase("ios")) {
+                helper.pushNotification(icon.getName() + "即將來電，請放心接聽", "ios", target.get(0).getUser().getDeviceKey());
+            } else {
+                //android part.
+            }
             return Response.status(Response.Status.CREATED).entity(res).build();
         } else {
             ErrorMessageBean erb = new ErrorMessageBean("Kits Main Server Error");

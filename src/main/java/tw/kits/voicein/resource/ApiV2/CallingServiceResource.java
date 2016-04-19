@@ -1,13 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package tw.kits.voicein.resource.ApiV2;
 
-import com.notnoop.apns.APNS;
-import com.notnoop.apns.ApnsService;
-import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -37,7 +29,6 @@ import tw.kits.voicein.model.User;
 import tw.kits.voicein.constant.ContactConstant;
 import tw.kits.voicein.constant.RecordConstant;
 import tw.kits.voicein.model.Record;
-import static tw.kits.voicein.resource.ApiV2.AccountGroupsResource.LOGGER;
 import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.TokenRequired;
@@ -155,21 +146,13 @@ public class CallingServiceResource {
                 Helpers.makeCall(contact.getUser(), targets.get(0).getUser(),
                         contact,
                         dataStoreObject);
-
-                // Push notification to the caller.
-                ClassLoader classLoader = getClass().getClassLoader();
-                File file = new File(classLoader.getResource("apn-key.p12").getFile());
-                LOGGER.info(file.getAbsolutePath());
-
-                ApnsService service
-                        = APNS.newService()
-                        .withCert(file.getAbsolutePath(), "hsnl33564")
-                        .withSandboxDestination()
-                        .build();
-
-                String payload = APNS.newPayload().alertBody(contact.getNickName() == null ? contact.getUser().getUserName() : contact.getNickName() + "即將來電，請放心接聽。").build();
-                String token = targets.get(0).getUser().getDeviceKey();
-                service.push(token, payload);
+                Helpers helper = new Helpers();
+                
+                if (targets.get(0).getUser().getDeviceOS().equalsIgnoreCase("ios")) {
+                    helper.pushNotification(contact.getUser() + "即將來電，請放心接聽", "ios", targets.get(0).getUser().getDeviceKey());
+                } else {
+                    //android part.
+                }
 
                 return Response.ok().build();
             } else {

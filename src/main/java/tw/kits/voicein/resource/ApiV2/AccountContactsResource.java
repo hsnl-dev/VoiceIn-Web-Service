@@ -1,6 +1,5 @@
 package tw.kits.voicein.resource.ApiV2;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,7 +32,6 @@ import tw.kits.voicein.model.User;
 import tw.kits.voicein.constant.ContactConstant;
 import tw.kits.voicein.model.Group;
 import tw.kits.voicein.model.Notification;
-import static tw.kits.voicein.resource.ApiV2.CallingServiceResource.LOGGER;
 import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.TokenRequired;
@@ -219,6 +217,14 @@ public class AccountContactsResource {
             notification.setNotificationContent(owner.getUserName() + " 已經加入您為聯絡人");
             notification.setContactId(contact.getId().toString());
             dataStoreObject.save(notification);
+            
+            Helpers helper = new Helpers();
+
+            if (provider.getDeviceOS().equalsIgnoreCase("ios")) {
+                helper.pushNotification(owner.getUserName() + " 已經加入您為聯絡人", "ios", provider.getDeviceKey());
+            } else {
+                //android part.
+            }
 
             return Response.ok().build();
         } else {
