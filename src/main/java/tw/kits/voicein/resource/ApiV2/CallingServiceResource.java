@@ -149,7 +149,8 @@ public class CallingServiceResource {
                 Helpers helper = new Helpers();
                 
                 if (targets.get(0).getUser().getDeviceOS().equalsIgnoreCase("ios")) {
-                    helper.pushNotification(contact.getNickName().equalsIgnoreCase("") ? contact.getUser().getUserName() : contact.getNickName() + "即將來電，請放心接聽", "ios", targets.get(0).getUser().getDeviceKey());
+                    String name = contact.getNickName().equalsIgnoreCase("") ? contact.getUser().getUserName() : contact.getNickName();
+                    helper.pushNotification(name + "即將來電，請放心接聽", "ios", targets.get(0).getUser().getDeviceKey());
                 } else {
                     //android part.
                 }
