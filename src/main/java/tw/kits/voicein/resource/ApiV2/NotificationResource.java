@@ -36,7 +36,7 @@ public class NotificationResource {
      * @return User
      */
     @GET
-    @Path("/account/{uuid}/notifications")
+    @Path("/accounts/{uuid}/notifications")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired

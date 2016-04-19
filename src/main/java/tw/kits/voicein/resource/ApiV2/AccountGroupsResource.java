@@ -102,6 +102,10 @@ public class AccountGroupsResource {
         ArrayList<String> contacts = group.getContacts();
         List<UserContactBean> userList = new ArrayList();
         UserContactBean userContactBean;
+        
+        if (contacts == null) {
+            return Response.ok(userList).build();
+        }
 
         for (String contactId : contacts) {
             Contact contact = dataStoreObject.get(Contact.class, new ObjectId(contactId));
