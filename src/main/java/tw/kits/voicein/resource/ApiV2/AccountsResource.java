@@ -24,6 +24,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 import org.mongodb.morphia.query.Query;
+import tw.kits.voicein.bean.DeviceBean;
 import tw.kits.voicein.bean.RecordResBean;
 import tw.kits.voicein.constant.ContactConstant;
 import tw.kits.voicein.constant.RecordConstant;
@@ -93,7 +94,22 @@ public class AccountsResource {
         LOGGER.log(Level.CONFIG, "Update User u{0}", user);
         return Response.ok().build();
     }
+    @PUT
+    @Path("/accounts/{uuid}/device")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @TokenRequired
+    public Response updateUserDeviceId(@PathParam("uuid") String uuid, @Valid DeviceBean deviceInfo) {
+        User modifiedUser = dataStoreObject.get(User.class, uuid);
 
+        modifiedUser.setDeviceKey(deviceInfo.getDeviceKey());
+        modifiedUser.setDeviceOS(deviceInfo.getDeviceOS());
+
+        dataStoreObject.save(modifiedUser);
+
+        LOGGER.log(Level.CONFIG, "Update User u{0}", modifiedUser);
+        return Response.ok().build();
+    }
     /**
      * This API allows user to delete a user account by given UUID. API By
      * Calvin.

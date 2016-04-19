@@ -146,13 +146,15 @@ public class CallingServiceResource {
                 Helpers.makeCall(contact.getUser(), targets.get(0).getUser(),
                         contact,
                         dataStoreObject);
-                Helpers helper = new Helpers();
+                
                 
                 if (targets.get(0).getUser().getDeviceOS().equalsIgnoreCase("ios")) {
+
                     String name = contact.getNickName().equalsIgnoreCase("") ? contact.getUser().getUserName() : contact.getNickName();
-                    helper.pushNotification(name + "即將來電，請放心接聽", "ios", targets.get(0).getUser().getDeviceKey());
+                    Helpers.pushNotification(name + "即將來電，請放心接聽", "ios", targets.get(0).getUser().getDeviceKey());
+
                 } else {
-                    //android part.
+                    Helpers.pushNotification(contact.getNickName().equalsIgnoreCase("") ? contact.getUser().getUserName() : contact.getNickName() + "#call#即將來電，請放心接聽", "android", targets.get(0).getUser().getDeviceKey());
                 }
 
                 return Response.ok().build();

@@ -1,5 +1,6 @@
 package tw.kits.voicein.resource.ApiV2;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -166,7 +167,7 @@ public class AccountContactsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
-    public Response createNewContactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, @NotNull @Valid Contact contact) {
+    public Response createNewContactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, @NotNull @Valid Contact contact) throws IOException {
         User owner = dataStoreObject.get(User.class, uuid);
         List<User> providers = dataStoreObject.createQuery(User.class).field("qrCodeUuid").equal(qrCodeUuid).asList();
 
@@ -223,7 +224,7 @@ public class AccountContactsResource {
             if (provider.getDeviceOS().equalsIgnoreCase("ios")) {
                 helper.pushNotification(owner.getUserName() + " 已經加入您為聯絡人", "ios", provider.getDeviceKey());
             } else {
-                //android part.
+                 helper.pushNotification(owner.getUserName() + " 已經加入您為聯絡人", "android", provider.getDeviceKey());
             }
 
             return Response.ok().build();

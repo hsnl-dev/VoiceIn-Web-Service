@@ -15,13 +15,16 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.TimeZone;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.core.SecurityContext;
+import okhttp3.Headers;
 import okhttp3.Response;
 import org.mongodb.morphia.Datastore;
+import tw.kits.voicein.bean.GcmPayloadBean;
 import tw.kits.voicein.bean.InitPhoneCallBean;
 import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.Icon;
@@ -161,10 +164,10 @@ public class Helpers {
         return (enable & isAfter & isBefore);
     }
 
-    public void pushNotification(String content, String os, String deviceToken) {
+    public static void pushNotification(String content, String os, String deviceToken) throws IOException {
         if (os.equalsIgnoreCase("ios")) {
             // Push notification to the caller.
-            ClassLoader classLoader = getClass().getClassLoader();
+            ClassLoader classLoader = Helpers.class.getClassLoader();
             File file = new File(classLoader.getResource("apn-key.p12").getFile());
             ApnsService service
                     = APNS.newService()
@@ -176,7 +179,17 @@ public class Helpers {
             String token = deviceToken;
             service.push(token, payload);
         } else {
-            // Android GCM.
+             Http http = new Http();
+             Headers headers = new Headers.Builder().add("Authorization", "key=AIzaSyD_SV6Nm12yXqGfIyU5Jt1qkihECJtUPbM").build();
+             GcmPayloadBean payload = new GcmPayloadBean();
+             payload.setTo(deviceToken);
+             payload.getData().setMessage(content);
+             ObjectMapper mapper = new ObjectMapper();
+             String payloadStr = mapper.writeValueAsString(payload);
+             LOGGER.warning(payloadStr);
+             Response res = http.postResponse("https://gcm-http.googleapis.com/gcm/send", payloadStr, headers);
+             LOGGER.warning(res.code()+"");
+             
         }
 
     }
