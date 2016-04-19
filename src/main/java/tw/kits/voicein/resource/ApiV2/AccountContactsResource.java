@@ -31,6 +31,7 @@ import tw.kits.voicein.model.Icon;
 import tw.kits.voicein.model.User;
 import tw.kits.voicein.constant.ContactConstant;
 import tw.kits.voicein.model.Group;
+import tw.kits.voicein.model.Notification;
 import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.TokenRequired;
@@ -209,6 +210,12 @@ public class AccountContactsResource {
                 contact.setChargeType(0);
                 dataStoreObject.save(contact);
             }
+
+            // Create notifications.
+            Notification notification = new Notification();
+            notification.setUser(owner);
+            notification.setNotificationContent(provider.getUserName() + " 已經加入您為聯絡人");
+            notification.setContactId(contact.getId().toString());
 
             return Response.ok().build();
         } else {
