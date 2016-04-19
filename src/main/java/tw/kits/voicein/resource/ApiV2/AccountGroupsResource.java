@@ -1,5 +1,7 @@
 package tw.kits.voicein.resource.ApiV2;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +63,7 @@ public class AccountGroupsResource {
     @SuppressWarnings("empty-statement")
     public Response getGroupList(
             @PathParam("uuid") String uuid
-    ) {
+    ) throws FileNotFoundException, IOException, InterruptedException {
         User owner = dataStoreObject.get(User.class, uuid);
         List<Group> groups = dataStoreObject.createQuery(Group.class).field("user").equal(owner).asList();
         ArrayList<HashMap<String, Object>> groupsEntities = new ArrayList();
@@ -75,7 +77,7 @@ public class AccountGroupsResource {
             groupEntity.put("contactCount", group.getContacts().size());
             groupsEntities.add(groupEntity);
         }
-     
+
         accountAllGroupBean.setGroups(groupsEntities);
         return Response.ok(accountAllGroupBean).build();
     }

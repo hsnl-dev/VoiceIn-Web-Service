@@ -29,8 +29,6 @@ import tw.kits.voicein.model.User;
  *
  * @author Henry
  */
-
-
 public class Helpers {
 
     static final Logger LOGGER = Logger.getLogger(Helpers.class.getName());
@@ -113,7 +111,7 @@ public class Helpers {
 
     }
 
-    public static Response makeAsymmeticCall(User account,Icon icon,boolean isCallByAccount,Contact callerContact, Datastore dsobj) throws IOException {
+    public static Response makeAsymmeticCall(User account, Icon icon, boolean isCallByAccount, Contact callerContact, Datastore dsobj) throws IOException {
         Record record = new Record();
         record.setAsymetricCall(account, icon, isCallByAccount, callerContact);
         dsobj.save(record);
@@ -159,5 +157,8 @@ public class Helpers {
         LOGGER.log(Level.CONFIG, "{0} {1}", new Object[]{availableStartTime, availableEndTime});
         return (enable & isAfter & isBefore);
     }
-
+    
+    public static void pushNotification(String content, String os, String deviceToken) {
+        
+    }
 }

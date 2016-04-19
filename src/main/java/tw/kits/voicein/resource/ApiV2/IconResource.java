@@ -42,7 +42,8 @@ public class IconResource {
     MongoManager mongoManager = MongoManager.getInstatnce();
     Datastore dsObj = mongoManager.getDs();
     private static final Logger LOGGER = Logger.getLogger(IconResource.class.getName());
-  /**
+
+    /**
      * This API allows customer to call provider after confirm button click. API
      * By Calvin Henry
      *
@@ -60,14 +61,18 @@ public class IconResource {
             ErrorMessageBean erb = new ErrorMessageBean("icon is not found");
             return Response.status(Status.NOT_FOUND).entity(erb).build();
         }
+        
         if (icon.getProvider().getCredit() <= 0) {
             return Response.status(Response.Status.PAYMENT_REQUIRED).entity(new ErrorMessageBean("credit <= 0")).build();
         }
+        
         List<Contact> target = dsObj.createQuery(Contact.class).field("customerIcon").equal(icon).asList();
+        
         if (target.size() != 1) {
             ErrorMessageBean erb = new ErrorMessageBean("contact is not found");
             return Response.status(Status.NOT_FOUND).entity(erb).build();
         }
+        
         if (!Helpers.isAllowedToCall(target.get(0))) {
             ErrorMessageBean erb = new ErrorMessageBean("Call is not allowed");
             return Response.status(Status.FORBIDDEN).entity(erb).build();
@@ -84,6 +89,7 @@ public class IconResource {
         }
 
     }
+
     /**
      * Get icon info!!!! 200 OK 404 NOT found!
      *
@@ -102,7 +108,7 @@ public class IconResource {
         if (contact.size() != 1) {
             return Response.status(Status.NOT_FOUND).entity(new ErrorMessageBean("contact is not found")).build();
         }
-        
+
         return Response.ok(new IconInfoBean(icon, contact.get(0))).build();
     }
 
