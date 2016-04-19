@@ -213,8 +213,8 @@ public class AccountContactsResource {
 
             // Create notifications.
             Notification notification = new Notification();
-            notification.setUser(owner);
-            notification.setNotificationContent(provider.getUserName() + " 已經加入您為聯絡人");
+            notification.setUser(provider);
+            notification.setNotificationContent(owner.getUserName() + " 已經加入您為聯絡人");
             notification.setContactId(contact.getId().toString());
             dataStoreObject.save(notification);
 
