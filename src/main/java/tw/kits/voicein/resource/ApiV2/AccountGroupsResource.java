@@ -63,7 +63,7 @@ public class AccountGroupsResource {
     @SuppressWarnings("empty-statement")
     public Response getGroupList(
             @PathParam("uuid") String uuid
-    ) throws FileNotFoundException, IOException, InterruptedException {
+    ) {
         User owner = dataStoreObject.get(User.class, uuid);
         List<Group> groups = dataStoreObject.createQuery(Group.class).field("user").equal(owner).asList();
         ArrayList<HashMap<String, Object>> groupsEntities = new ArrayList();
