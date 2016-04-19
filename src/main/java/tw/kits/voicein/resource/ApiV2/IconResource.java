@@ -85,10 +85,10 @@ public class IconResource {
             Helpers helper = new Helpers();
             
             LOGGER.info(target.get(0).getUser().getUserName());
-            if (target.get(0).getUser().getDeviceOS().equalsIgnoreCase("ios")) {
+            if ("ios".equalsIgnoreCase(target.get(0).getUser().getDeviceOS())) {
                 helper.pushNotification(icon.getName() + "即將來電，請放心接聽", "ios", target.get(0).getUser().getDeviceKey());
             } else {
-                 helper.pushNotification("#call#"+icon.getName() + "即將來電，請放心接聽", "ios", target.get(0).getUser().getDeviceKey());
+                 helper.pushNotification("#call#"+icon.getName() + "即將來電，請放心接聽", "android", target.get(0).getUser().getDeviceKey());
             }
             return Response.status(Response.Status.CREATED).entity(res).build();
         } else {

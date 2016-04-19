@@ -221,7 +221,7 @@ public class AccountContactsResource {
             
             Helpers helper = new Helpers();
 
-            if (provider.getDeviceOS().equalsIgnoreCase("ios")) {
+            if ("ios".equalsIgnoreCase(provider.getDeviceOS())) {
                 helper.pushNotification(owner.getUserName() + " 已經加入您為聯絡人", "ios", provider.getDeviceKey());
             } else {
                  helper.pushNotification(owner.getUserName() + " 已經加入您為聯絡人", "android", provider.getDeviceKey());
