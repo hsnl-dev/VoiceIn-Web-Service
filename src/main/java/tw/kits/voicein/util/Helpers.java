@@ -143,8 +143,8 @@ public class Helpers {
         consoleHandler.setLevel(Level.CONFIG);
         LOGGER.addHandler(consoleHandler);
 
-        availableStartTime = target.getAvailableStartTime().replace(" ", "");
-        availableEndTime = target.getAvailableEndTime().replace(" ", "");
+        availableStartTime = target.getAvailableStartTime().replaceAll("\\s+","");
+        availableEndTime = target.getAvailableEndTime().replaceAll("\\s+","");
         enable = target.getIsEnable();
 
         // Get current time.
