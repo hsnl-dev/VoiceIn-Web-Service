@@ -208,8 +208,8 @@ public class IconResource {
         icon.setProvider(code.getProvider());
         icon.setName(icb.getName());
         icon.setPhoneNumber(icb.getPhoneNumber());
-        icon.setAvailableStartTime(icb.getCustomer().getAvailableStartTime());
-        icon.setAvailableEndTime(icb.getCustomer().getAvailableEndTime());
+        icon.setAvailableStartTime(icb.getCustomer().getAvailableStartTime().replaceAll("\\s+",""));
+        icon.setAvailableEndTime(icb.getCustomer().getAvailableEndTime().replaceAll("\\s+",""));
         icon.setCompany(icb.getCustomer().getCompany());
         icon.setLocation(icb.getCustomer().getLocation());
         icon.setIsEnable(icb.getCustomer().getIsEnable() == null ? true : icb.getCustomer().getIsEnable());
