@@ -246,7 +246,7 @@ public class AccountsResource {
             } else if (type.equals(RecordConstant.ICON_TO_APP)) {
                 Contact another = dataStoreObject.createQuery(Contact.class).field("customerIcon").equal(one.getCallerIcon()).get();
                 rrb = new RecordResBean(one.getCallerIcon(), one, another,one.getCallerPhone());
-                rrb.setType("imcoming");
+                rrb.setType("incoming");
             }else{
                 
             }
