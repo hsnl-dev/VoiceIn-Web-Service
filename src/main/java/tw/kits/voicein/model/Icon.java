@@ -137,28 +137,28 @@ public class Icon {
      * @return the availableStartTime
      */
     public String getAvailableStartTime() {
-        return availableStartTime;
+        return availableStartTime.replaceAll("\\s+","");
     }
 
     /**
      * @param availableStartTime the availableStartTime to set
      */
     public void setAvailableStartTime(String availableStartTime) {
-        this.availableStartTime = availableStartTime;
+        this.availableStartTime = availableStartTime.replaceAll("\\s+","");
     }
 
     /**
      * @return the availableEndTime
      */
     public String getAvailableEndTime() {
-        return availableEndTime;
+        return availableEndTime.replaceAll("\\s+","");
     }
 
     /**
      * @param availableEndTime the availableEndTime to set
      */
     public void setAvailableEndTime(String availableEndTime) {
-        this.availableEndTime = availableEndTime;
+        this.availableEndTime = availableEndTime.replaceAll("\\s+","");
     }
 
     /**
