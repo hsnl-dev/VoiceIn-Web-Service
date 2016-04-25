@@ -13,9 +13,11 @@ import javax.validation.constraints.NotNull;
  */
 public class UserAuthBean {
 
-    @NotNull
+    
     private String code;
-    @NotNull
+    private String mode;
+    private String password;
+    private String phoneNumber;
     private String userUuid;
 
     public UserAuthBean(String code, String userUuid) {
@@ -53,6 +55,48 @@ public class UserAuthBean {
      */
     public void setUserUuid(String userUuid) {
         this.userUuid = userUuid;
+    }
+
+    /**
+     * @return the mode
+     */
+    public String getMode() {
+        return mode;
+    }
+
+    /**
+     * @param mode the mode to set
+     */
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+
+    /**
+     * @return the password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    /**
+     * @return the phoneNumber
+     */
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    /**
+     * @param phoneNumber the phoneNumber to set
+     */
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
 }

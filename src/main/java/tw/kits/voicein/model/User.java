@@ -34,7 +34,7 @@ public class User {
     private String availableStartTime;
     @NotNull
     private String availableEndTime;
-    
+    private String password;
     private String deviceOS;
     
     private String deviceKey;
@@ -269,5 +269,19 @@ public class User {
      */
     public void setDeviceKey(String deviceKey) {
         this.deviceKey = deviceKey;
+    }
+
+    /**
+     * @return the password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

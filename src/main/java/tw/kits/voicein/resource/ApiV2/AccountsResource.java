@@ -25,6 +25,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 import org.mongodb.morphia.query.Query;
 import tw.kits.voicein.bean.DeviceBean;
+import tw.kits.voicein.bean.PasswordChangeBean;
 import tw.kits.voicein.bean.RecordResBean;
 import tw.kits.voicein.constant.ContactConstant;
 import tw.kits.voicein.constant.RecordConstant;
@@ -262,4 +263,26 @@ public class AccountsResource {
                 .build();
 
     }
+    
+    @POST
+    @Path("/accounts/{uuid}/actions/changePassword")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @TokenRequired
+    public Response changePass(@PathParam("uuid") String uuid, @Valid PasswordChangeBean form) {
+        User modifiedUser = dataStoreObject.get(User.class, uuid);
+        if(modifiedUser.getPassword()==null){
+            modifiedUser.setPassword(form.getNewPassword());
+        }else{
+        
+        
+        }
+        
+
+        dataStoreObject.save(modifiedUser);
+
+        LOGGER.log(Level.CONFIG, "Update User u{0}", modifiedUser);
+        return Response.ok().build();
+    }
+    
 }
