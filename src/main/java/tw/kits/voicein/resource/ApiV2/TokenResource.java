@@ -199,7 +199,10 @@ public class TokenResource {
     User getVaildUserByDisPass(UserAuthBean auth) {
         Datastore ds = MongoManager.getInstatnce().getDs();
         User user = ds.createQuery(User.class).field("phoneNumber").equal(auth.getPhoneNumber()).get();
-        
+        if(user==null){
+            LOGGER.info("There is no user");
+            return null;
+        }
         Code code = ds.find(Code.class).field("user").equal(user).field("code").equal(auth.getCode()).get();
         LOGGER.info(code.getCode());
         if (code == null) {
