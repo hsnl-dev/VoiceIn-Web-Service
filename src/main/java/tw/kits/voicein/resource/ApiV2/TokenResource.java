@@ -68,7 +68,7 @@ public class TokenResource {
                 u.setAvailableStartTime("00:00");
                 u.setAvailableEndTime("23:59");
                 u.setCredit(3000);
-            } else {
+            }  else {
                 //if code exist for userid delete it 
                 Key key = new Key(User.class, "accounts", u.getUuid());
                 Code code = ds.find(Code.class).field("user").equal(key).get();
@@ -81,7 +81,7 @@ public class TokenResource {
                     RandomStringUtils.random(6, false, true),
                     new Date(),
                     3600);
-
+            LOGGER.info(info.getPhoneNumber()+"--------------");
             HashMap<String, String> reqTo = new HashMap<>();
             reqTo.put("number", info.getPhoneNumber());
             reqTo.put("content", String.format("親愛的用戶您好，您的驗證碼是 %s，來自KITS VoiceIn 服務中心", code.getCode()));

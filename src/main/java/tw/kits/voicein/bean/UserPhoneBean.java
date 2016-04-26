@@ -1,6 +1,10 @@
 package tw.kits.voicein.bean;
 
+import com.google.i18n.phonenumbers.NumberParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.validation.constraints.NotNull;
+import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.PhoneNum;
 
 public class UserPhoneBean {
@@ -11,7 +15,12 @@ public class UserPhoneBean {
     private String mode;
 
     public String getPhoneNumber() {
-        return phoneNumber;
+         try {
+            return Helpers.normalizePhoneNum(phoneNumber);
+        } catch (NumberParseException ex) {
+            Logger.getLogger(UserAuthBean.class.getName()).log(Level.SEVERE, null, ex);
+            return phoneNumber;
+        }   
     }
 
     public void setPhoneNumber(String phoneNumber) {
