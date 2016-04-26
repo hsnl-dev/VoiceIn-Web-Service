@@ -169,6 +169,7 @@ public class TokenResource {
             tm.setUser(validUser);
             ds.save(tm);
             TokenResBean res = new TokenResBean(tm.getTokenId());
+            res.setToken(user.getUserUuid());
             return Response
                     .status(Status.CREATED)
                     .entity(res)
