@@ -169,7 +169,8 @@ public class TokenResource {
             tm.setUser(validUser);
             ds.save(tm);
             TokenResBean res = new TokenResBean(tm.getTokenId());
-            res.setToken(user.getUserUuid());
+            LOGGER.info(res.getToken()+"==");
+            res.setUserUuid(validUser.getUuid());
             return Response
                     .status(Status.CREATED)
                     .entity(res)
@@ -205,7 +206,7 @@ public class TokenResource {
             return null;
         }
         Code code = ds.find(Code.class).field("user").equal(user).field("code").equal(auth.getCode()).get();
-        LOGGER.info(code.getCode());
+       
         if (code == null) {
             return null;
         }else{
