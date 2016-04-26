@@ -102,7 +102,7 @@ public class AccountsResource {
         LOGGER.log(Level.CONFIG, "Update User u{0}", user);
         return Response.ok().build();
     }
-    
+
     /**
      *
      * @param uuid
@@ -125,6 +125,7 @@ public class AccountsResource {
         LOGGER.log(Level.CONFIG, "Update User u{0}", modifiedUser);
         return Response.ok().build();
     }
+
     /**
      * This API allows user to delete a user account by given UUID. API By
      * Calvin.
@@ -195,7 +196,7 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response getHistory(@PathParam("userUuid") String uid, @QueryParam("before") long timestamp) {
-        
+
         User user = dataStoreObject.get(User.class, uid);
         if (user == null) {
             return Response.status(Status.NOT_FOUND).build();
@@ -221,12 +222,12 @@ public class AccountsResource {
                     || type.equals(RecordConstant.APP_TO_APP_CHARGE_CALLER)) {
                 if (uid.equals(one.getCaller().getUuid())) {
                     Contact contact = dataStoreObject.get(Contact.class, one.getCallerContactId());
-                    rrb = new RecordResBean(one.getCallee(), one, contact,one.getCalleePhone());
+                    rrb = new RecordResBean(one.getCallee(), one, contact, one.getCalleePhone());
                     rrb.setType("outgoing");
                 } else if (uid.equals(one.getCallee().getUuid())) {
                     Contact contact = dataStoreObject.get(Contact.class, one.getCallerContactId());
                     if (contact == null) {
-                        rrb = new RecordResBean(one.getCaller(), one, null,one.getCallerPhone());
+                        rrb = new RecordResBean(one.getCaller(), one, null, one.getCallerPhone());
                         rrb.setType("incoming");
                     } else {
                         int contactType;
@@ -246,14 +247,14 @@ public class AccountsResource {
                 }
             } else if (type.equals(RecordConstant.APP_TO_ICON)) {
                 Contact contact = dataStoreObject.get(Contact.class, one.getCallerContactId());
-                rrb = new RecordResBean(one.getCalleeIcon(), one, contact,one.getCalleePhone());
+                rrb = new RecordResBean(one.getCalleeIcon(), one, contact, one.getCalleePhone());
                 rrb.setType("outgoing");
             } else if (type.equals(RecordConstant.ICON_TO_APP)) {
                 Contact another = dataStoreObject.createQuery(Contact.class).field("customerIcon").equal(one.getCallerIcon()).get();
-                rrb = new RecordResBean(one.getCallerIcon(), one, another,one.getCallerPhone());
+                rrb = new RecordResBean(one.getCallerIcon(), one, another, one.getCallerPhone());
                 rrb.setType("incoming");
-            }else{
-                
+            } else {
+
             }
             res.add(rrb);
             last = one.getReqTime();
@@ -267,7 +268,7 @@ public class AccountsResource {
                 .build();
 
     }
-    
+
     @POST
     @Path("/accounts/{uuid}/actions/changePassword")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -275,17 +276,17 @@ public class AccountsResource {
     @TokenRequired
     public Response changePass(@PathParam("uuid") String uuid, @NotNull @Valid PasswordChangeBean form) {
         User modifiedUser = dataStoreObject.get(User.class, uuid);
-        if(modifiedUser.getPassword()==null){
+        if (modifiedUser.getPassword() == null) {
             modifiedUser.setPassword(PasswordHelper.getHashedString(form.getNewPassword()));
-        }else if (PasswordHelper.isValidPassword(form.getOldPassword(),modifiedUser.getPassword())){
-           modifiedUser.setPassword(PasswordHelper.getHashedString(form.getNewPassword()));
-        }else{
+        } else if (PasswordHelper.isValidPassword(form.getOldPassword(), modifiedUser.getPassword())) {
+            modifiedUser.setPassword(PasswordHelper.getHashedString(form.getNewPassword()));
+        } else {
             return Response.status(Status.UNAUTHORIZED).entity(new ErrorMessageBean("Your old password is invalid")).build();
         }
-        
+
         dataStoreObject.save(modifiedUser);
         LOGGER.log(Level.CONFIG, "Update User u{0}", modifiedUser);
         return Response.ok().build();
     }
-    
+
 }
