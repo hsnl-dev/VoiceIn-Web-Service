@@ -33,6 +33,7 @@ import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.Http;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.Parameter;
+import tw.kits.voicein.util.PasswordHelper;
 
 @Path("/api/v2")
 public class TokenResource {
@@ -182,7 +183,8 @@ public class TokenResource {
 
     User getVaildUserByPassword(UserAuthBean auth) {
         Datastore ds = MongoManager.getInstatnce().getDs();
-        User user = ds.createQuery(User.class).field("phoneNumber").equal(auth.getPhoneNumber()).get();
+        String hashedPass = PasswordHelper.getHashedString(auth.getPhoneNumber());
+        User user = ds.createQuery(User.class).field("phoneNumber").equal(hashedPass).get();
         
         if (user == null) {
             return null;

@@ -5,12 +5,15 @@
  */
 package tw.kits.voicein.bean;
 
+import javax.validation.constraints.NotNull;
+
 /**
  *
  * @author Henry
  */
 public class PasswordChangeBean {
     private String oldPassword;
+    @NotNull
     private String newPassword;
 
     /**

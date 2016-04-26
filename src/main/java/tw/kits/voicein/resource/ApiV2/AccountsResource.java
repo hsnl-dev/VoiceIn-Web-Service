@@ -20,17 +20,21 @@ import tw.kits.voicein.util.Http;
 import tw.kits.voicein.util.Parameter;
 import javax.servlet.annotation.MultipartConfig;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
+import org.glassfish.jersey.internal.Errors.ErrorMessage;
 import org.mongodb.morphia.query.Query;
 import tw.kits.voicein.bean.DeviceBean;
+import tw.kits.voicein.bean.ErrorMessageBean;
 import tw.kits.voicein.bean.PasswordChangeBean;
 import tw.kits.voicein.bean.RecordResBean;
 import tw.kits.voicein.constant.ContactConstant;
 import tw.kits.voicein.constant.RecordConstant;
 import tw.kits.voicein.model.Record;
 import tw.kits.voicein.util.Helpers;
+import tw.kits.voicein.util.PasswordHelper;
 import tw.kits.voicein.util.TokenRequired;
 
 /**
@@ -269,18 +273,17 @@ public class AccountsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
-    public Response changePass(@PathParam("uuid") String uuid, @Valid PasswordChangeBean form) {
+    public Response changePass(@PathParam("uuid") String uuid, @NotNull @Valid PasswordChangeBean form) {
         User modifiedUser = dataStoreObject.get(User.class, uuid);
         if(modifiedUser.getPassword()==null){
-            modifiedUser.setPassword(form.getNewPassword());
+            modifiedUser.setPassword(PasswordHelper.getHashedString(form.getNewPassword()));
+        }else if (PasswordHelper.isValidPassword(form.getOldPassword(),modifiedUser.getPassword())){
+           modifiedUser.setPassword(PasswordHelper.getHashedString(form.getNewPassword()));
         }else{
-        
-        
+            return Response.status(Status.UNAUTHORIZED).entity(new ErrorMessageBean("Your old password is invalid")).build();
         }
         
-
         dataStoreObject.save(modifiedUser);
-
         LOGGER.log(Level.CONFIG, "Update User u{0}", modifiedUser);
         return Response.ok().build();
     }
