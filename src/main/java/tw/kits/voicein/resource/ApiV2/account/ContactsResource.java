@@ -33,6 +33,7 @@ import tw.kits.voicein.model.User;
 import tw.kits.voicein.constant.ContactConstant;
 import tw.kits.voicein.model.Group;
 import tw.kits.voicein.model.Notification;
+import tw.kits.voicein.model.Record;
 import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.TokenRequired;
@@ -324,6 +325,7 @@ public class ContactsResource {
                 dataStoreObject.save(group);
             }
             dataStoreObject.delete(freeContact);
+           
         } else {
             //remove dependency;
             List<String> contacts = Arrays.asList(payContact.getId().toString());
@@ -333,6 +335,13 @@ public class ContactsResource {
                 dataStoreObject.save(group);
             }
             dataStoreObject.delete(payContact.getCustomerIcon());
+            Query<Record> invalidRec = dataStoreObject.createQuery(Record.class);
+            invalidRec.or(
+                invalidRec.criteria("callerIcon").equal(payContact.getCustomerIcon()),
+                invalidRec.criteria("calleeIcon").equal(payContact.getCustomerIcon())         
+            );
+            
+            dataStoreObject.delete(invalidRec);
         }
 
         dataStoreObject.delete(payContact);
