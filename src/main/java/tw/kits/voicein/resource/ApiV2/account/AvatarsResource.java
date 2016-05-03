@@ -170,7 +170,8 @@ public class AvatarsResource {
             return Response.status(Response.Status.NOT_FOUND).build();
             
         }else{
-            EntityTag tag = new EntityTag(u.getProfilePhotoLastModifiedTime().getTime()+"");
+            long time = u.getProfilePhotoLastModifiedTime()==null? -1: u.getProfilePhotoLastModifiedTime().getTime();
+            EntityTag tag = new EntityTag(time+"");
             ResponseBuilder  responseBuild = request.evaluatePreconditions(tag);
             if(responseBuild==null){
                 return Response.ok(getAvatar(uuid, size)).tag(tag).build();
@@ -228,7 +229,8 @@ public class AvatarsResource {
             return Response.status(Response.Status.NOT_FOUND).build();
             
         }else{
-            EntityTag tag = new EntityTag(user.getProfilePhotoLastModifiedTime().getTime()+"");
+            long time = user.getProfilePhotoLastModifiedTime()==null? -1: user.getProfilePhotoLastModifiedTime().getTime();
+            EntityTag tag = new EntityTag(time+"");
             ResponseBuilder  responseBuild = request.evaluatePreconditions(tag);
             if(responseBuild==null){
                 return Response.ok(getAvatar(user.getProfilePhotoId(), size)).tag(tag).build();
