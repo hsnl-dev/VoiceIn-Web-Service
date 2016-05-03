@@ -1,4 +1,4 @@
-package tw.kits.voicein.resource.ApiV2;
+package tw.kits.voicein.resource.ApiV2.account;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
@@ -47,11 +47,11 @@ import tw.kits.voicein.util.TokenRequired;
 
 @MultipartConfig(maxFileSize = 1024 * 1024 * 1)
 @Path("/api/v2")
-public class AccountQRcodesResource {
+public class QRcodesResource {
 
     @Context
     SecurityContext mContext;
-    static final Logger LOGGER = Logger.getLogger(AccountQRcodesResource.class.getName());
+    static final Logger LOGGER = Logger.getLogger(QRcodesResource.class.getName());
 //    private String tokenUser = context.getUserPrincipal().getName(); //user id of token
     ConsoleHandler consoleHandler = new ConsoleHandler();
     MongoManager mongoManager = MongoManager.getInstatnce();

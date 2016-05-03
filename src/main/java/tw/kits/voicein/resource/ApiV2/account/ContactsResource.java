@@ -1,4 +1,4 @@
-package tw.kits.voicein.resource.ApiV2;
+package tw.kits.voicein.resource.ApiV2.account;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,11 +39,11 @@ import tw.kits.voicein.util.TokenRequired;
 
 @MultipartConfig(maxFileSize = 1024 * 1024 * 1)
 @Path("/api/v2")
-public class AccountContactsResource {
+public class ContactsResource {
 
     @Context
     SecurityContext mContext;
-    static final Logger LOGGER = Logger.getLogger(AccountContactsResource.class.getName());
+    static final Logger LOGGER = Logger.getLogger(ContactsResource.class.getName());
     ConsoleHandler consoleHandler = new ConsoleHandler();
     MongoManager mongoManager = MongoManager.getInstatnce();
     Datastore dataStoreObject = mongoManager.getDs();

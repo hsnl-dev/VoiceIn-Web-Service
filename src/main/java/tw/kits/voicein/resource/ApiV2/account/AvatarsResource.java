@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package tw.kits.voicein.resource.ApiV2;
+package tw.kits.voicein.resource.ApiV2.account;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -31,8 +32,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.SecurityContext;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -48,14 +52,14 @@ import tw.kits.voicein.util.TokenRequired;
 
 @MultipartConfig(maxFileSize = 1024 * 1024 * 1)
 @Path("/api/v2")
-public class AccountAvatarsResource {
+public class AvatarsResource {
 
     private static final int AVATAR_LARGE = 256;
     private static final int AVATAR_MID = 128;
     private static final int AVATAR_SMALL = 64;
     @Context
     SecurityContext mContext;
-    static final Logger LOGGER = Logger.getLogger(AccountAvatarsResource.class.getName());
+    static final Logger LOGGER = Logger.getLogger(AvatarsResource.class.getName());
 //    private String tokenUser = context.getUserPrincipal().getName(); //user id of token
     ConsoleHandler consoleHandler = new ConsoleHandler();
     MongoManager mongoManager = MongoManager.getInstatnce();
@@ -125,7 +129,10 @@ public class AccountAvatarsResource {
                 }
             }
             LOGGER.log(Level.INFO, String.format("file update" + "ok" + tmpDir + "/" + photoUuid));
-            UpdateOperations<User> upo = dataStoreObject.createUpdateOperations(User.class).set("profilePhotoId", photoUuid);
+            UpdateOperations<User> upo = dataStoreObject
+                    .createUpdateOperations(User.class)
+                    .set("profilePhotoId", photoUuid)
+                    .set("profilePhotoLastModifiedTime", new Date());
             dataStoreObject.update(key, upo);
 
             LOGGER.log(Level.INFO, String.format("user info update OK"));
@@ -155,13 +162,26 @@ public class AccountAvatarsResource {
     @Path("/avatars/{avatarUuid}")
     @Produces("image/jpg")
     public Response getAvatarByAvId(@PathParam("avatarUuid") String uuid,
-            @Context SecurityContext sc,
+            @Context Request request,
             @QueryParam("size") String size) throws IOException {
         User u = dataStoreObject.createQuery(User.class).field("profilePhotoId").equal(uuid).get();
         if (u == null) {
-            Response.status(Response.Status.NOT_FOUND).build();
+            
+            return Response.status(Response.Status.NOT_FOUND).build();
+            
+        }else{
+            EntityTag tag = new EntityTag(u.getProfilePhotoLastModifiedTime().getTime()+"");
+            ResponseBuilder  responseBuild = request.evaluatePreconditions(tag);
+            if(responseBuild==null){
+                return Response.ok(getAvatar(uuid, size)).tag(tag).build();
+            }else{
+                return responseBuild.build();
+            
+            }
+        
+            
         }
-        return Response.ok(getAvatar(uuid, size)).build();
+        
     }
 
     private byte[] getAvatar(String avatarUuid, String size) throws IOException {
@@ -199,12 +219,25 @@ public class AccountAvatarsResource {
     @TokenRequired
     public Response getAccountAvatar(@PathParam("uuid") String uuid,
             @Context SecurityContext sc,
+            @Context Request request,
             @QueryParam("size") String size) throws IOException {
-        String avatarUuid = dataStoreObject.get(User.class, uuid).getProfilePhotoId();
-        if (avatarUuid == null) {
-            Response.status(Response.Status.NOT_FOUND).build();
+        User user = dataStoreObject.get(User.class, sc.getUserPrincipal().getName());
+        
+        if (user == null) {
+            
+            return Response.status(Response.Status.NOT_FOUND).build();
+            
+        }else{
+            EntityTag tag = new EntityTag(user.getProfilePhotoLastModifiedTime().getTime()+"");
+            ResponseBuilder  responseBuild = request.evaluatePreconditions(tag);
+            if(responseBuild==null){
+                return Response.ok(getAvatar(user.getProfilePhotoId(), size)).tag(tag).build();
+            }else{
+                return responseBuild.build();
+       
+            }  
         }
-        return Response.ok(getAvatar(avatarUuid, size)).build();
+        
     }
 
 }

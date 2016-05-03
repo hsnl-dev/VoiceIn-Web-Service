@@ -1,6 +1,7 @@
 package tw.kits.voicein.model;
 
 import com.google.i18n.phonenumbers.NumberParseException;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.validation.constraints.NotNull;
@@ -29,6 +30,7 @@ public class User {
     private String jobTitle;
     private String email;
     private String profilePhotoId;
+    private Date profilePhotoLastModifiedTime;
     private String qrCodeUuid;
     @NotNull
     private String availableStartTime;
@@ -283,5 +285,19 @@ public class User {
      */
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    /**
+     * @return the profilePhotoLastModifiedTime
+     */
+    public Date getProfilePhotoLastModifiedTime() {
+        return profilePhotoLastModifiedTime;
+    }
+
+    /**
+     * @param profilePhotoLastModifiedTime the profilePhotoLastModifiedTime to set
+     */
+    public void setProfilePhotoLastModifiedTime(Date profilePhotoLastModifiedTime) {
+        this.profilePhotoLastModifiedTime = profilePhotoLastModifiedTime;
     }
 }
