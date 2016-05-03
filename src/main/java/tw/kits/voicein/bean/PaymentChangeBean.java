@@ -11,7 +11,7 @@ package tw.kits.voicein.bean;
  */
 public class PaymentChangeBean {
     private String status;
-
+   
     /**
      * @return the status
      */
