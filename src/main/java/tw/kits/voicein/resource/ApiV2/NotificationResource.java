@@ -84,7 +84,7 @@ public class NotificationResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
-    public Response deleteUserAccount(@PathParam("uuid") String uuid, @PathParam("notificationUuid") String notificationUuid) {
+    public Response deleteNotification(@PathParam("uuid") String uuid, @PathParam("notificationUuid") String notificationUuid) {
         dataStoreObject.delete(Notification.class, new ObjectId(notificationUuid));
         LOGGER.log(Level.CONFIG, "Delete notification u{0}", notificationUuid);
         return Response.ok().build();

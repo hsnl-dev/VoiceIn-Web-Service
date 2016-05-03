@@ -1,4 +1,4 @@
-package tw.kits.voicein.resource.ApiV2;
+package tw.kits.voicein.resource.ApiV2.account;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -40,14 +40,14 @@ import tw.kits.voicein.util.TokenRequired;
  * @author Calvin
  */
 @Path("/api/v2")
-public class AccountGroupsResource {
+public class GroupsResource {
 
     // For mongodb.
     MongoManager mongoManager = MongoManager.getInstatnce();
     Datastore dataStoreObject = mongoManager.getDs();
 
     // Logger.
-    static final Logger LOGGER = Logger.getLogger(AccountAvatarsResource.class.getName());
+    static final Logger LOGGER = Logger.getLogger(AvatarsResource.class.getName());
     ConsoleHandler consoleHandler = new ConsoleHandler();
 
     /**
