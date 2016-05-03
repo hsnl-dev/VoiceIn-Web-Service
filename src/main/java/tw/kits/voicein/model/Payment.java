@@ -15,8 +15,8 @@ import tw.kits.voicein.bean.*;
  */
 @Entity("payments")
 public class Payment {
+    
     @Id
-    private String id;
     private String payId;
     private String userId;
     private String status;
@@ -94,19 +94,7 @@ public class Payment {
         this.userId = userId;
     }
 
-    /**
-     * @return the id
-     */
-    public String getId() {
-        return id;
-    }
 
-    /**
-     * @param id the id to set
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
 
     /**
      * @return the transationStatus

@@ -19,6 +19,7 @@ import org.mongodb.morphia.Key;
 import org.mongodb.morphia.query.UpdateOperations;
 import org.mongodb.morphia.query.UpdateResults;
 import tw.kits.voicein.bean.PayCreateBean;
+import tw.kits.voicein.bean.PaymentChangeBean;
 import tw.kits.voicein.model.Payment;
 import tw.kits.voicein.model.User;
 import tw.kits.voicein.util.MongoManager;
@@ -43,17 +44,36 @@ public class PaymentResource {
         pay.setMoney(form.getMoney());
         pay.setStatus(form.getStatus());
         pay.setUserId(uuid);
+        pay.setPayId(form.getPayId());
         pay.setTransationStatus("create");
         dataStore.save(pay);
- 
-       
-        if ("success".equals(pay.getStatus())) {
-            Key key = new Key(User.class, "accounts", uuid);
-            UpdateOperations<User> upo = dataStore.createUpdateOperations(User.class).inc("credit", pay.getMoney());
-            UpdateResults res ;
-            res = dataStore.update(key, upo);
-            if(res.getUpdatedCount()<1){
-                return Response.status(Response.Status.NOT_FOUND).build();
+
+        return Response.status(Response.Status.CREATED).build();
+
+    }
+
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/accounts/{uuid}/payments/{payId}/actions/changePayment")
+    @POST
+    public Response changePayment(@PathParam("uuid") String uuid, @PathParam("payId") String payId, PaymentChangeBean form) {
+        Payment payment = dataStore.get(Payment.class, payId);
+        if (payment == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        if ("success".equals(form.getStatus())) {
+            if ("success".equals(payment.getStatus())) {
+                Key key = new Key(User.class, "accounts", uuid);
+                UpdateOperations<User> upo = dataStore.createUpdateOperations(User.class).inc("credit", payment.getMoney());
+                UpdateResults res;
+                res = dataStore.update(key, upo);
+                if (res.getUpdatedCount() < 1) {
+                    return Response.status(Response.Status.NOT_FOUND).build();
+                }
+            }else{
+                return Response.status(Response.Status.CONFLICT).entity(new ErrorMessageBean("error")).build();
+            
             }
 
         }
