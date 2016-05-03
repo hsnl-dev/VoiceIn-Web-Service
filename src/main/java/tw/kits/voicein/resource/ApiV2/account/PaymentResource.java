@@ -15,6 +15,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.Key;
+import org.mongodb.morphia.query.UpdateOperations;
+import org.mongodb.morphia.query.UpdateResults;
 import tw.kits.voicein.bean.PayCreateBean;
 import tw.kits.voicein.model.Payment;
 import tw.kits.voicein.model.User;
@@ -43,14 +46,14 @@ public class PaymentResource {
         pay.setTransationStatus("create");
         dataStore.save(pay);
  
-        User user = dataStore.get(User.class, uuid);
+       
         if ("success".equals(pay.getStatus())) {
-            LOGGER.info(user+"");
-            if (user != null) {
-                user.setCredit(user.getCredit() + form.getMoney());
-                dataStore.save(user);
-            } else {
-                return Response.status(Response.Status.NOT_FOUND).build();    
+            Key key = new Key(User.class, "accounts", uuid);
+            UpdateOperations<User> upo = dataStore.createUpdateOperations(User.class).inc("credit", pay.getMoney());
+            UpdateResults res ;
+            res = dataStore.update(key, upo);
+            if(res.getUpdatedCount()<1){
+                return Response.status(Response.Status.NOT_FOUND).build();
             }
 
         }
