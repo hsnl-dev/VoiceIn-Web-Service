@@ -66,7 +66,8 @@ public class CallingServiceResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         if (form.isSuccess()) {
-            float pay = 2 * 0.8f * (form.getEndTime() - form.getStartTime()) / 1000;
+            // 0.34*2/ 180sec
+            float pay =  (float) (2 * 4.5f * Math.ceil((form.getEndTime() - form.getStartTime()) / 1000 /60));
             record.setChargeDollar(pay);
             record.setIsAnswer(true);
             record.setStartTime(new Date(form.getStartTime()));
