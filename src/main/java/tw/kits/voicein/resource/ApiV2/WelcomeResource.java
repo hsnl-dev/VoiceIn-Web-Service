@@ -9,7 +9,6 @@ import javax.ws.rs.core.MediaType;
 @Path("/api/v2")
 public class WelcomeResource {
     @GET
-    @Path("/")
     @Produces(MediaType.TEXT_HTML)
     public String index() {
         return "<center>VoiceIn API Version: V2.<br/> 2016 built by Henry Chang and Calvin Jeng</center>";
