@@ -27,7 +27,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import net.glxn.qrgen.QRCode;
@@ -249,7 +251,7 @@ public class QRcodesResource {
         String s3Bucket = "voice-in";
         String qrCodeUuid = UUID.randomUUID().toString();
         String s3FilePath = String.format("qrCode/%s.png", qrCodeUuid);
-
+        
         // Generate QRCode Image and Upload to S3.
         File qrCodeImage = QRCode.from(Parameter.WEB_SITE_QRCODE + qrCodeUuid).to(ImageType.PNG).withSize(250, 250).file();
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
@@ -287,6 +289,7 @@ public class QRcodesResource {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
         QRcode code = dataStoreObject.get(QRcode.class, qrCode);
+        
         if (QRcodeType.TYPE_ACCOUNT.equals(code.getType()) || !code.getProvider().getUuid().equals(uuid)) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
@@ -310,11 +313,17 @@ public class QRcodesResource {
     @GET
     @Path("/qrcodes/{uuid}/image")
     @Produces("image/png")
-    public Response getQRCodeImgById(@PathParam("uuid") String uuid) throws IOException {
+    public Response getQRCodeImgById( @Context Request cilentRequest,@PathParam("uuid") String uuid) throws IOException {
         byte[] qrCodeData;
         QRcode code = dataStoreObject.get(QRcode.class, uuid);
+        
         if (code == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        EntityTag tag = new EntityTag(code.getUpdateAt().getTime()+"");
+        Response.ResponseBuilder  responseBuilder = cilentRequest.evaluatePreconditions(tag);
+        if(responseBuilder!=null){
+            return responseBuilder.build();
         }
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
         String s3Bucket = "voice-in";
@@ -323,6 +332,6 @@ public class QRcodesResource {
         S3Object object = s3Client.getObject(request);
         qrCodeData = IOUtils.toByteArray(object.getObjectContent());
 
-        return Response.ok(qrCodeData).build();
+        return Response.ok(qrCodeData).tag(tag).build();
     }
 }
