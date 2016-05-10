@@ -99,11 +99,17 @@ public class QRcodesResource {
     @Path("/accounts/{uuid}/qrcode")
     @Produces("image/png")
     @TokenRequired
-    public Response getAccountQRCode(@PathParam("uuid") String uuid) throws IOException {
+    public Response getAccountQRCode(@Context Request req, @PathParam("uuid") String uuid) throws IOException {
         // [Testing]
         byte[] qrCodeData;
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
         User user = dataStoreObject.get(User.class, uuid);
+        EntityTag tag = new EntityTag(user.getQrCodeUuid());
+        Response.ResponseBuilder  responseBuilder = req.evaluatePreconditions(tag);
+        if(responseBuilder!=null){
+            return responseBuilder.build();
+        }
+        
         if (user == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
