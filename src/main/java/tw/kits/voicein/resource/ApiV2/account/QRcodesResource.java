@@ -124,7 +124,7 @@ public class QRcodesResource {
             fos.write(qrCodeData);
             fos.close();
         }*/
-        return Response.ok(qrCodeData).build();
+        return Response.ok(qrCodeData).tag(tag).build();
     }
 
     /**
