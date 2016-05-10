@@ -55,7 +55,7 @@ public class AccountsResource {
     Datastore dataStoreObject = mongoManager.getDs();
 
     /**
-     * This API allows client to retrieve user's full informations. API By
+     * This API allows client to retrieve of logined user's  full informations. API By
      * Calvin
      *
      * @param uuid
@@ -67,7 +67,7 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response getUserAccount(@PathParam("uuid") String uuid) {
-        User user = dataStoreObject.get(User.class, uuid);
+        User user = dataStoreObject.get(User.class, context.getUserPrincipal().getName());
         if (user == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
@@ -88,14 +88,16 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response updateUserAccount(@PathParam("uuid") String uuid, @Valid User user) {
-        User modifiedUser = dataStoreObject.get(User.class, uuid);
-
+        User modifiedUser = dataStoreObject.get(User.class, context.getUserPrincipal().getName());
+        if(modifiedUser==null){
+            return Response.status(Status.NOT_FOUND).build();
+        }
         user.setUuid(uuid);
         user.setProfilePhotoId(modifiedUser.getProfilePhotoId());
         user.setQrCodeUuid(modifiedUser.getQrCodeUuid());
         user.setDeviceOS(modifiedUser.getDeviceOS());
         user.setDeviceKey(modifiedUser.getDeviceKey());
-        user.setCredit(modifiedUser.getCredit());
+        //user.setCredit(modifiedUser.getCredit());
 
         dataStoreObject.save(user);
 
@@ -115,7 +117,7 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response updateUserDeviceId(@PathParam("uuid") String uuid, @Valid DeviceBean deviceInfo) {
-        User modifiedUser = dataStoreObject.get(User.class, uuid);
+        User modifiedUser = dataStoreObject.get(User.class, context.getUserPrincipal().getName());
 
         modifiedUser.setDeviceKey(deviceInfo.getDeviceKey());
         modifiedUser.setDeviceOS(deviceInfo.getDeviceOS());
@@ -139,7 +141,7 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response deleteUserAccount(@PathParam("uuid") String uuid) {
-        dataStoreObject.delete(User.class, uuid);
+        dataStoreObject.delete(User.class, context.getUserPrincipal().getName());
 
         LOGGER.log(Level.CONFIG, "Delete User u{0}", uuid);
         return Response.ok().build();
@@ -197,7 +199,7 @@ public class AccountsResource {
     @TokenRequired
     public Response getHistory(@PathParam("userUuid") String uid, @QueryParam("before") long timestamp) {
 
-        User user = dataStoreObject.get(User.class, uid);
+        User user = dataStoreObject.get(User.class, context.getUserPrincipal().getName());
         if (user == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
@@ -275,7 +277,7 @@ public class AccountsResource {
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     public Response changePass(@PathParam("uuid") String uuid, @NotNull @Valid PasswordChangeBean form) {
-        User modifiedUser = dataStoreObject.get(User.class, uuid);
+        User modifiedUser = dataStoreObject.get(User.class, context.getUserPrincipal().getName());
         if (modifiedUser.getPassword() == null) {
             modifiedUser.setPassword(PasswordHelper.getHashedString(form.getNewPassword()));
         } else if (PasswordHelper.isValidPassword(form.getOldPassword(), modifiedUser.getPassword())) {

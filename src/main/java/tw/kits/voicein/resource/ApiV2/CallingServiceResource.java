@@ -125,9 +125,16 @@ public class CallingServiceResource {
         if (contact == null) {
             return Response.status(Response.Status.NOT_FOUND).entity(new ErrorMessageBean("contact not found")).build();
         }
-        if (contact.getProviderUser().getCredit() <= 0) {
-            return Response.status(Response.Status.PAYMENT_REQUIRED).entity(new ErrorMessageBean("credit <= 0")).build();
+        if(contact.getChargeType()==ContactConstant.TYPE_FREE){
+            if (contact.getProviderUser().getCredit() <= 0) {
+                return Response.status(Response.Status.PAYMENT_REQUIRED).entity(new ErrorMessageBean("credit <= 0")).build();
+            }
+        }else{
+            if (contact.getUser().getCredit() <= 0) {
+                return Response.status(Response.Status.PAYMENT_REQUIRED).entity(new ErrorMessageBean("credit <= 0")).build();
+            }
         }
+        
         if (contact.getChargeType() != ContactConstant.TYPE_ICON) {
             int targetType = contact.getChargeType() == ContactConstant.TYPE_FREE ? ContactConstant.TYPE_CHARGE : ContactConstant.TYPE_FREE;
 
