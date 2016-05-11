@@ -95,9 +95,13 @@ public class AccountsResource {
         user.setUuid(uuid);
         user.setProfilePhotoId(modifiedUser.getProfilePhotoId());
         user.setQrCodeUuid(modifiedUser.getQrCodeUuid());
-        user.setDeviceOS(modifiedUser.getDeviceOS());
-        user.setDeviceKey(modifiedUser.getDeviceKey());
-        //user.setCredit(modifiedUser.getCredit());
+
+        if (user.getDeviceOS() == null) {
+          user.setDeviceOS(modifiedUser.getDeviceOS());
+          user.setDeviceKey(modifiedUser.getDeviceKey());
+        }
+
+        user.setCredit(modifiedUser.getCredit());
 
         dataStoreObject.save(user);
 
