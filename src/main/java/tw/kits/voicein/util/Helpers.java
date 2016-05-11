@@ -190,6 +190,7 @@ public class Helpers {
              Response res = http.postResponse("https://gcm-http.googleapis.com/gcm/send", payloadStr, headers);
              LOGGER.warning(res.code()+"");
              
+             
         }
 
     }

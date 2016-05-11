@@ -26,6 +26,11 @@
     </prerequisites>
 
     <dependencies>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.6.0</version>
+        </dependency>
         <!-- Compile/runtime dependencies -->
         <dependency>
             <groupId>javax.servlet</groupId>

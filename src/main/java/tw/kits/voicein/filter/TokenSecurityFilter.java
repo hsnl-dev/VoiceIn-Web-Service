@@ -1,5 +1,8 @@
 package tw.kits.voicein.filter;
 
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureException;
 import java.io.IOException;
 import java.security.Principal;
 import javax.annotation.Priority;
@@ -29,48 +32,61 @@ public class TokenSecurityFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext crc) throws IOException {
-        Datastore ds = MongoManager.getInstatnce().getDs();
-        String token = crc.getHeaderString("token");
-        final Token tm2 = ds.get(Token.class, token);
+        final String token = crc.getHeaderString("token");
+        if (!Parameter.IS_SANDBOX) {
+            if (token == null) {
+                System.out.println("");
+                ErrorMessageBean errMsg = new ErrorMessageBean();
+                errMsg.setErrorReason("Token is required");
+                crc.abortWith(
+                        Response.status(Status.UNAUTHORIZED)
+                        .type(MediaType.APPLICATION_JSON)
+                        .entity(errMsg)
+                        .build()
+                );
+            }
 
-        if (tm2 == null && !Parameter.IS_SANDBOX) {
-            System.out.println("");
-            ErrorMessageBean errMsg = new ErrorMessageBean();
-            errMsg.setErrorReason("Your code is not correct");
-            crc.abortWith(
-                    Response.status(Status.UNAUTHORIZED)
-                    .type(MediaType.APPLICATION_JSON)
-                    .entity(errMsg)
-                    .build()
-            );
-        }
-
-        crc.setSecurityContext(new SecurityContext() {
-            @Override
-            public Principal getUserPrincipal() {
-                return new Principal() {
+            try {
+                final String userid = Jwts.parser().setSigningKey(Parameter.SECRET_KEY).parseClaimsJws(token).getBody().getSubject();
+                crc.setSecurityContext(new SecurityContext() {
                     @Override
-                    public String getName() {
-                        return tm2.getUser().getUuid();
+                    public Principal getUserPrincipal() {
+                        return new Principal() {
+                            @Override
+                            public String getName() {
+                                return userid;
+                            }
+                        };
                     }
-                };
-            }
 
-            @Override
-            public boolean isUserInRole(String string) {
-                return false;
-            }
+                    @Override
+                    public boolean isUserInRole(String string) {
+                        return false;
+                    }
 
-            @Override
-            public boolean isSecure() {
-                return false;
-            }
+                    @Override
+                    public boolean isSecure() {
+                        return false;
+                    }
 
-            @Override
-            public String getAuthenticationScheme() {
-                return null;
-            }
-        });
+                    @Override
+                    public String getAuthenticationScheme() {
+                        return null;
+                    }
+                });
+
+            } catch (JwtException e) {
+                ErrorMessageBean errMsg = new ErrorMessageBean();
+                errMsg.setErrorReason("Your code is not correct");
+                crc.abortWith(
+                        Response.status(Status.UNAUTHORIZED)
+                        .type(MediaType.APPLICATION_JSON)
+                        .entity(errMsg)
+                        .build()
+                );
+            } 
+
+        }
 
     }
 }
