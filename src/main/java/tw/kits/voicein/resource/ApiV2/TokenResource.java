@@ -70,7 +70,7 @@ public class TokenResource {
                 u.setAvailableStartTime("00:00");
                 u.setAvailableEndTime("23:59");
                 u.setCredit(3000);
-            }  else {
+            } else {
                 //if code exist for userid delete it 
                 Key key = new Key(User.class, "accounts", u.getUuid());
                 Code code = ds.find(Code.class).field("user").equal(key).get();
@@ -83,7 +83,7 @@ public class TokenResource {
                     RandomStringUtils.random(6, false, true),
                     new Date(),
                     3600);
-            LOGGER.info(info.getPhoneNumber()+"--------------");
+            LOGGER.info(info.getPhoneNumber() + "--------------");
             HashMap<String, String> reqTo = new HashMap<>();
             reqTo.put("number", info.getPhoneNumber());
             reqTo.put("content", String.format("親愛的用戶您好，您的驗證碼是 %s，來自KITS VoiceIn 服務中心", code.getCode()));
@@ -160,14 +160,14 @@ public class TokenResource {
             validUser = getVaildUserByPassword(user);
         } else if (user.getMode().equals("disposablePass")) {
             validUser = getVaildUserByDisPass(user);
-        } else{
+        } else {
             return Response.status(Status.BAD_REQUEST).build();
         }
         String token = Jwts.builder()
                 .setIssuer(Parameter.HOST_NAME)
                 .setSubject(user.getUserUuid())
                 .signWith(SignatureAlgorithm.HS256, Parameter.SECRET_KEY).compact();
-        
+
         if (validUser != null) {
             // issue new token
             Token tm = new Token(3600);
@@ -175,7 +175,7 @@ public class TokenResource {
             tm.setUser(validUser);
             ds.save(tm);
             TokenResBean res = new TokenResBean(token);
-            LOGGER.info(res.getToken()+"==");
+            LOGGER.info(res.getToken() + "==");
             res.setUserUuid(validUser.getUuid());
             return Response
                     .status(Status.CREATED)
@@ -193,7 +193,7 @@ public class TokenResource {
         Datastore ds = MongoManager.getInstatnce().getDs();
         String hashedPass = PasswordHelper.getHashedString(auth.getPhoneNumber());
         User user = ds.createQuery(User.class).field("phoneNumber").equal(hashedPass).get();
-        
+
         if (user == null) {
             return null;
         } else if (user.getPassword() == null) {
@@ -207,15 +207,15 @@ public class TokenResource {
     User getVaildUserByDisPass(UserAuthBean auth) {
         Datastore ds = MongoManager.getInstatnce().getDs();
         User user = ds.createQuery(User.class).field("phoneNumber").equal(auth.getPhoneNumber()).get();
-        if(user==null){
+        if (user == null) {
             LOGGER.info("There is no user");
             return null;
         }
         Code code = ds.find(Code.class).field("user").equal(user).field("code").equal(auth.getCode()).get();
-       
+
         if (code == null) {
             return null;
-        }else{
+        } else {
             return user;
         }
     }

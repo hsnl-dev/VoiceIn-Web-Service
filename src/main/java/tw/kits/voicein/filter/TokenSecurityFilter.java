@@ -2,7 +2,6 @@ package tw.kits.voicein.filter;
 
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureException;
 import java.io.IOException;
 import java.security.Principal;
 import javax.annotation.Priority;
@@ -14,10 +13,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
-import org.mongodb.morphia.Datastore;
 import tw.kits.voicein.bean.ErrorMessageBean;
-import tw.kits.voicein.model.Token;
-import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.Parameter;
 import tw.kits.voicein.util.TokenRequired;
 
@@ -84,7 +80,7 @@ public class TokenSecurityFilter implements ContainerRequestFilter {
                         .entity(errMsg)
                         .build()
                 );
-            } 
+            }
 
         }
 

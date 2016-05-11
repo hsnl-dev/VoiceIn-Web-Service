@@ -219,13 +219,13 @@ public class ContactsResource {
             notification.setNotificationContent(owner.getUserName() + " 已經加入您為聯絡人");
             notification.setContactId(contact.getId().toString());
             dataStoreObject.save(notification);
-            
+
             Helpers helper = new Helpers();
 
             if ("ios".equalsIgnoreCase(provider.getDeviceOS())) {
                 helper.pushNotification(owner.getUserName() + " 已經加入您為聯絡人", "ios", provider.getDeviceKey());
             } else {
-                 helper.pushNotification(owner.getUserName() + " 已經加入您為聯絡人", "android", provider.getDeviceKey());
+                helper.pushNotification(owner.getUserName() + " 已經加入您為聯絡人", "android", provider.getDeviceKey());
             }
 
             return Response.ok().build();
@@ -325,7 +325,7 @@ public class ContactsResource {
                 dataStoreObject.save(group);
             }
             dataStoreObject.delete(freeContact);
-           
+
         } else {
             //remove dependency;
             List<String> contacts = Arrays.asList(payContact.getId().toString());
@@ -337,10 +337,10 @@ public class ContactsResource {
             dataStoreObject.delete(payContact.getCustomerIcon());
             Query<Record> invalidRec = dataStoreObject.createQuery(Record.class);
             invalidRec.or(
-                invalidRec.criteria("callerIcon").equal(payContact.getCustomerIcon()),
-                invalidRec.criteria("calleeIcon").equal(payContact.getCustomerIcon())         
+                    invalidRec.criteria("callerIcon").equal(payContact.getCustomerIcon()),
+                    invalidRec.criteria("calleeIcon").equal(payContact.getCustomerIcon())
             );
-            
+
             dataStoreObject.delete(invalidRec);
         }
 

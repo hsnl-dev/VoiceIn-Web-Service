@@ -1,7 +1,5 @@
 package tw.kits.voicein.resource.ApiV2.account;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -102,7 +100,7 @@ public class GroupsResource {
         ArrayList<String> contacts = group.getContacts();
         List<UserContactBean> userList = new ArrayList();
         UserContactBean userContactBean;
-        
+
         if (contacts == null) {
             return Response.ok(userList).build();
         }

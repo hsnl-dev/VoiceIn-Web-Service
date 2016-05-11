@@ -67,7 +67,7 @@ public class CallingServiceResource {
         }
         if (form.isSuccess()) {
             // 0.34*2/ 180sec
-            float pay =  (float) (2 * 4.5f * Math.ceil((form.getEndTime() - form.getStartTime()) / 1000 /60));
+            float pay = (float) (2 * 4.5f * Math.ceil((form.getEndTime() - form.getStartTime()) / 1000 / 60));
             record.setChargeDollar(pay);
             record.setIsAnswer(true);
             record.setStartTime(new Date(form.getStartTime()));
@@ -125,16 +125,14 @@ public class CallingServiceResource {
         if (contact == null) {
             return Response.status(Response.Status.NOT_FOUND).entity(new ErrorMessageBean("contact not found")).build();
         }
-        if(contact.getChargeType()==ContactConstant.TYPE_FREE){
+        if (contact.getChargeType() == ContactConstant.TYPE_FREE) {
             if (contact.getProviderUser().getCredit() <= 0) {
                 return Response.status(Response.Status.PAYMENT_REQUIRED).entity(new ErrorMessageBean("credit <= 0")).build();
             }
-        }else{
-            if (contact.getUser().getCredit() <= 0) {
-                return Response.status(Response.Status.PAYMENT_REQUIRED).entity(new ErrorMessageBean("credit <= 0")).build();
-            }
+        } else if (contact.getUser().getCredit() <= 0) {
+            return Response.status(Response.Status.PAYMENT_REQUIRED).entity(new ErrorMessageBean("credit <= 0")).build();
         }
-        
+
         if (contact.getChargeType() != ContactConstant.TYPE_ICON) {
             int targetType = contact.getChargeType() == ContactConstant.TYPE_FREE ? ContactConstant.TYPE_CHARGE : ContactConstant.TYPE_FREE;
 
@@ -154,15 +152,14 @@ public class CallingServiceResource {
                 Helpers.makeCall(contact.getUser(), targets.get(0).getUser(),
                         contact,
                         dataStoreObject);
-                
-                   String name = contact.getNickName().equalsIgnoreCase("") ? contact.getUser().getUserName() : contact.getNickName();
+
+                String name = contact.getNickName().equalsIgnoreCase("") ? contact.getUser().getUserName() : contact.getNickName();
                 if ("ios".equalsIgnoreCase(targets.get(0).getUser().getDeviceOS())) {
 
-                 
                     Helpers.pushNotification(name + "即將來電，請放心接聽", "ios", targets.get(0).getUser().getDeviceKey());
 
                 } else {
-                    Helpers.pushNotification("#call#"+name + "即將來電，請放心接聽", "android", targets.get(0).getUser().getDeviceKey());
+                    Helpers.pushNotification("#call#" + name + "即將來電，請放心接聽", "android", targets.get(0).getUser().getDeviceKey());
                 }
 
                 return Response.ok().build();

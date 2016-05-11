@@ -61,8 +61,9 @@ public class QRcodesResource {
 
     /**
      * This API allows client to get provider 's information by
-     * qrCodeUuid(providerId) API By Henry
-     * Searching in QRCode Collection to get provider 's information.
+     * qrCodeUuid(providerId) API By Henry Searching in QRCode Collection to get
+     * provider 's information.
+     *
      * @param uProviderId
      * @return
      */
@@ -86,7 +87,7 @@ public class QRcodesResource {
         prb.setState(code.getState());
         return Response.ok(prb).build();
     }
-    
+
     // ========= Normal QRCode Section ===========
     /**
      * This API allows client to retrieve their QRCode API By Calvin
@@ -105,11 +106,11 @@ public class QRcodesResource {
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
         User user = dataStoreObject.get(User.class, uuid);
         EntityTag tag = new EntityTag(user.getQrCodeUuid());
-        Response.ResponseBuilder  responseBuilder = req.evaluatePreconditions(tag);
-        if(responseBuilder!=null){
+        Response.ResponseBuilder responseBuilder = req.evaluatePreconditions(tag);
+        if (responseBuilder != null) {
             return responseBuilder.build();
         }
-        
+
         if (user == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -202,7 +203,7 @@ public class QRcodesResource {
         response.put("qrcodes", res);
         return Response.ok(response).build();
     }
-    
+
     /**
      * *
      * To update a special QR-Code of customer
@@ -234,7 +235,7 @@ public class QRcodesResource {
         dataStoreObject.save(code);
         return Response.ok().build();
     }
-    
+
     /**
      * *
      * To create special QR-Code for customer
@@ -257,7 +258,7 @@ public class QRcodesResource {
         String s3Bucket = "voice-in";
         String qrCodeUuid = UUID.randomUUID().toString();
         String s3FilePath = String.format("qrCode/%s.png", qrCodeUuid);
-        
+
         // Generate QRCode Image and Upload to S3.
         File qrCodeImage = QRCode.from(Parameter.WEB_SITE_QRCODE + qrCodeUuid).to(ImageType.PNG).withSize(250, 250).file();
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
@@ -282,6 +283,7 @@ public class QRcodesResource {
 
     /**
      * To delete the custom QR-Code of an customer.
+     *
      * @param uuid
      * @param qrCode
      * @return
@@ -295,7 +297,7 @@ public class QRcodesResource {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
         QRcode code = dataStoreObject.get(QRcode.class, qrCode);
-        
+
         if (QRcodeType.TYPE_ACCOUNT.equals(code.getType()) || !code.getProvider().getUuid().equals(uuid)) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
@@ -308,7 +310,7 @@ public class QRcodesResource {
 
         return Response.ok().build();
     }
-    
+
     /**
      * This API allows client to retrieve their QRCode API By Calvin
      *
@@ -319,16 +321,16 @@ public class QRcodesResource {
     @GET
     @Path("/qrcodes/{uuid}/image")
     @Produces("image/png")
-    public Response getQRCodeImgById( @Context Request cilentRequest,@PathParam("uuid") String uuid) throws IOException {
+    public Response getQRCodeImgById(@Context Request cilentRequest, @PathParam("uuid") String uuid) throws IOException {
         byte[] qrCodeData;
         QRcode code = dataStoreObject.get(QRcode.class, uuid);
-        
+
         if (code == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        EntityTag tag = new EntityTag(code.getUpdateAt().getTime()+"");
-        Response.ResponseBuilder  responseBuilder = cilentRequest.evaluatePreconditions(tag);
-        if(responseBuilder!=null){
+        EntityTag tag = new EntityTag(code.getUpdateAt().getTime() + "");
+        Response.ResponseBuilder responseBuilder = cilentRequest.evaluatePreconditions(tag);
+        if (responseBuilder != null) {
             return responseBuilder.build();
         }
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);

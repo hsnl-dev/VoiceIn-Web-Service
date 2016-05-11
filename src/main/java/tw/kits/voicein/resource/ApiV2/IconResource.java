@@ -83,12 +83,12 @@ public class IconResource {
 
         if (res.isSuccessful()) {
             Helpers helper = new Helpers();
-            
+
             LOGGER.info(target.get(0).getUser().getUserName());
             if ("ios".equalsIgnoreCase(target.get(0).getUser().getDeviceOS())) {
                 helper.pushNotification(icon.getName() + "即將來電，請放心接聽", "ios", target.get(0).getUser().getDeviceKey());
             } else {
-                 helper.pushNotification("#call#"+icon.getName() + "即將來電，請放心接聽", "android", target.get(0).getUser().getDeviceKey());
+                helper.pushNotification("#call#" + icon.getName() + "即將來電，請放心接聽", "android", target.get(0).getUser().getDeviceKey());
             }
             return Response.status(Response.Status.CREATED).entity(res).build();
         } else {
@@ -187,11 +187,11 @@ public class IconResource {
                     .field("phoneNumber").equal(icb.getCustomer().getPhoneNumber())
                     .field("qrCodeId").equal(code.getId())
                     .asList();
-            LOGGER.warning(existedIcons.size()+"");
+            LOGGER.warning(existedIcons.size() + "");
             if (existedIcons.size() > 0) {
                 icon = existedIcons.get(0);
                 saveNewIcon(icon, code, icb);
-            } else{
+            } else {
                 icon = new Icon();
                 icon.setIconId(UUID.randomUUID().toString());
                 saveNewIcon(icon, code, icb);
@@ -245,7 +245,7 @@ public class IconResource {
         contact.setAvailableEndTime("23:59");
         contact.setAvailableStartTime("00:00");
         dsObj.save(contact);
-        
+
         // Create notifications.
         Notification notification = new Notification();
         notification.setUser(code.getProvider());

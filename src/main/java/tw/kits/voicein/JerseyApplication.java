@@ -8,7 +8,6 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import tw.kits.voicein.filter.KeySecurityFilter;
 import tw.kits.voicein.filter.TokenSecurityFilter;
-import tw.kits.voicein.util.Parameter;
 
 public class JerseyApplication extends ResourceConfig {
 

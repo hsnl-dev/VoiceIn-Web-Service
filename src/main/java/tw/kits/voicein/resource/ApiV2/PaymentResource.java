@@ -36,13 +36,14 @@ public class PaymentResource {
 
     Datastore dataStore = MongoManager.getInstatnce().getDs();
     final Logger LOGGER = Logger.getLogger(PaymentResource.class.getName());
+
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
     @Path("/payments")
     @POST
-    public Response createPayment(@Context SecurityContext sc,PayCreateBean form) {
-       
+    public Response createPayment(@Context SecurityContext sc, PayCreateBean form) {
+
         Payment pay = new Payment();
         pay.setMethod(form.getMethod());
         pay.setMoney(form.getMoney());
@@ -79,7 +80,7 @@ public class PaymentResource {
                 }
             } else {
                 return Response.status(Response.Status.CONFLICT).entity(new ErrorMessageBean("invalid status")).build();
-                
+
             }
 
         }
