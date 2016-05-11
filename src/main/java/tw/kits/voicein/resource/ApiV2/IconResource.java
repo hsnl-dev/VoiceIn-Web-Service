@@ -184,9 +184,10 @@ public class IconResource {
             }
         } else {
             List<Icon> existedIcons = dsObj.createQuery(Icon.class)
-                    .field("phoneNumber").equal(code.getPhoneNumber())
+                    .field("phoneNumber").equal(icb.getCustomer().getPhoneNumber())
                     .field("qrCodeId").equal(code.getId())
                     .asList();
+            LOGGER.warning(existedIcons.size()+"");
             if (existedIcons.size() > 0) {
                 icon = existedIcons.get(0);
                 saveNewIcon(icon, code, icb);
