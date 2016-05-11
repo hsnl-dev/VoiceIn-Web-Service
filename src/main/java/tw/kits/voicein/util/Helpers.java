@@ -172,7 +172,7 @@ public class Helpers {
             ApnsService service
                     = APNS.newService()
                     .withCert(file.getAbsolutePath(), "hsnl33564")
-                    .withSandboxDestination()
+                    .withProductionDestination()
                     .build();
 
             String payload = APNS.newPayload().alertBody(content).build();
