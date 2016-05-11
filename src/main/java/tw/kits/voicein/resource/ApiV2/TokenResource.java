@@ -2,6 +2,8 @@ package tw.kits.voicein.resource.ApiV2;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
@@ -161,14 +163,18 @@ public class TokenResource {
         } else{
             return Response.status(Status.BAD_REQUEST).build();
         }
-
+        String token = Jwts.builder()
+                .setIssuer(Parameter.HOST_NAME)
+                .setSubject(user.getUserUuid())
+                .signWith(SignatureAlgorithm.HS256, Parameter.SECRET_KEY).compact();
+        
         if (validUser != null) {
             // issue new token
             Token tm = new Token(3600);
             // inject user to token collection
             tm.setUser(validUser);
             ds.save(tm);
-            TokenResBean res = new TokenResBean(tm.getTokenId());
+            TokenResBean res = new TokenResBean(token);
             LOGGER.info(res.getToken()+"==");
             res.setUserUuid(validUser.getUuid());
             return Response
