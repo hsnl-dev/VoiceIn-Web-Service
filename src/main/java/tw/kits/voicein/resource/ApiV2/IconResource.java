@@ -183,10 +183,19 @@ public class IconResource {
                 linkNewContact(code, icon);
             }
         } else {
-            icon = new Icon();
-            icon.setIconId(UUID.randomUUID().toString());
-            saveNewIcon(icon, code, icb);
-            linkNewContact(code, icon);
+            List<Icon> existedIcons = dsObj.createQuery(Icon.class)
+                    .field("phoneNumber").equal(code.getPhoneNumber())
+                    .field("qrCodeId").equal(code.getId())
+                    .asList();
+            if (existedIcons.size() > 0) {
+                icon = existedIcons.get(0);
+                saveNewIcon(icon, code, icb);
+            } else{
+                icon = new Icon();
+                icon.setIconId(UUID.randomUUID().toString());
+                saveNewIcon(icon, code, icb);
+                linkNewContact(code, icon);
+            }
         }
 
         LOGGER.info("add to user contact");
