@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.TimeZone;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -179,18 +178,17 @@ public class Helpers {
             String token = deviceToken;
             service.push(token, payload);
         } else {
-             Http http = new Http();
-             Headers headers = new Headers.Builder().add("Authorization", "key=AIzaSyD_SV6Nm12yXqGfIyU5Jt1qkihECJtUPbM").build();
-             GcmPayloadBean payload = new GcmPayloadBean();
-             payload.setTo(deviceToken);
-             payload.getData().setMessage(content);
-             ObjectMapper mapper = new ObjectMapper();
-             String payloadStr = mapper.writeValueAsString(payload);
-             LOGGER.warning(payloadStr);
-             Response res = http.postResponse("https://gcm-http.googleapis.com/gcm/send", payloadStr, headers);
-             LOGGER.warning(res.code()+"");
-             
-             
+            Http http = new Http();
+            Headers headers = new Headers.Builder().add("Authorization", "key=AIzaSyD_SV6Nm12yXqGfIyU5Jt1qkihECJtUPbM").build();
+            GcmPayloadBean payload = new GcmPayloadBean();
+            payload.setTo(deviceToken);
+            payload.getData().setMessage(content);
+            ObjectMapper mapper = new ObjectMapper();
+            String payloadStr = mapper.writeValueAsString(payload);
+            LOGGER.warning(payloadStr);
+            Response res = http.postResponse("https://gcm-http.googleapis.com/gcm/send", payloadStr, headers);
+            LOGGER.warning(res.code() + "");
+
         }
 
     }

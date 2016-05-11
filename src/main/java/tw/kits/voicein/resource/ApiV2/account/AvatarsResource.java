@@ -166,23 +166,22 @@ public class AvatarsResource {
             @QueryParam("size") String size) throws IOException {
         User u = dataStoreObject.createQuery(User.class).field("profilePhotoId").equal(uuid).get();
         if (u == null) {
-            
+
             return Response.status(Response.Status.NOT_FOUND).build();
-            
-        }else{
-            long time = u.getProfilePhotoLastModifiedTime()==null? -1: u.getProfilePhotoLastModifiedTime().getTime();
-            EntityTag tag = new EntityTag(time+"");
-            ResponseBuilder  responseBuild = request.evaluatePreconditions(tag);
-            if(responseBuild==null){
+
+        } else {
+            long time = u.getProfilePhotoLastModifiedTime() == null ? -1 : u.getProfilePhotoLastModifiedTime().getTime();
+            EntityTag tag = new EntityTag(time + "");
+            ResponseBuilder responseBuild = request.evaluatePreconditions(tag);
+            if (responseBuild == null) {
                 return Response.ok(getAvatar(uuid, size)).tag(tag).build();
-            }else{
+            } else {
                 return responseBuild.build();
-            
+
             }
-        
-            
+
         }
-        
+
     }
 
     private byte[] getAvatar(String avatarUuid, String size) throws IOException {
@@ -223,23 +222,23 @@ public class AvatarsResource {
             @Context Request request,
             @QueryParam("size") String size) throws IOException {
         User user = dataStoreObject.get(User.class, sc.getUserPrincipal().getName());
-        
+
         if (user == null) {
-            
+
             return Response.status(Response.Status.NOT_FOUND).build();
-            
-        }else{
-            long time = user.getProfilePhotoLastModifiedTime()==null? -1: user.getProfilePhotoLastModifiedTime().getTime();
-            EntityTag tag = new EntityTag(time+"");
-            ResponseBuilder  responseBuild = request.evaluatePreconditions(tag);
-            if(responseBuild==null){
+
+        } else {
+            long time = user.getProfilePhotoLastModifiedTime() == null ? -1 : user.getProfilePhotoLastModifiedTime().getTime();
+            EntityTag tag = new EntityTag(time + "");
+            ResponseBuilder responseBuild = request.evaluatePreconditions(tag);
+            if (responseBuild == null) {
                 return Response.ok(getAvatar(user.getProfilePhotoId(), size)).tag(tag).build();
-            }else{
+            } else {
                 return responseBuild.build();
-       
-            }  
+
+            }
         }
-        
+
     }
 
 }

@@ -55,8 +55,8 @@ public class AccountsResource {
     Datastore dataStoreObject = mongoManager.getDs();
 
     /**
-     * This API allows client to retrieve of logined user's  full informations. API By
-     * Calvin
+     * This API allows client to retrieve of logined user's full informations.
+     * API By Calvin
      *
      * @param uuid
      * @return User
@@ -89,7 +89,7 @@ public class AccountsResource {
     @TokenRequired
     public Response updateUserAccount(@PathParam("uuid") String uuid, @Valid User user) {
         User modifiedUser = dataStoreObject.get(User.class, context.getUserPrincipal().getName());
-        if(modifiedUser==null){
+        if (modifiedUser == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
         user.setUuid(uuid);
@@ -97,8 +97,8 @@ public class AccountsResource {
         user.setQrCodeUuid(modifiedUser.getQrCodeUuid());
 
         if (user.getDeviceOS() == null) {
-          user.setDeviceOS(modifiedUser.getDeviceOS());
-          user.setDeviceKey(modifiedUser.getDeviceKey());
+            user.setDeviceOS(modifiedUser.getDeviceOS());
+            user.setDeviceKey(modifiedUser.getDeviceKey());
         }
 
         user.setCredit(modifiedUser.getCredit());
