@@ -112,7 +112,7 @@ public class ContactsResource {
                 userContactBean.setEmail(provider.getEmail());
                 userContactBean.setJobTitle(provider.getJobTitle());
 
-                LOGGER.log(Level.CONFIG, "Provider is available: {0}", Helpers.isAllowedToCall(providerContact));
+                //LOGGER.log(Level.CONFIG, "Provider is available: {0}", Helpers.isAllowedToCall(providerContact));
                 userContactBean.setProviderIsEnable(Helpers.isAllowedToCall(providerContact));
                 userContactBean.setProfilePhotoId(provider.getProfilePhotoId());
                 if (providerContact.getIsHigherPriorityThanGlobal()) {
@@ -130,7 +130,7 @@ public class ContactsResource {
                 userContactBean.setPhoneNumber(icon.getPhoneNumber());
                 userContactBean.setEmail("尚未設定");
                 userContactBean.setJobTitle("尚未設定");
-                LOGGER.log(Level.CONFIG, "Icon is available: {0}", Helpers.isAllowedToCall(icon));
+                //LOGGER.log(Level.CONFIG, "Icon is available: {0}", Helpers.isAllowedToCall(icon));
                 userContactBean.setProviderIsEnable(Helpers.isAllowedToCall(icon));
                 userContactBean.setProviderAvailableEndTime(icon.getAvailableEndTime());
                 userContactBean.setProviderAvailableStartTime(icon.getAvailableStartTime());

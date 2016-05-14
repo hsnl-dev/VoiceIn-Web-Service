@@ -209,6 +209,7 @@ public class AvatarsResource {
      *
      * @param uuid
      * @param sc
+     * @param request
      * @param size
      * @return
      * @throws IOException
@@ -224,9 +225,7 @@ public class AvatarsResource {
         User user = dataStoreObject.get(User.class, sc.getUserPrincipal().getName());
 
         if (user == null) {
-
             return Response.status(Response.Status.NOT_FOUND).build();
-
         } else {
             long time = user.getProfilePhotoLastModifiedTime() == null ? -1 : user.getProfilePhotoLastModifiedTime().getTime();
             EntityTag tag = new EntityTag(time + "");
@@ -235,7 +234,6 @@ public class AvatarsResource {
                 return Response.ok(getAvatar(user.getProfilePhotoId(), size)).tag(tag).build();
             } else {
                 return responseBuild.build();
-
             }
         }
 
