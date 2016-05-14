@@ -138,9 +138,9 @@ public class Helpers {
         String availableStartTime;
         String availableEndTime;
         boolean enable;
-        ConsoleHandler consoleHandler = new ConsoleHandler();
-        consoleHandler.setLevel(Level.CONFIG);
-        LOGGER.addHandler(consoleHandler);
+        //ConsoleHandler consoleHandler = new ConsoleHandler();
+        //consoleHandler.setLevel(Level.CONFIG);
+        //LOGGER.addHandler(consoleHandler);
 
         availableStartTime = target.getAvailableStartTime();
         availableEndTime = target.getAvailableEndTime();
@@ -158,8 +158,9 @@ public class Helpers {
         boolean isAfter = currentTimeInString.compareTo(availableStartTime) >= 0;
         boolean isBefore = currentTimeInString.compareTo(availableEndTime) <= 0;
 
-        LOGGER.setLevel(Level.ALL);
-        LOGGER.log(Level.CONFIG, "{0} {1}", new Object[]{availableStartTime, availableEndTime});
+        //LOGGER.setLevel(Level.ALL);
+        //LOGGER.log(Level.CONFIG, "{0} {1}", new Object[]{availableStartTime, availableEndTime});
+        
         return (enable & isAfter & isBefore);
     }
 
