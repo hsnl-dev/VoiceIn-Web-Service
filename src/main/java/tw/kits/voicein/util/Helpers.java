@@ -64,9 +64,9 @@ public class Helpers {
     public static boolean isAllowedToCall(Contact contact) {
         String availableStartTime;
         String availableEndTime;
-        ConsoleHandler consoleHandler = new ConsoleHandler();
-        consoleHandler.setLevel(Level.CONFIG);
-        LOGGER.addHandler(consoleHandler);
+        //ConsoleHandler consoleHandler = new ConsoleHandler();
+        //consoleHandler.setLevel(Level.CONFIG);
+        //LOGGER.addHandler(consoleHandler);
 
         User provider = contact.getUser();
         boolean isEnable = contact.getIsEnable();
@@ -91,8 +91,8 @@ public class Helpers {
         boolean isAfter = currentTimeInString.compareTo(availableStartTime) >= 0;
         boolean isBefore = currentTimeInString.compareTo(availableEndTime) <= 0;
 
-        LOGGER.setLevel(Level.ALL);
-        LOGGER.log(Level.CONFIG, "{0} {1}", new Object[]{availableStartTime, availableEndTime});
+        //LOGGER.setLevel(Level.ALL);
+        //LOGGER.log(Level.CONFIG, "{0} {1}", new Object[]{availableStartTime, availableEndTime});
 
         return isEnable && isAfter && isBefore;
     }
