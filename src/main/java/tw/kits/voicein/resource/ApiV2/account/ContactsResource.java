@@ -85,8 +85,15 @@ public class ContactsResource {
                     contactList = dataStoreObject.find(Contact.class).field("user").equal(user).field("isLike").equal(Boolean.TRUE).asList();
                     break;
                 default:
-                    contactList = dataStoreObject.find(Contact.class).field("user").equal(user).asList();
-
+                    if (conditional == null || "false".equalsIgnoreCase(conditional)) {
+                      contactList = dataStoreObject.find(Contact.class).field("user").equal(user).asList();
+                    } else {
+                      Date lastContactGet = user.getLastContactGet();
+                      contactList = dataStoreObject.find(Contact.class).field("user").equal(user).filter("updateAt >=", lastContactGet).asList();
+                    }
+                    
+                    user.setLastContactGet(new Date());
+                    dataStoreObject.save(user);
             }
         } else {
             contactList = dataStoreObject.find(Contact.class).field("user").equal(user).asList();
