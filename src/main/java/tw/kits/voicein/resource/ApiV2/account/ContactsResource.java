@@ -86,17 +86,25 @@ public class ContactsResource {
                     break;
                 default:
                     if (conditional == null || "false".equalsIgnoreCase(conditional)) {
-                      contactList = dataStoreObject.find(Contact.class).field("user").equal(user).asList();
+                        contactList = dataStoreObject.find(Contact.class).field("user").equal(user).asList();
                     } else {
-                      Date lastContactGet = user.getLastContactGet();
-                      contactList = dataStoreObject.find(Contact.class).field("user").equal(user).filter("updateAt >=", lastContactGet).asList();
+                        Date lastContactGet = user.getLastContactGet();
+                        contactList = dataStoreObject.find(Contact.class).field("user").equal(user).filter("updateAt >=", lastContactGet).asList();
                     }
-                    
+
                     user.setLastContactGet(new Date());
                     dataStoreObject.save(user);
             }
         } else {
-            contactList = dataStoreObject.find(Contact.class).field("user").equal(user).asList();
+            if (conditional == null || "false".equalsIgnoreCase(conditional)) {
+                contactList = dataStoreObject.find(Contact.class).field("user").equal(user).asList();
+            } else {
+                Date lastContactGet = user.getLastContactGet();
+                contactList = dataStoreObject.find(Contact.class).field("user").equal(user).filter("updateAt >=", lastContactGet).asList();
+            }
+
+            user.setLastContactGet(new Date());
+            dataStoreObject.save(user);
         }
 
         initLogger();
@@ -300,7 +308,7 @@ public class ContactsResource {
         if (like != null) {
             modifiedContact.setIsLike(Boolean.parseBoolean(like));
         }
-        
+
         modifiedContact.setUpdateAt(new Date());
         dataStoreObject.save(modifiedContact);
         return Response.ok().build();
