@@ -1,5 +1,6 @@
 package tw.kits.voicein.model;
 
+import java.util.Date;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import org.bson.types.ObjectId;
@@ -35,11 +36,14 @@ public class Contact {
     private Icon customerIcon;
     private Boolean isHigherPriorityThanGlobal;
     private Boolean isLike;
+    private Date createAt;
+    private Date updateAt;
 
     public Contact() {
         this.isHigherPriorityThanGlobal = false;
-        this.availableEndTime = "23:59";
         this.availableStartTime = "00:00";
+        this.availableEndTime = "23:59";
+        this.createAt = new Date();
     }
 
     /**
@@ -208,6 +212,34 @@ public class Contact {
      */
     public void setIsLike(Boolean isLike) {
         this.isLike = isLike;
+    }
+
+    /**
+     * @return the createAt
+     */
+    public Date getCreateAt() {
+        return createAt;
+    }
+
+    /**
+     * @param createAt the createAt to set
+     */
+    public void setCreateAt(Date createAt) {
+        this.createAt = createAt;
+    }
+
+    /**
+     * @return the updateAt
+     */
+    public Date getUpdateAt() {
+        return updateAt;
+    }
+
+    /**
+     * @param updateAt the updateAt to set
+     */
+    public void setUpdateAt(Date updateAt) {
+        this.updateAt = updateAt;
     }
 
 }

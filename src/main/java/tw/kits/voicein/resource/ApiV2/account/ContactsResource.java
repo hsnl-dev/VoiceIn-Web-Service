@@ -3,6 +3,7 @@ package tw.kits.voicein.resource.ApiV2.account;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -290,7 +291,8 @@ public class ContactsResource {
         if (like != null) {
             modifiedContact.setIsLike(Boolean.parseBoolean(like));
         }
-
+        
+        modifiedContact.setUpdateAt(new Date());
         dataStoreObject.save(modifiedContact);
         return Response.ok().build();
     }
