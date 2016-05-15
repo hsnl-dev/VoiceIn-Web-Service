@@ -42,7 +42,7 @@ public class User {
     private String deviceKey;
     
     private float credit;
-    
+    private Date lastContactGet;
 
     /**
      * @param uuid the uuid to set
@@ -299,5 +299,19 @@ public class User {
      */
     public void setProfilePhotoLastModifiedTime(Date profilePhotoLastModifiedTime) {
         this.profilePhotoLastModifiedTime = profilePhotoLastModifiedTime;
+    }
+
+    /**
+     * @return the lastContactGet
+     */
+    public Date getLastContactGet() {
+        return lastContactGet;
+    }
+
+    /**
+     * @param lastContactGet the lastContactGet to set
+     */
+    public void setLastContactGet(Date lastContactGet) {
+        this.lastContactGet = lastContactGet;
     }
 }

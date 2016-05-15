@@ -61,6 +61,7 @@ public class ContactsResource {
      *
      * @param uuid
      * @param filter
+     * @param conditional
      * @return
      */
     @GET
@@ -70,7 +71,8 @@ public class ContactsResource {
     @TokenRequired
     public Response getContactListOfAnUser(
             @PathParam("uuid") String uuid,
-            @QueryParam("filter") String filter
+            @QueryParam("filter") String filter,
+            @QueryParam("conditional") String conditional
     ) {
         User user = dataStoreObject.get(User.class, uuid);
 

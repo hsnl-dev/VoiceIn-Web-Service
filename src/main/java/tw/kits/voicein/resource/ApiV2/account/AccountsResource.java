@@ -92,18 +92,9 @@ public class AccountsResource {
         if (modifiedUser == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
+        
         user.setUuid(uuid);
-        user.setProfilePhotoId(modifiedUser.getProfilePhotoId());
-        user.setQrCodeUuid(modifiedUser.getQrCodeUuid());
-
-        if (user.getDeviceOS() == null) {
-            user.setDeviceOS(modifiedUser.getDeviceOS());
-            user.setDeviceKey(modifiedUser.getDeviceKey());
-        }
-
-        user.setCredit(modifiedUser.getCredit());
-
-        dataStoreObject.save(user);
+        dataStoreObject.merge(user);
 
         LOGGER.log(Level.CONFIG, "Update User u{0}", user);
         return Response.ok().build();
