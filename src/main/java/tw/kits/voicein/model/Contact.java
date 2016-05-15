@@ -44,6 +44,7 @@ public class Contact {
         this.availableStartTime = "00:00";
         this.availableEndTime = "23:59";
         this.createAt = new Date();
+        this.updateAt = new Date();
     }
 
     /**
