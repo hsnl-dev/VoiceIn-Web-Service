@@ -94,6 +94,7 @@ public class AccountsResource {
         }
         
         user.setUuid(uuid);
+        user.setCredit(modifiedUser.getCredit());
         dataStoreObject.merge(user);
 
         LOGGER.log(Level.CONFIG, "Update User u{0}", user);
