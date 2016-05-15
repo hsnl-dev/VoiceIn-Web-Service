@@ -231,8 +231,10 @@ public class AvatarsResource {
             EntityTag tag = new EntityTag(time + "");
             ResponseBuilder responseBuild = request.evaluatePreconditions(tag);
             if (responseBuild == null) {
+                LOGGER.info("Return avatar image data.");
                 return Response.ok(getAvatar(user.getProfilePhotoId(), size)).tag(tag).build();
             } else {
+                LOGGER.info("Return 304.");
                 return responseBuild.build();
             }
         }
