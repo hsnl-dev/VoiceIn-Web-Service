@@ -1,6 +1,7 @@
 package tw.kits.voicein.resource.ApiV2;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -135,21 +136,29 @@ public class IconResource {
     @Path("/icons/{iconId}")
     public Response updateIcon(@PathParam("iconId") String uuid, IconUpdateBean iub) {
         Icon icon = dsObj.get(Icon.class, uuid);
+        Contact providerContact = dsObj.createQuery(Contact.class).field("user").equal(icon.getProvider())
+                .field("customerIcon").equal(icon).get();
+
         if (icon == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+        
         if (iub.getName() != null) {
             icon.setName(iub.getName());
         }
+        
         if (iub.getPhoneNumber() != null) {
             icon.setPhoneNumber(iub.getPhoneNumber());
         }
+        
         icon.setAvailableEndTime(iub.getAvailableEndTime());
         icon.setAvailableStartTime(iub.getAvailableStartTime());
         icon.setCompany(iub.getCompany());
         icon.setIsEnable(iub.getIsEnable());
         icon.setLocation(iub.getLocation());
-        dsObj.save(icon);
+        
+        providerContact.setUpdateAt(new Date());
+        dsObj.save(icon, providerContact);
         return Response.ok().build();
     }
 
