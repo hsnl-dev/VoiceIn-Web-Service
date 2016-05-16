@@ -11,6 +11,9 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import com.notnoop.apns.APNS;
 import com.notnoop.apns.ApnsService;
+import com.notnoop.exceptions.InvalidSSLConfig;
+import com.notnoop.exceptions.NetworkIOException;
+import com.notnoop.exceptions.RuntimeIOException;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -93,7 +96,6 @@ public class Helpers {
 
         //LOGGER.setLevel(Level.ALL);
         //LOGGER.log(Level.CONFIG, "{0} {1}", new Object[]{availableStartTime, availableEndTime});
-
         return isEnable && isAfter && isBefore;
     }
 
@@ -160,7 +162,6 @@ public class Helpers {
 
         //LOGGER.setLevel(Level.ALL);
         //LOGGER.log(Level.CONFIG, "{0} {1}", new Object[]{availableStartTime, availableEndTime});
-        
         return (enable & isAfter & isBefore);
     }
 
@@ -169,15 +170,20 @@ public class Helpers {
             // Push notification to the caller.
             ClassLoader classLoader = Helpers.class.getClassLoader();
             File file = new File(classLoader.getResource("apn-key.p12").getFile());
-            ApnsService service
-                    = APNS.newService()
-                    .withCert(file.getAbsolutePath(), "hsnl33564")
-                    .withProductionDestination()
-                    .build();
 
-            String payload = APNS.newPayload().alertBody(content).build();
-            String token = deviceToken;
-            service.push(token, payload);
+            try {
+                ApnsService service
+                        = APNS.newService()
+                        .withCert(file.getAbsolutePath(), "hsnl33564")
+                        .withProductionDestination()
+                        .build();
+                String payload = APNS.newPayload().alertBody(content).build();
+                String token = deviceToken;
+                service.push(token, payload);
+            } catch (RuntimeIOException | InvalidSSLConfig | NetworkIOException e) {
+                System.out.print(e);
+            }
+
         } else {
             Http http = new Http();
             Headers headers = new Headers.Builder().add("Authorization", "key=AIzaSyD_SV6Nm12yXqGfIyU5Jt1qkihECJtUPbM").build();
