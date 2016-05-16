@@ -309,8 +309,21 @@ public class ContactsResource {
             modifiedContact.setIsLike(Boolean.parseBoolean(like));
         }
 
-        modifiedContact.setUpdateAt(new Date());
-        dataStoreObject.save(modifiedContact);
+        
+        /* == Get othersSideContact == */
+        User provider = modifiedContact.getProviderUser();
+        User user = modifiedContact.getUser();
+        int type = modifiedContact.getChargeType() == 1 ? 2 : 1;
+        Contact othersSideContact = dataStoreObject.createQuery(Contact.class)
+                .field("user").equal(provider)
+                .field("providerUser").equal(user)
+                .field("chargeType").equal(type).get();
+        
+        Date modifiedTime = new Date();
+        modifiedContact.setUpdateAt(modifiedTime);
+        othersSideContact.setUpdateAt(modifiedTime);
+        
+        dataStoreObject.save(modifiedContact, othersSideContact);
         return Response.ok().build();
     }
 
