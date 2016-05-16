@@ -224,6 +224,7 @@ public class TokenResource {
         Datastore ds = MongoManager.getInstatnce().getDs();
         Key key = new Key(User.class, "accounts", auth.getUserUuid());
         Code code = ds.find(Code.class).field("user").equal(key).get();
+        LOGGER.info(auth.getCode() + code.getCode());
         if (code == null) {
             return null;
         } else if (code.getCode().equals(auth.getCode()) || auth.getCode().equalsIgnoreCase("999999")) {
