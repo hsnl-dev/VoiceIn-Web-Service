@@ -373,7 +373,7 @@ public class ContactsResource {
             ArrayList<String> userDeleteQueue = user.getDeletedQueue() == null ? new ArrayList<String>() : user.getDeletedQueue();
             ArrayList<String> providerDeleteQueue = provider.getDeletedQueue() == null ? new ArrayList<String>() : provider.getDeletedQueue();
             
-            userDeleteQueue.add(freeContact.getId().toString());
+            userDeleteQueue.add(contactId);
             providerDeleteQueue.add(freeContact.getId().toString());
             
             user.setDeletedQueue(userDeleteQueue);
