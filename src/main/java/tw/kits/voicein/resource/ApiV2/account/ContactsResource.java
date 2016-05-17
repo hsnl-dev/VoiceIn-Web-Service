@@ -169,7 +169,14 @@ public class ContactsResource {
 
             userList.add(userContactBean);
         }
-
+        
+        ArrayList<String> deletedQueue = user.getDeletedQueue();
+        for (String deletedContactId : deletedQueue) {
+            userContactBean = new UserContactBean();
+            userContactBean.setId(deletedContactId);
+            userList.add(userContactBean);
+        }
+        
         return Response.ok(userList).build();
     }
 
@@ -238,12 +245,10 @@ public class ContactsResource {
             notification.setContactId(contact.getId().toString());
             dataStoreObject.save(notification);
 
-            Helpers helper = new Helpers();
-
             if ("ios".equalsIgnoreCase(provider.getDeviceOS())) {
-                helper.pushNotification(owner.getUserName() + " 已經加入您為聯絡人", "ios", provider.getDeviceKey());
+                Helpers.pushNotification(owner.getUserName() + " 已經加入您為聯絡人", "ios", provider.getDeviceKey());
             } else {
-                helper.pushNotification(owner.getUserName() + " 已經加入您為聯絡人", "android", provider.getDeviceKey());
+                Helpers.pushNotification(owner.getUserName() + " 已經加入您為聯絡人", "android", provider.getDeviceKey());
             }
 
             return Response.ok().build();
@@ -309,7 +314,6 @@ public class ContactsResource {
             modifiedContact.setIsLike(Boolean.parseBoolean(like));
         }
 
-        
         /* == Get othersSideContact == */
         User provider = modifiedContact.getProviderUser();
         User user = modifiedContact.getUser();
@@ -318,11 +322,11 @@ public class ContactsResource {
                 .field("user").equal(provider)
                 .field("providerUser").equal(user)
                 .field("chargeType").equal(type).get();
-        
+
         Date modifiedTime = new Date();
         modifiedContact.setUpdateAt(modifiedTime);
         othersSideContact.setUpdateAt(modifiedTime);
-        
+
         dataStoreObject.save(modifiedContact, othersSideContact);
         return Response.ok().build();
     }
@@ -347,7 +351,7 @@ public class ContactsResource {
 
         if (payContact.getChargeType() != ContactConstant.TYPE_ICON) {
             Contact freeContact = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", provider).get();
-            LOGGER.info("ssss" + freeContact.getId().toString());
+            LOGGER.log(Level.INFO, "Delete contact - {0}", freeContact.getId().toString());
             List<String> contacts = Arrays.asList(freeContact.getId().toString(), payContact.getId().toString());
             List<Group> groupList = query.field("contacts").hasAnyOf(contacts).asList();
 
@@ -356,6 +360,11 @@ public class ContactsResource {
                 group.getContacts().remove(freeContact.getId().toString());
                 dataStoreObject.save(group);
             }
+            ArrayList<String> deleteQueue = provider.getDeletedQueue();
+            deleteQueue.add(freeContact.getId().toString());
+            provider.setDeletedQueue(deleteQueue);
+            
+            dataStoreObject.save(provider);
             dataStoreObject.delete(freeContact);
 
         } else {
