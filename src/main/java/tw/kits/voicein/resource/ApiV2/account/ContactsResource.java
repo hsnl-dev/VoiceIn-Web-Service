@@ -353,6 +353,7 @@ public class ContactsResource {
         Contact payContact = dataStoreObject.get(Contact.class, new ObjectId(contactId));
 
         User provider = payContact.getProviderUser();
+        User user = payContact.getUser();
         String qrCodeUuid = payContact.getQrCodeUuid();
         Query<Group> query = dataStoreObject.createQuery(Group.class);
 
@@ -367,11 +368,18 @@ public class ContactsResource {
                 group.getContacts().remove(freeContact.getId().toString());
                 dataStoreObject.save(group);
             }
-            ArrayList<String> deleteQueue = provider.getDeletedQueue() == null ? new ArrayList<String>() : provider.getDeletedQueue();
-            deleteQueue.add(freeContact.getId().toString());
-            provider.setDeletedQueue(deleteQueue);
+            
+            /** add deleted contacts to the queue **/
+            ArrayList<String> userDeleteQueue = user.getDeletedQueue() == null ? new ArrayList<String>() : user.getDeletedQueue();
+            ArrayList<String> providerDeleteQueue = provider.getDeletedQueue() == null ? new ArrayList<String>() : provider.getDeletedQueue();
+            
+            userDeleteQueue.add(freeContact.getId().toString());
+            providerDeleteQueue.add(freeContact.getId().toString());
+            
+            user.setDeletedQueue(userDeleteQueue);
+            provider.setDeletedQueue(providerDeleteQueue);
 
-            dataStoreObject.save(provider);
+            dataStoreObject.save(provider, user);
             dataStoreObject.delete(freeContact);
 
         } else {
