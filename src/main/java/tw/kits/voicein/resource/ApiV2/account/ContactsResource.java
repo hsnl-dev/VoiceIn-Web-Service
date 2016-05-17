@@ -318,7 +318,8 @@ public class ContactsResource {
 
         /* == Get othersSideContact == */
         User provider = modifiedContact.getProviderUser();
-
+        Date modifiedTime = new Date();
+        
         if (provider != null) {
             /* Its not icon on the other side. */
             User user = modifiedContact.getUser();
@@ -328,7 +329,6 @@ public class ContactsResource {
                     .field("providerUser").equal(user)
                     .field("chargeType").equal(type).get();
 
-            Date modifiedTime = new Date();
             modifiedContact.setUpdateAt(modifiedTime);
             othersSideContact.setUpdateAt(modifiedTime);
             dataStoreObject.save(othersSideContact);
