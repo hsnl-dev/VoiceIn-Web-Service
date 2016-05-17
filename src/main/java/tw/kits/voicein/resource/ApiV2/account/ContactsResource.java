@@ -329,11 +329,11 @@ public class ContactsResource {
                     .field("providerUser").equal(user)
                     .field("chargeType").equal(type).get();
 
-            modifiedContact.setUpdateAt(modifiedTime);
             othersSideContact.setUpdateAt(modifiedTime);
             dataStoreObject.save(othersSideContact);
         }
         
+        modifiedContact.setUpdateAt(modifiedTime);
         dataStoreObject.save(modifiedContact);
         return Response.ok().build();
     }
