@@ -103,9 +103,9 @@ public class ContactsResource {
                 Date lastContactGet = user.getLastContactGet();
                 contactList = dataStoreObject.find(Contact.class).field("user").equal(user).filter("updateAt >=", lastContactGet).asList();
             }
-            
+
             ArrayList<String> deletedQueue = user.getDeletedQueue();
-        
+
             if (deletedQueue != null) {
                 for (String deletedContactId : deletedQueue) {
                     userContactBean = new UserContactBean();
@@ -122,7 +122,7 @@ public class ContactsResource {
         initLogger();
 
         LOGGER.log(Level.CONFIG, "Contact Length {0}", contactList.size());
-        
+
         for (Contact contact : contactList) {
             userContactBean = new UserContactBean();
             User provider = contact.getProviderUser();
@@ -178,7 +178,7 @@ public class ContactsResource {
 
             userList.add(userContactBean);
         }
-        
+
         return Response.ok(userList).build();
     }
 
@@ -318,18 +318,23 @@ public class ContactsResource {
 
         /* == Get othersSideContact == */
         User provider = modifiedContact.getProviderUser();
-        User user = modifiedContact.getUser();
-        int type = modifiedContact.getChargeType() == 1 ? 2 : 1;
-        Contact othersSideContact = dataStoreObject.createQuery(Contact.class)
-                .field("user").equal(provider)
-                .field("providerUser").equal(user)
-                .field("chargeType").equal(type).get();
 
-        Date modifiedTime = new Date();
-        modifiedContact.setUpdateAt(modifiedTime);
-        othersSideContact.setUpdateAt(modifiedTime);
+        if (provider != null) {
+            /* Its not icon on the other side. */
+            User user = modifiedContact.getUser();
+            int type = modifiedContact.getChargeType() == 1 ? 2 : 1;
+            Contact othersSideContact = dataStoreObject.createQuery(Contact.class)
+                    .field("user").equal(provider)
+                    .field("providerUser").equal(user)
+                    .field("chargeType").equal(type).get();
 
-        dataStoreObject.save(modifiedContact, othersSideContact);
+            Date modifiedTime = new Date();
+            modifiedContact.setUpdateAt(modifiedTime);
+            othersSideContact.setUpdateAt(modifiedTime);
+            dataStoreObject.save(othersSideContact);
+        }
+        
+        dataStoreObject.save(modifiedContact);
         return Response.ok().build();
     }
 
@@ -365,7 +370,7 @@ public class ContactsResource {
             ArrayList<String> deleteQueue = provider.getDeletedQueue() == null ? new ArrayList<String>() : provider.getDeletedQueue();
             deleteQueue.add(freeContact.getId().toString());
             provider.setDeletedQueue(deleteQueue);
-            
+
             dataStoreObject.save(provider);
             dataStoreObject.delete(freeContact);
 
