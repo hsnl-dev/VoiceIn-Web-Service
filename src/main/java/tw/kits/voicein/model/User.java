@@ -1,6 +1,7 @@
 package tw.kits.voicein.model;
 
 import com.google.i18n.phonenumbers.NumberParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,6 +43,7 @@ public class User {
     private String deviceKey;
     
     private float credit;
+    private ArrayList<String> deletedQueue;
     private Date lastContactGet;
 
     /**
@@ -313,5 +315,19 @@ public class User {
      */
     public void setLastContactGet(Date lastContactGet) {
         this.lastContactGet = lastContactGet;
+    }
+
+    /**
+     * @return the deletedQueue
+     */
+    public ArrayList<String> getDeletedQueue() {
+        return deletedQueue;
+    }
+
+    /**
+     * @param deletedQueue the deletedQueue to set
+     */
+    public void setDeletedQueue(ArrayList<String> deletedQueue) {
+        this.deletedQueue = deletedQueue;
     }
 }
