@@ -75,7 +75,8 @@ public class ContactsResource {
             @QueryParam("conditional") String conditional
     ) {
         User user = dataStoreObject.get(User.class, uuid);
-
+        UserContactBean userContactBean;
+        List<UserContactBean> userList = new ArrayList();
         // Return the contact you like or not.
         List<Contact> contactList = null;
 
@@ -102,6 +103,16 @@ public class ContactsResource {
                 Date lastContactGet = user.getLastContactGet();
                 contactList = dataStoreObject.find(Contact.class).field("user").equal(user).filter("updateAt >=", lastContactGet).asList();
             }
+            
+            ArrayList<String> deletedQueue = user.getDeletedQueue();
+        
+            if (deletedQueue != null) {
+                for (String deletedContactId : deletedQueue) {
+                    userContactBean = new UserContactBean();
+                    userContactBean.setId(deletedContactId);
+                    userList.add(userContactBean);
+                }
+            }
 
             user.setLastContactGet(new Date());
             dataStoreObject.save(user);
@@ -110,10 +121,7 @@ public class ContactsResource {
         initLogger();
 
         LOGGER.log(Level.CONFIG, "Contact Length {0}", contactList.size());
-
-        List<UserContactBean> userList = new ArrayList();
-        UserContactBean userContactBean;
-
+        
         for (Contact contact : contactList) {
             userContactBean = new UserContactBean();
             User provider = contact.getProviderUser();
@@ -167,13 +175,6 @@ public class ContactsResource {
             userContactBean.setId(contact.getId().toString());
             userContactBean.setIsHigherPriorityThanGlobal(contact.getIsHigherPriorityThanGlobal());
 
-            userList.add(userContactBean);
-        }
-        
-        ArrayList<String> deletedQueue = user.getDeletedQueue();
-        for (String deletedContactId : deletedQueue) {
-            userContactBean = new UserContactBean();
-            userContactBean.setId(deletedContactId);
             userList.add(userContactBean);
         }
         
