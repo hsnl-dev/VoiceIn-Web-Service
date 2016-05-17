@@ -361,7 +361,7 @@ public class ContactsResource {
                 group.getContacts().remove(freeContact.getId().toString());
                 dataStoreObject.save(group);
             }
-            ArrayList<String> deleteQueue = provider.getDeletedQueue();
+            ArrayList<String> deleteQueue = provider.getDeletedQueue() == null ? new ArrayList<String>() : provider.getDeletedQueue();
             deleteQueue.add(freeContact.getId().toString());
             provider.setDeletedQueue(deleteQueue);
             
