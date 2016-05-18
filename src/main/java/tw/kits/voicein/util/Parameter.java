@@ -11,7 +11,7 @@ public interface Parameter {
     public static final AWSCredentials AWS_CREDENTIALS = new BasicAWSCredentials("AKIAI4RNBMGTLTP6HWFQ", "bKOJ+9emilF2cZIK+44bRBoRHpPxyJmfc7y+VpFe");
     public static final String DB_NAME = System.getenv("DB_NAME") == null ? "voicein" : System.getenv("DB_NAME");
     public final static String DB_URI = System.getenv("DB_URI") == null ? "mongodb://hsnl-dev:hsnl33564hsnl33564@ds013908.mongolab.com:13908/voicein" : System.getenv("DB_URI");
-    public static final Boolean IS_SANDBOX = false;
+    public static final Boolean IS_SANDBOX = !"false".equals(System.getenv("IS_SANDBOX"));
     public static final String WEB_SITE_QRCODE= "https://voice-in.herokuapp.com/qrcode?id=";
     public static final String HOST_NAME = "https://voicein.herokuapp.com/";
     public static final String SECRET_KEY = "RYlvpRyzJMLlR5vpXKnn";
