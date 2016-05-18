@@ -31,7 +31,7 @@ import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.Icon;
 import tw.kits.voicein.model.Record;
 import tw.kits.voicein.model.User;
-import static tw.kits.voicein.util.Parameter.IS_SANDBOX;
+import static tw.kits.voicein.util.Parameter.IS_APS_SANDBOX;
 
 /**
  *
@@ -173,7 +173,7 @@ public class Helpers {
             try {
                 ApnsService service = null;
 
-                if (!IS_SANDBOX) {
+                if (!IS_APS_SANDBOX) {
                     File productionFile = new File(classLoader.getResource("apn-key.p12").getFile());
                     service = APNS.newService()
                             .withCert(productionFile.getAbsolutePath(), "hsnl33564")
