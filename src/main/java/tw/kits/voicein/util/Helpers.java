@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.core.SecurityContext;
@@ -32,6 +31,7 @@ import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.Icon;
 import tw.kits.voicein.model.Record;
 import tw.kits.voicein.model.User;
+import static tw.kits.voicein.util.Parameter.IS_SANDBOX;
 
 /**
  *
@@ -169,14 +169,24 @@ public class Helpers {
         if (os.equalsIgnoreCase("ios")) {
             // Push notification to the caller.
             ClassLoader classLoader = Helpers.class.getClassLoader();
-            File file = new File(classLoader.getResource("apn-key.p12").getFile());
 
             try {
-                ApnsService service
-                        = APNS.newService()
-                        .withCert(file.getAbsolutePath(), "hsnl33564")
-                        .withProductionDestination()
-                        .build();
+                ApnsService service = null;
+
+                if (!IS_SANDBOX) {
+                    File productionFile = new File(classLoader.getResource("apn-key.p12").getFile());
+                    service = APNS.newService()
+                            .withCert(productionFile.getAbsolutePath(), "hsnl33564")
+                            .withProductionDestination()
+                            .build();
+                } else {
+                    File sandboxFile = new File(classLoader.getResource("apn-key-dev.p12").getFile());
+                    service = APNS.newService()
+                            .withCert(sandboxFile.getAbsolutePath(), "hsnl33564")
+                            .withSandboxDestination()
+                            .build();
+                }
+
                 String payload = APNS.newPayload().alertBody(content).build();
                 String token = deviceToken;
                 service.push(token, payload);
