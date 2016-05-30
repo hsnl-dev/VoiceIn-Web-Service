@@ -13,8 +13,8 @@ public class Parameter {
     public final static String DB_URI = Parameter.getParameter("DB_URI","mongodb://hsnl-dev:hsnl33564hsnl33564@ds013908.mongolab.com:13908/voicein");
     public static final Boolean IS_SANDBOX = !"false".equals(Parameter.getParameter("IS_SANDBOX","true"));
     public static final Boolean IS_APS_SANDBOX = !"false".equals(Parameter.getParameter("IS_APS_SANDBOX","true"));
-    public static final String WEB_SITE_QRCODE= "https://voice-in.herokuapp.com/qrcode?id=";
-    public static final String HOST_NAME = "https://voicein.herokuapp.com/";
+    public static final String HOST_NAME = Parameter.getParameter("WEB_HOST_NAME","https://voicein.herokuapp.com/");
+    public static final String WEB_SITE_QRCODE= HOST_NAME+"qrcode?id=";
 
     public static final String SECRET_KEY = "RYlvpRyzJMLlR5vpXKnn";
     public static String getParameter(String key,String defaultValue){
