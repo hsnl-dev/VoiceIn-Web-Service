@@ -24,7 +24,6 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
-import org.glassfish.jersey.internal.Errors.ErrorMessage;
 import org.mongodb.morphia.query.Query;
 import tw.kits.voicein.bean.DeviceBean;
 import tw.kits.voicein.bean.ErrorMessageBean;
@@ -59,6 +58,7 @@ public class AccountsResource {
      * API By Calvin
      *
      * @param uuid
+     * @param field
      * @return User
      */
     @GET
@@ -66,13 +66,30 @@ public class AccountsResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @TokenRequired
-    public Response getUserAccount(@PathParam("uuid") String uuid) {
+    public Response getUserAccount(
+            @PathParam("uuid") String uuid,
+            @QueryParam("field") String field
+    ) {
         User user = dataStoreObject.get(User.class, context.getUserPrincipal().getName());
+
         if (user == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
+        
         LOGGER.log(Level.CONFIG, "Get User u{0}", uuid);
-        return Response.ok(user).build();
+
+        if (field != null) {
+            switch (field) {
+                case "credit":
+                    HashMap<String, Object> res = new HashMap<>();
+                    res.put("credit", user.getCredit());
+                    return Response.ok(res).build();
+                default:
+                    return Response.ok(user).build();
+            }
+        } else {
+            return Response.ok(user).build();
+        }
     }
 
     /**
@@ -92,7 +109,7 @@ public class AccountsResource {
         if (modifiedUser == null) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        
+
         user.setUuid(uuid);
         user.setCredit(modifiedUser.getCredit());
         dataStoreObject.merge(user);
