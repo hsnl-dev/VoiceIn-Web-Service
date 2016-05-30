@@ -11,7 +11,7 @@ public class Parameter {
     public static final AWSCredentials AWS_CREDENTIALS = new BasicAWSCredentials("AKIAI4RNBMGTLTP6HWFQ", "bKOJ+9emilF2cZIK+44bRBoRHpPxyJmfc7y+VpFe");
     public static final String DB_NAME = Parameter.getParameter("DB_NAME","voicein");
     public final static String DB_URI = Parameter.getParameter("DB_URI","mongodb://hsnl-dev:hsnl33564hsnl33564@ds013908.mongolab.com:13908/voicein");
-    public static final Boolean IS_SANDBOX = !"false".equals(Parameter.getParameter("IS_APS_SANDBOX","true"));
+    public static final Boolean IS_SANDBOX = !"false".equals(Parameter.getParameter("IS_SANDBOX","true"));
     public static final Boolean IS_APS_SANDBOX = !"false".equals(Parameter.getParameter("IS_APS_SANDBOX","true"));
     public static final String WEB_SITE_QRCODE= "https://voice-in.herokuapp.com/qrcode?id=";
     public static final String HOST_NAME = "https://voicein.herokuapp.com/";
