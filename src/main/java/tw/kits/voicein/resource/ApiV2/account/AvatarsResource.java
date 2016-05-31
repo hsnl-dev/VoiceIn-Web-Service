@@ -115,7 +115,7 @@ public class AvatarsResource {
                 s3client.putObject(
                         new PutObjectRequest(
                                 "voice-in",
-                                "userPhotos/" + onefile.getName(),
+                                Parameter.S3_AVATAR_FOLDER+"/" + onefile.getName(),
                                 onefile
                         )
                 );
@@ -198,7 +198,7 @@ public class AvatarsResource {
         } else {
             imgSize = AVATAR_SMALL;
         }
-        String file = String.format("userPhotos/%s-%d.jpg", avatarUuid, imgSize);
+        String file = String.format("%s/%s-%d.jpg",Parameter.S3_AVATAR_FOLDER, avatarUuid, imgSize);
         GetObjectRequest request = new GetObjectRequest(s3Bucket, file);
         S3Object object = s3Client.getObject(request);
         return IOUtils.toByteArray(object.getObjectContent());

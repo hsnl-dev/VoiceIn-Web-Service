@@ -115,7 +115,7 @@ public class QRcodesResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         String s3Bucket = "voice-in";
-        String file = String.format("qrCode/%s.png", user.getQrCodeUuid());
+        String file = String.format("%s/%s.png", Parameter.S3_QR_CODE_FOLDER ,user.getQrCodeUuid());
         GetObjectRequest request = new GetObjectRequest(s3Bucket, file);
         S3Object object = s3Client.getObject(request);
         qrCodeData = IOUtils.toByteArray(object.getObjectContent());
@@ -151,7 +151,7 @@ public class QRcodesResource {
 
         String s3Bucket = "voice-in";
         String qrCodeUuid = UUID.randomUUID().toString();
-        String s3FilePath = String.format("qrCode/%s.png", qrCodeUuid);
+        String s3FilePath = String.format("%s/%s.png",Parameter.S3_QR_CODE_FOLDER, qrCodeUuid);
 
         // Generate QRCode Image and Upload to S3.
         File qrCodeImage = QRCode.from(Parameter.WEB_SITE_QRCODE + qrCodeUuid).to(ImageType.PNG).withSize(250, 250).file();
@@ -257,7 +257,7 @@ public class QRcodesResource {
 
         String s3Bucket = "voice-in";
         String qrCodeUuid = UUID.randomUUID().toString();
-        String s3FilePath = String.format("qrCode/%s.png", qrCodeUuid);
+        String s3FilePath = String.format("%s/%s.png",Parameter.S3_QR_CODE_FOLDER, qrCodeUuid);
 
         // Generate QRCode Image and Upload to S3.
         File qrCodeImage = QRCode.from(Parameter.WEB_SITE_QRCODE + qrCodeUuid).to(ImageType.PNG).withSize(250, 250).file();
@@ -303,7 +303,7 @@ public class QRcodesResource {
         }
 
         String s3Bucket = "voice-in";
-        String s3FilePath = String.format("qrCode/%s.png", code.getId());
+        String s3FilePath = String.format("%s/%s.png", Parameter.S3_QR_CODE_FOLDER,code.getId());
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
         s3Client.deleteObject(s3Bucket, s3FilePath);
         dataStoreObject.delete(code);
@@ -335,7 +335,7 @@ public class QRcodesResource {
         }
         AmazonS3 s3Client = new AmazonS3Client(Parameter.AWS_CREDENTIALS);
         String s3Bucket = "voice-in";
-        String file = String.format("qrCode/%s.png", uuid);
+        String file = String.format("%s/%s.png",Parameter.S3_QR_CODE_FOLDER, uuid);
         GetObjectRequest request = new GetObjectRequest(s3Bucket, file);
         S3Object object = s3Client.getObject(request);
         qrCodeData = IOUtils.toByteArray(object.getObjectContent());
