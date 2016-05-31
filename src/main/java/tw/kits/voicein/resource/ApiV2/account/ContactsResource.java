@@ -359,7 +359,6 @@ public class ContactsResource {
 
         if (payContact.getChargeType() != ContactConstant.TYPE_ICON) {
             Contact freeContact = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", provider).get();
-            LOGGER.log(Level.INFO, "Delete contact - {0}", freeContact.getId().toString());
             List<String> contacts = Arrays.asList(freeContact.getId().toString(), payContact.getId().toString());
             List<Group> groupList = query.field("contacts").hasAnyOf(contacts).asList();
 

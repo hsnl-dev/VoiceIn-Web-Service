@@ -72,7 +72,13 @@ public class GroupsResource {
 
             groupEntity.put("groupName", group.getGroupName());
             groupEntity.put("groupId", group.getId().toString());
-            groupEntity.put("contactCount", group.getContacts().size());
+            
+            if (group.getContacts() != null) {
+                groupEntity.put("contactCount", group.getContacts().size());   
+            } else {
+                groupEntity.put("contactCount", 0);   
+            }
+            
             groupsEntities.add(groupEntity);
         }
 

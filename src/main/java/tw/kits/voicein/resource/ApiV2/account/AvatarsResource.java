@@ -89,7 +89,8 @@ public class AvatarsResource {
         String tmpDir = System.getProperty("java.io.tmpdir");
         String photoUuid = UUID.randomUUID().toString();
         String photoBaseName = tmpDir + File.separator + photoUuid;
-        ArrayList<File> files = new ArrayList<File>();
+        ArrayList<File> files = new ArrayList<>();
+
         int[] imageSizes = {AVATAR_LARGE, AVATAR_MID, AVATAR_SMALL};
         try {
             BufferedImage bri = ImageIO.read(fileInputStream);
@@ -120,6 +121,7 @@ public class AvatarsResource {
                         )
                 );
             }
+            
             if (oldId != null) {
                 //delete old
                 for (int size : imageSizes) {
@@ -128,6 +130,7 @@ public class AvatarsResource {
 
                 }
             }
+            
             LOGGER.log(Level.INFO, String.format("file update" + "ok" + tmpDir + "/" + photoUuid));
             UpdateOperations<User> upo = dataStoreObject
                     .createUpdateOperations(User.class)
