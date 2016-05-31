@@ -18,6 +18,7 @@ public class Parameter {
     public static final String S3_QR_CODE_FOLDER = Parameter.getParameter("S3_QR_CODE_FOLDER","qrCode");
     public static final String S3_AVATAR_FOLDER = Parameter.getParameter("S3_AVATAR_FOLDER","userPhotos");
     public static final String SECRET_KEY = "RYlvpRyzJMLlR5vpXKnn";
+    public static final String SIP_CALL_PREFIX = Parameter.getParameter("SIP_CALL_PREFIX","vi$");
     public static String getParameter(String key,String defaultValue){
         if(System.getProperty(key) != null){
             return System.getProperty(key);

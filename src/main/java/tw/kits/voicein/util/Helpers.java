@@ -107,8 +107,8 @@ public class Helpers {
         InitPhoneCallBean ipcb = new InitPhoneCallBean();
         ipcb.setCalleeNumber(cdr.getCalleePhone());
         ipcb.setCallerNumber(cdr.getCallerPhone());
-        ipcb.setCallerid("vi$" + cdr.getId());
-        ipcb.setHisuid("vi$" + cdr.getId());
+        ipcb.setCallerid(Parameter.SIP_CALL_PREFIX + cdr.getId());
+        ipcb.setHisuid(Parameter.SIP_CALL_PREFIX + cdr.getId());
 
         Http http = new Http();
         ObjectMapper mapper = new ObjectMapper();
@@ -125,8 +125,8 @@ public class Helpers {
         InitPhoneCallBean ipcb = new InitPhoneCallBean();
         ipcb.setCalleeNumber(record.getCalleePhone());
         ipcb.setCallerNumber(record.getCallerPhone());
-        ipcb.setCallerid("vi$" + record.getId());
-        ipcb.setHisuid("vi$" + record.getId());
+        ipcb.setCallerid(Parameter.SIP_CALL_PREFIX + record.getId());
+        ipcb.setHisuid(Parameter.SIP_CALL_PREFIX + record.getId());
 
         Http http = new Http();
         ObjectMapper mapper = new ObjectMapper();
