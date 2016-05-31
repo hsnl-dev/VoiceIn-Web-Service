@@ -43,7 +43,7 @@ public class PaymentResource {
     @Path("/payments")
     @POST
     public Response createPayment(@Context SecurityContext sc, PayCreateBean form) {
-
+        LOGGER.warning(sc.getUserPrincipal().getName());
         Payment pay = new Payment();
         pay.setMethod(form.getMethod());
         pay.setMoney(form.getMoney());
