@@ -101,10 +101,23 @@ public class ContactsResource {
                 contactList = dataStoreObject.find(Contact.class).field("user").equal(user).asList();
             } else {
                 Date lastContactGet = user.getLastContactGet();
+
+                List<Contact> allContactList = dataStoreObject.find(Contact.class)
+                        .field("user").equal(user)
+                        .asList();
                 
-                Query<Contact> q = dataStoreObject.createQuery(Contact.class);
-                q.or(q.criteria("updateAt").greaterThanOrEq(lastContactGet), q.criteria("providerUser.profilePhotoLastModifiedTime").greaterThanOrEq(lastContactGet));
-                contactList = q.field("user").equal(user).asList();
+                 for (Contact c : allContactList) {
+                     Date profileUpdateTime = c.getProviderUser().getProfilePhotoLastModifiedTime();
+                     if (profileUpdateTime.getTime() >= c.getUpdateAt().getTime()) {
+                         c.setUpdateAt(profileUpdateTime);
+                         dataStoreObject.save(c);
+                     } 
+                 }
+                 
+                 contactList = dataStoreObject.find(Contact.class)
+                        .field("user").equal(user)
+                        .filter("updateAt >=", lastContactGet)
+                        .asList();
             }
 
             ArrayList<String> deletedQueue = user.getDeletedQueue();
