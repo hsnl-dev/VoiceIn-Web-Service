@@ -101,7 +101,10 @@ public class ContactsResource {
                 contactList = dataStoreObject.find(Contact.class).field("user").equal(user).asList();
             } else {
                 Date lastContactGet = user.getLastContactGet();
-                contactList = dataStoreObject.find(Contact.class).field("user").equal(user).filter("updateAt >=", lastContactGet).asList();
+                
+                Query<Contact> q = dataStoreObject.createQuery(Contact.class);
+                q.or(q.criteria("updateAt").greaterThanOrEq(lastContactGet), q.criteria("providerUser.profilePhotoLastModifiedTime").greaterThanOrEq(lastContactGet));
+                contactList = q.field("user").equal(user).asList();
             }
 
             ArrayList<String> deletedQueue = user.getDeletedQueue();
@@ -319,7 +322,7 @@ public class ContactsResource {
         /* == Get othersSideContact == */
         User provider = modifiedContact.getProviderUser();
         Date modifiedTime = new Date();
-        
+
         if (provider != null) {
             /* Its not icon on the other side. */
             User user = modifiedContact.getUser();
@@ -332,7 +335,7 @@ public class ContactsResource {
             othersSideContact.setUpdateAt(modifiedTime);
             dataStoreObject.save(othersSideContact);
         }
-        
+
         modifiedContact.setUpdateAt(modifiedTime);
         dataStoreObject.save(modifiedContact);
         return Response.ok().build();
@@ -367,14 +370,16 @@ public class ContactsResource {
                 group.getContacts().remove(freeContact.getId().toString());
                 dataStoreObject.save(group);
             }
-            
-            /** add deleted contacts to the queue **/
+
+            /**
+             * add deleted contacts to the queue *
+             */
             ArrayList<String> userDeleteQueue = user.getDeletedQueue() == null ? new ArrayList<String>() : user.getDeletedQueue();
             ArrayList<String> providerDeleteQueue = provider.getDeletedQueue() == null ? new ArrayList<String>() : provider.getDeletedQueue();
-            
+
             userDeleteQueue.add(contactId);
             providerDeleteQueue.add(freeContact.getId().toString());
-            
+
             user.setDeletedQueue(userDeleteQueue);
             provider.setDeletedQueue(providerDeleteQueue);
 
