@@ -105,32 +105,31 @@ public class ContactsResource {
                 List<Contact> allContactList = dataStoreObject.find(Contact.class)
                         .field("user").equal(user)
                         .asList();
-                
-                 for (Contact c : allContactList) {
-                     if (c.getProviderUser() != null && c.getProviderUser().getProfilePhotoLastModifiedTime() != null) {
+
+                for (Contact c : allContactList) {
+                    if (c.getProviderUser() != null && c.getProviderUser().getProfilePhotoLastModifiedTime() != null) {
                         Date profileUpdateTime = c.getProviderUser().getProfilePhotoLastModifiedTime();
                         if (profileUpdateTime.getTime() >= c.getUpdateAt().getTime()) {
                             c.setUpdateAt(profileUpdateTime);
                             dataStoreObject.save(c);
                         }
-                     }
-                 }
-                 
-                 contactList = dataStoreObject.find(Contact.class)
+                    }
+                }
+
+                contactList = dataStoreObject.find(Contact.class)
                         .field("user").equal(user)
                         .filter("updateAt >=", lastContactGet)
                         .asList();
-            }
+                ArrayList<String> deletedQueue = user.getDeletedQueue();
 
-            ArrayList<String> deletedQueue = user.getDeletedQueue();
-
-            if (deletedQueue != null) {
-                for (String deletedContactId : deletedQueue) {
-                    userContactBean = new UserContactBean();
-                    userContactBean.setId(deletedContactId);
-                    userList.add(userContactBean);
+                if (deletedQueue != null) {
+                    for (String deletedContactId : deletedQueue) {
+                        userContactBean = new UserContactBean();
+                        userContactBean.setId(deletedContactId);
+                        userList.add(userContactBean);
+                    }
+                    user.setDeletedQueue(new ArrayList());
                 }
-                user.setDeletedQueue(new ArrayList());
             }
 
             user.setLastContactGet(new Date());
