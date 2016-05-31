@@ -18,7 +18,7 @@ public class Contact {
     private ObjectId id;
     @Reference
     private User user;
-    @Reference
+    @Embedded
     private User providerUser;
     @NotNull
     private String nickName;
