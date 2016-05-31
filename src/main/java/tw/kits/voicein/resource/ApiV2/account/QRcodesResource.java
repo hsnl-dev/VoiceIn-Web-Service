@@ -116,7 +116,6 @@ public class QRcodesResource {
         }
         String s3Bucket = "voice-in";
         String file = String.format("%s/%s.png", Parameter.S3_QR_CODE_FOLDER ,user.getQrCodeUuid());
-        LOGGER.warning("file name is " +file);
         GetObjectRequest request = new GetObjectRequest(s3Bucket, file);
         S3Object object = s3Client.getObject(request);
         qrCodeData = IOUtils.toByteArray(object.getObjectContent());
