@@ -107,11 +107,13 @@ public class ContactsResource {
                         .asList();
                 
                  for (Contact c : allContactList) {
-                     Date profileUpdateTime = c.getProviderUser().getProfilePhotoLastModifiedTime();
-                     if (profileUpdateTime.getTime() >= c.getUpdateAt().getTime()) {
-                         c.setUpdateAt(profileUpdateTime);
-                         dataStoreObject.save(c);
-                     } 
+                     if (c.getProviderUser() != null && c.getProviderUser().getProfilePhotoLastModifiedTime() != null) {
+                        Date profileUpdateTime = c.getProviderUser().getProfilePhotoLastModifiedTime();
+                        if (profileUpdateTime.getTime() >= c.getUpdateAt().getTime()) {
+                            c.setUpdateAt(profileUpdateTime);
+                            dataStoreObject.save(c);
+                        }
+                     }
                  }
                  
                  contactList = dataStoreObject.find(Contact.class)
