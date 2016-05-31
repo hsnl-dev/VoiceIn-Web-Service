@@ -4,6 +4,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.logging.Logger;
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -14,6 +15,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
 import tw.kits.voicein.bean.ErrorMessageBean;
+import tw.kits.voicein.resource.ApiV2.PaymentResource;
 import tw.kits.voicein.util.Parameter;
 import tw.kits.voicein.util.TokenRequired;
 
@@ -44,6 +46,9 @@ public class TokenSecurityFilter implements ContainerRequestFilter {
 
             try {
                 final String userid = Jwts.parser().setSigningKey(Parameter.SECRET_KEY).parseClaimsJws(token).getBody().getSubject();
+                 final Logger LOGGER = Logger.getLogger(PaymentResource.class.getName());
+                 LOGGER.info(userid+"userid");
+                 LOGGER.info(token+"token");
                 crc.setSecurityContext(new SecurityContext() {
                     @Override
                     public Principal getUserPrincipal() {

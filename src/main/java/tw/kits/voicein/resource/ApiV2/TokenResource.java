@@ -165,7 +165,7 @@ public class TokenResource {
         }
         String token = Jwts.builder()
                 .setIssuer(Parameter.HOST_NAME)
-                .setSubject(user.getUserUuid())
+                .setSubject(validUser.getUuid())
                 .setIssuedAt(new Date())
                 .signWith(SignatureAlgorithm.HS256, Parameter.SECRET_KEY).compact();
 
