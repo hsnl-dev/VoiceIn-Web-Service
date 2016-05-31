@@ -1,5 +1,6 @@
 package tw.kits.voicein.resource.ApiV2;
 
+import com.mongodb.operation.UpdateOperation;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -20,6 +21,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.UpdateOperations;
 import tw.kits.voicein.bean.AccountDialBean;
 import tw.kits.voicein.bean.ErrorMessageBean;
 import tw.kits.voicein.bean.HangupNotifyBean;
@@ -67,7 +70,9 @@ public class CallingServiceResource {
         }
         if (form.isSuccess()) {
             // 0.34*2/ 180sec
-            float pay = (float) (2 * 4.5f * Math.ceil((form.getEndTime() - form.getStartTime()) / 1000 / 60));
+            float timeSecond = (float)(form.getEndTime() - form.getStartTime())/1000.0f;
+            float unit = timeSecond/60.0f;
+            float pay = (float) (2 * 4.5f * Math.ceil(unit));
             record.setChargeDollar(pay);
             record.setIsAnswer(true);
             record.setStartTime(new Date(form.getStartTime()));
@@ -87,11 +92,14 @@ public class CallingServiceResource {
                 case RecordConstant.ICON_TO_APP:
                     chargeTarget = record.getCallee();
             }
-
-            float curCredit = chargeTarget.getCredit() - pay;
-            chargeTarget.setCredit(curCredit);
-            dataStoreObject.save(chargeTarget);
-
+            
+            Query<User> updateQuery = dataStoreObject.createQuery(User.class).field("_id").equal(chargeTarget.getUuid());
+            LOGGER.info(chargeTarget.getUuid());
+            LOGGER.info(pay+"====charge");
+            
+            //transcation atomic
+            UpdateOperations<User> ops = dataStoreObject.createUpdateOperations(User.class).inc("credit",-pay);
+            dataStoreObject.update(updateQuery, ops);
         } else {
             record.setStartTime(new Date(form.getStartTime()));
             record.setIsAnswer(false);
