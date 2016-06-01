@@ -23,6 +23,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
@@ -34,6 +35,7 @@ import tw.kits.voicein.model.User;
 import tw.kits.voicein.constant.ContactConstant;
 import tw.kits.voicein.model.Group;
 import tw.kits.voicein.model.Notification;
+import tw.kits.voicein.model.QRcode;
 import tw.kits.voicein.model.Record;
 import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.MongoManager;
@@ -214,11 +216,23 @@ public class ContactsResource {
     @TokenRequired
     public Response createNewContactOfAnUser(@PathParam("uuid") String uuid, @PathParam("qrCodeUuid") String qrCodeUuid, @NotNull @Valid Contact contact) throws IOException {
         User owner = dataStoreObject.get(User.class, uuid);
-        List<User> providers = dataStoreObject.createQuery(User.class).field("qrCodeUuid").equal(qrCodeUuid).asList();
-
-        LOGGER.log(Level.CONFIG, "Save A Contact.");
-
+        User provider = dataStoreObject.createQuery(User.class).field("qrCodeUuid").equal(qrCodeUuid).get();
         List<Contact> contacts = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", qrCodeUuid).filter("user =", owner).asList();
+
+        if (provider == null) {
+            // If user scans custom qrCode
+            QRcode code = dataStoreObject.get(QRcode.class, qrCodeUuid);
+            if (code != null) {
+                provider = code.getProvider();
+            } else {
+                return Response.status(Status.NOT_FOUND).build();
+            }
+        }
+
+        if (qrCodeUuid.equalsIgnoreCase(owner.getQrCodeUuid())) {
+            // If you added your self.
+            return Response.status(Status.CONFLICT).build();
+        }
 
         if (contacts.size() > 0) {
             // Owner has already add the provider as friend.
@@ -226,8 +240,9 @@ public class ContactsResource {
         }
 
         // user.size() must be 1.
-        if (providers.size() == 1) {
-            User provider = providers.get(0);
+        if (provider != null) {
+            LOGGER.log(Level.CONFIG, "Save A Contact.");
+
             if (contact.getChargeType() != 0) {
                 // the contact of the scanner side.
                 contact.setUser(owner);
