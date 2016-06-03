@@ -224,6 +224,7 @@ public class ContactsResource {
             QRcode code = dataStoreObject.get(QRcode.class, qrCodeUuid);
             if (code != null) {
                 provider = code.getProvider();
+                contacts = dataStoreObject.createQuery(Contact.class).filter("qrCodeUuid =", provider.getQrCodeUuid()).filter("user =", provider).asList();
             } else {
                 return Response.status(Status.NOT_FOUND).build();
             }

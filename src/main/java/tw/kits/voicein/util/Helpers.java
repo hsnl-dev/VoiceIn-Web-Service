@@ -167,7 +167,7 @@ public class Helpers {
 
     public static void pushNotification(String content, String os, String deviceToken) throws IOException {
         if (os.equalsIgnoreCase("ios")) {
-            // Push notification to the caller.
+            // APNS Part
             ClassLoader classLoader = Helpers.class.getClassLoader();
 
             try {
@@ -188,13 +188,18 @@ public class Helpers {
                 }
 
                 String payload = APNS.newPayload().alertBody(content).build();
-                String token = deviceToken;
-                service.push(token, payload);
+                
+                if (deviceToken != null && deviceToken.length() > 20) {
+                    // deviceToken must be longer than 20.
+                    service.push(deviceToken, payload);
+                }
+                
             } catch (RuntimeIOException | InvalidSSLConfig | NetworkIOException e) {
                 System.out.print(e);
             }
 
         } else {
+            // GCM Part.
             Http http = new Http();
             Headers headers = new Headers.Builder().add("Authorization", "key=AIzaSyAI-4ZELTey6llacUkj9-o99AOWjRFPKII").build();
             GcmPayloadBean payload = new GcmPayloadBean();
@@ -204,8 +209,7 @@ public class Helpers {
             String payloadStr = mapper.writeValueAsString(payload);
             LOGGER.warning(payloadStr);
             Response res = http.postResponse("https://gcm-http.googleapis.com/gcm/send", payloadStr, headers);
-            LOGGER.warning(res.code() + "");
-
+            LOGGER.log(Level.WARNING, "{0}", res.code());
         }
 
     }
