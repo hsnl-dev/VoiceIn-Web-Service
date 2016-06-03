@@ -213,7 +213,7 @@ public class ContactsResource {
 
         if (contact.getProviderUser() != null) {
             User receiver = dataStoreObject.get(User.class, contact.getProviderUser().getUuid());
-            Helpers.pushNotification(amb.getContent(), receiver.getDeviceOS(), receiver.getDeviceKey());
+            Helpers.pushNotification(sender.getUserName() + "說: " + amb.getContent(), receiver.getDeviceOS(), receiver.getDeviceKey());
             
             // Create notifications.
             Notification notification = new Notification();
