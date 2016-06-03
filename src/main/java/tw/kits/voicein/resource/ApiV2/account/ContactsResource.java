@@ -28,6 +28,7 @@ import javax.ws.rs.core.SecurityContext;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
+import tw.kits.voicein.bean.AccountMessageBean;
 import tw.kits.voicein.bean.UserContactBean;
 import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.Icon;
@@ -201,6 +202,31 @@ public class ContactsResource {
         return Response.ok(userList).build();
     }
 
+    @POST
+    @Path("/accounts/{uuid}/ping/{contactId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @TokenRequired
+    public Response pingTheUser(@PathParam("uuid") String uuid, @PathParam("contactId") String contactId, @NotNull @Valid AccountMessageBean amb) throws IOException {
+        User sender = dataStoreObject.get(User.class, uuid);
+        Contact contact = dataStoreObject.get(Contact.class, new ObjectId(contactId));
+
+        if (contact.getProviderUser() != null) {
+            User receiver = dataStoreObject.get(User.class, contact.getProviderUser().getUuid());
+            Helpers.pushNotification(amb.getContent(), receiver.getDeviceOS(), receiver.getDeviceKey());
+            
+            // Create notifications.
+            Notification notification = new Notification();
+            notification.setUser(receiver);
+            notification.setNotificationContent(sender.getUserName() + "說: " + amb.getContent());
+            notification.setContactId(contact.getId().toString());
+            dataStoreObject.save(notification);
+            return Response.ok().build();
+        } else {
+            return Response.status(Status.NOT_FOUND).build();
+        }
+    }
+
     /**
      * This API allows user to add a contact. API By Calvin
      *
@@ -276,14 +302,14 @@ public class ContactsResource {
             // Create notifications.
             Notification notification = new Notification();
             notification.setUser(provider);
-            notification.setNotificationContent(owner.getUserName() + " 已經加入您為聯絡人");
+            notification.setNotificationContent(owner.getUserName() + "已經加入您為聯絡人");
             notification.setContactId(contact.getId().toString());
             dataStoreObject.save(notification);
 
             if ("ios".equalsIgnoreCase(provider.getDeviceOS())) {
-                Helpers.pushNotification(owner.getUserName() + " 已經加入您為聯絡人", "ios", provider.getDeviceKey());
+                Helpers.pushNotification(owner.getUserName() + "已經加入您為聯絡人", "ios", provider.getDeviceKey());
             } else {
-                Helpers.pushNotification(owner.getUserName() + " 已經加入您為聯絡人", "android", provider.getDeviceKey());
+                Helpers.pushNotification(owner.getUserName() + "已經加入您為聯絡人", "android", provider.getDeviceKey());
             }
 
             return Response.ok().build();
