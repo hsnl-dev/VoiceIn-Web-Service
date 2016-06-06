@@ -222,10 +222,11 @@ public class ContactsResource {
             notification.setContactId(contact.getId().toString());
             dataStoreObject.save(notification);
             
-            notification.setUser(sender);
-            notification.setNotificationContent("您對 " + sender.getUserName() + "說: " + amb.getContent());
-            notification.setContactId(contact.getId().toString());
-            dataStoreObject.save(notification);
+            Notification notificationOfSender = new Notification();
+            notificationOfSender.setUser(sender);
+            notificationOfSender.setNotificationContent("您對 " + sender.getUserName() + "說: " + amb.getContent());
+            notificationOfSender.setContactId(contact.getId().toString());
+            dataStoreObject.save(notificationOfSender);
             return Response.ok().build();
         } else {
             return Response.status(Status.NOT_FOUND).build();
