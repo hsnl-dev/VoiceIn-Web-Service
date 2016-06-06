@@ -71,8 +71,8 @@ public class CallingServiceResource {
         if (form.isSuccess()) {
             // 0.34*2/ 180sec
             float timeSecond = (float)(form.getEndTime() - form.getStartTime())/1000.0f;
-            float unit = timeSecond/60.0f;
-            float pay = (float) (2 * 4.5f * Math.ceil(unit));
+            float unit = timeSecond/6.0f;
+            float pay = (float) (0.9f * Math.ceil(unit));
             record.setChargeDollar(pay);
             record.setIsAnswer(true);
             record.setStartTime(new Date(form.getStartTime()));
