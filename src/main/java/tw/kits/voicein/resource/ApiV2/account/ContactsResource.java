@@ -221,6 +221,11 @@ public class ContactsResource {
             notification.setNotificationContent(sender.getUserName() + "說: " + amb.getContent());
             notification.setContactId(contact.getId().toString());
             dataStoreObject.save(notification);
+            
+            notification.setUser(sender);
+            notification.setNotificationContent("您對 " + sender.getUserName() + "說: " + amb.getContent());
+            notification.setContactId(contact.getId().toString());
+            dataStoreObject.save(notification);
             return Response.ok().build();
         } else {
             return Response.status(Status.NOT_FOUND).build();
