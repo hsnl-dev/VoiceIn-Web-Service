@@ -224,7 +224,7 @@ public class ContactsResource {
             
             Notification notificationOfSender = new Notification();
             notificationOfSender.setUser(sender);
-            notificationOfSender.setNotificationContent("您對 " + sender.getUserName() + "說: " + amb.getContent());
+            notificationOfSender.setNotificationContent("您對 " + receiver.getUserName() + "說: " + amb.getContent());
             notificationOfSender.setContactId(contact.getId().toString());
             dataStoreObject.save(notificationOfSender);
             return Response.ok().build();
