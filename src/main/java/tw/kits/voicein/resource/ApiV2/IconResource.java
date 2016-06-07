@@ -223,7 +223,6 @@ public class IconResource {
     @Path("/icons/{iconId}/ping")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @TokenRequired
     public Response pingTheUser(@PathParam("iconId") String iconId, @NotNull @Valid AccountMessageBean amb) throws IOException {
         Icon icon = dsObj.get(Icon.class, iconId);
         User provider = icon.getProvider();
