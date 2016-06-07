@@ -220,7 +220,7 @@ public class ContactsResource {
            
             dataStoreObject.save(notification);
             
-            Notification notificationOfSender = Helpers.createNotificationInstance("您對 " + receiver.getUserName() + "說: " + amb.getContent(), sender, contact.getId().toString());
+            Notification notificationOfSender = Helpers.createNotificationInstance("您對" + receiver.getUserName() + "說: " + amb.getContent(), sender, contact.getId().toString());
             
             dataStoreObject.save(notificationOfSender);
             return Response.ok().build();
