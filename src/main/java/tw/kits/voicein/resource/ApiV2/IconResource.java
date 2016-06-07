@@ -18,7 +18,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
+import tw.kits.voicein.bean.AccountMessageBean;
 import tw.kits.voicein.bean.ErrorMessageBean;
 import tw.kits.voicein.bean.IconCreateBean;
 import tw.kits.voicein.bean.IconInfoBean;
@@ -28,9 +30,11 @@ import tw.kits.voicein.model.Icon;
 import tw.kits.voicein.model.QRcode;
 import tw.kits.voicein.constant.ContactConstant;
 import tw.kits.voicein.model.Notification;
+import tw.kits.voicein.model.User;
 import tw.kits.voicein.util.Helpers;
 import tw.kits.voicein.util.MongoManager;
 import tw.kits.voicein.util.QRcodeType;
+import tw.kits.voicein.util.TokenRequired;
 
 /**
  * *
@@ -213,6 +217,26 @@ public class IconResource {
         res.put("iconId", icon.getIconId());
         return Response.status(Response.Status.CREATED).entity(res).build();
 
+    }
+    
+    @POST
+    @Path("/icons/{iconId}/ping")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @TokenRequired
+    public Response pingTheUser(@PathParam("iconId") String iconId, @NotNull @Valid AccountMessageBean amb) throws IOException {
+        Icon icon = dsObj.get(Icon.class, iconId);
+        User provider = icon.getProvider();
+
+        if (provider != null) {
+            Helpers.pushNotification(icon.getName() + "說: " + amb.getContent(), provider.getDeviceOS(), provider.getDeviceKey());
+            // Create notifications.
+            Notification notification = Helpers.createNotificationInstance(icon.getName() + "說: " + amb.getContent(), provider, iconId);
+            dsObj.save(notification);            
+            return Response.ok().build();
+        } else {
+            return Response.status(Status.NOT_FOUND).build();
+        }
     }
 
     /**
