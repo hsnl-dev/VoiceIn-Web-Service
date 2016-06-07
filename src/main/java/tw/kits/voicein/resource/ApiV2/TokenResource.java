@@ -163,20 +163,20 @@ public class TokenResource {
         } else {
             return Response.status(Status.BAD_REQUEST).build();
         }
-        String token = Jwts.builder()
-                .setIssuer(Parameter.HOST_NAME)
-                .setSubject(validUser.getUuid())
-                .setIssuedAt(new Date())
-                .signWith(SignatureAlgorithm.HS256, Parameter.SECRET_KEY).compact();
 
         if (validUser != null) {
+            String token = Jwts.builder()
+                    .setIssuer(Parameter.HOST_NAME)
+                    .setSubject(validUser.getUuid())
+                    .setIssuedAt(new Date())
+                    .signWith(SignatureAlgorithm.HS256, Parameter.SECRET_KEY).compact();
             // issue new token
-            Token tm = new Token(3600);
+            //Token tm = new Token(3600);
             // inject user to token collection
-            tm.setUser(validUser);
-            ds.save(tm);
+            //tm.setUser(validUser);
+            //ds.save(tm);
             TokenResBean res = new TokenResBean(token);
-            LOGGER.info(res.getToken() + "==");
+            //LOGGER.info(res.getToken() + "==");
             res.setUserUuid(validUser.getUuid());
             return Response
                     .status(Status.CREATED)
@@ -200,6 +200,7 @@ public class TokenResource {
         } else if (user.getPassword() == null) {
             return null;
         } else if (user.getPassword().equals(auth.getPassword())) {
+
             return user;
         }
         return null;
@@ -217,6 +218,7 @@ public class TokenResource {
         if (code == null) {
             return null;
         } else {
+            ds.delete(code);
             return user;
         }
     }
@@ -225,10 +227,10 @@ public class TokenResource {
         Datastore ds = MongoManager.getInstatnce().getDs();
         Key key = new Key(User.class, "accounts", auth.getUserUuid());
         Code code = ds.find(Code.class).field("user").equal(key).get();
-        LOGGER.info(auth.getCode() + code.getCode());
         if (code == null) {
             return null;
         } else if (code.getCode().equals(auth.getCode()) || auth.getCode().equalsIgnoreCase("999999")) {
+            ds.delete(code);
             return code.getUser();
         } else {
             return null;
