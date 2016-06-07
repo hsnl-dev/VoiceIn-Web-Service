@@ -29,6 +29,7 @@ import tw.kits.voicein.bean.GcmPayloadBean;
 import tw.kits.voicein.bean.InitPhoneCallBean;
 import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.Icon;
+import tw.kits.voicein.model.Notification;
 import tw.kits.voicein.model.Record;
 import tw.kits.voicein.model.User;
 import static tw.kits.voicein.util.Parameter.IS_SANDBOX;
@@ -165,6 +166,15 @@ public class Helpers {
         return (enable & isAfter & isBefore);
     }
 
+    public static Notification createNotificationInstance(String content, User owner, String contactId) {
+        Notification notification = new Notification();
+        notification.setUser(owner);
+        notification.setNotificationContent(content);
+        notification.setContactId(contactId);
+        
+        return notification;
+    }
+
     public static void pushNotification(String content, String os, String deviceToken) throws IOException {
         if (os.equalsIgnoreCase("ios")) {
             // APNS Part
@@ -188,12 +198,12 @@ public class Helpers {
                 }
 
                 String payload = APNS.newPayload().alertBody(content).badge(1).build();
-                
+
                 if (deviceToken != null && deviceToken.length() > 20) {
                     // deviceToken must be longer than 20.
                     service.push(deviceToken, payload);
                 }
-                
+
             } catch (RuntimeIOException | InvalidSSLConfig | NetworkIOException e) {
                 System.out.print(e);
             }

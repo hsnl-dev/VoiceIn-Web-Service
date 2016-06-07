@@ -216,16 +216,12 @@ public class ContactsResource {
             Helpers.pushNotification(sender.getUserName() + "說: " + amb.getContent(), receiver.getDeviceOS(), receiver.getDeviceKey());
             
             // Create notifications.
-            Notification notification = new Notification();
-            notification.setUser(receiver);
-            notification.setNotificationContent(sender.getUserName() + "說: " + amb.getContent());
-            notification.setContactId(contact.getId().toString());
+            Notification notification = Helpers.createNotificationInstance(sender.getUserName() + "說: " + amb.getContent(), receiver, contact.getId().toString());
+           
             dataStoreObject.save(notification);
             
-            Notification notificationOfSender = new Notification();
-            notificationOfSender.setUser(sender);
-            notificationOfSender.setNotificationContent("您對 " + receiver.getUserName() + "說: " + amb.getContent());
-            notificationOfSender.setContactId(contact.getId().toString());
+            Notification notificationOfSender = Helpers.createNotificationInstance("您對 " + receiver.getUserName() + "說: " + amb.getContent(), sender, contact.getId().toString());
+            
             dataStoreObject.save(notificationOfSender);
             return Response.ok().build();
         } else {
@@ -444,7 +440,7 @@ public class ContactsResource {
 
             user.setDeletedQueue(userDeleteQueue);
             provider.setDeletedQueue(providerDeleteQueue);
-
+                      
             dataStoreObject.save(provider, user);
             dataStoreObject.delete(freeContact);
 
@@ -466,6 +462,8 @@ public class ContactsResource {
             dataStoreObject.delete(invalidRec);
         }
 
+        Notification notification = Helpers.createNotificationInstance(user.getUserName() + "已經刪除您", provider, payContact.getId().toString());
+        dataStoreObject.save(notification);
         dataStoreObject.delete(payContact);
         //clean dependency
 
