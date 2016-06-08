@@ -72,6 +72,9 @@ public class QRcodesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getIconProvider(@PathParam("providerId") String uProviderId) {
         QRcode code = dataStoreObject.get(QRcode.class, uProviderId);
+        if(code==null){
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         User user = code.getProvider();
         ProviderResBean prb = new ProviderResBean();
         prb.setName(user.getUserName());
