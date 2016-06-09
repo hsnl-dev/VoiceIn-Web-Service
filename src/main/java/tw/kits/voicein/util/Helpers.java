@@ -197,7 +197,7 @@ public class Helpers {
                             .build();
                 }
 
-                String payload = APNS.newPayload().alertBody(content).badge(1).build();
+                String payload = APNS.newPayload().alertBody(content).badge(1).instantDeliveryOrSilentNotification().build();
 
                 if (deviceToken != null && deviceToken.length() > 20) {
                     // deviceToken must be longer than 20.
