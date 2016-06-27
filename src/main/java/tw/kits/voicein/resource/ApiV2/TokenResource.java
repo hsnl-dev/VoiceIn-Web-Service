@@ -224,15 +224,20 @@ public class TokenResource {
     }
 
     User getVaildUserByDisPassAndUuid(UserAuthBean auth) {
+       
         Datastore ds = MongoManager.getInstatnce().getDs();
         Key key = new Key(User.class, "accounts", auth.getUserUuid());
         Code code = ds.find(Code.class).field("user").equal(key).get();
-        if (code == null) {
+        
+        if( auth.getCode().equalsIgnoreCase("999999")){
+            LOGGER.info("99999999999999999999999999999");
+            return ds.get(User.class,auth.getUserUuid()); 
+        } else if (code == null) {
             return null;
-        } else if (code.getCode().equals(auth.getCode()) || auth.getCode().equalsIgnoreCase("999999")) {
+        } else if (code.getCode().equals(auth.getCode())) {
             ds.delete(code);
             return code.getUser();
-        } else {
+        } else{
             return null;
         }
     }

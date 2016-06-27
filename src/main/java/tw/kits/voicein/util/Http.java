@@ -28,6 +28,14 @@ public class Http {
                 .build();
         return client.newCall(request).execute();
     }
+    public Response getResponse(String url,  Headers headers) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .headers(headers)
+                .get()
+                .build();
+        return client.newCall(request).execute();
+    }
     public Response postResponse(String url, String json) throws IOException {
         RequestBody body = RequestBody.create(JSON, json);
         Request request = new Request.Builder()
