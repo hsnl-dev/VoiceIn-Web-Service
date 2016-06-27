@@ -335,7 +335,7 @@ public class User {
     /**
      * @return the enableMVPNChecker
      */
-    public boolean isEnableMVPNChecker() {
+    public boolean getEnableMVPNChecker() {
         return enableMVPNChecker;
     }
 
