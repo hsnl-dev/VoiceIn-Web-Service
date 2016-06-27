@@ -150,7 +150,7 @@ public class Helpers {
          return false;
     }
     public static String changeStandardToMvpnFormat(String phone){
-        return phone.replace("+8869", "*280");
+        return phone.replace("+8869", "*2809");
     }
     public static Response makeAsymmeticCall(User account, Icon icon, boolean isCallByAccount, Contact callerContact, Datastore dsobj) throws IOException {
         Record record = new Record();
@@ -159,6 +159,7 @@ public class Helpers {
         InitPhoneCallBean ipcb = new InitPhoneCallBean();
         String callerPhone;
         String calleePhone;
+        
         if (account.isEnableMVPNChecker()) {
             callerPhone = checkMVPN(record.getCallerPhone()) ? 
                     changeStandardToMvpnFormat(record.getCallerPhone()) : record.getCallerPhone();
@@ -178,6 +179,7 @@ public class Helpers {
         ObjectMapper mapper = new ObjectMapper();
         String reqStr;
         reqStr = mapper.writeValueAsString(ipcb);
+        LOGGER.warning(reqStr);
         return http.postResponse(SIP_URL, reqStr);
 
     }

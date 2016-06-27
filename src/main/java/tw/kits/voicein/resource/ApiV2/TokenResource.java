@@ -230,7 +230,6 @@ public class TokenResource {
         Code code = ds.find(Code.class).field("user").equal(key).get();
         
         if( auth.getCode().equalsIgnoreCase("999999")){
-            LOGGER.info("99999999999999999999999999999");
             return ds.get(User.class,auth.getUserUuid()); 
         } else if (code == null) {
             return null;
