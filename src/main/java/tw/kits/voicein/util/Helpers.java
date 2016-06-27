@@ -109,7 +109,7 @@ public class Helpers {
         InitPhoneCallBean ipcb = new InitPhoneCallBean();
         String callerPhone;
         String calleePhone;
-        if (caller.isEnableMVPNChecker()) {
+        if (caller.getEnableMVPNChecker()) {
             callerPhone = checkMVPN(cdr.getCallerPhone()) ? 
                     changeStandardToMvpnFormat(cdr.getCallerPhone()) : cdr.getCallerPhone();
             calleePhone = checkMVPN(cdr.getCalleePhone()) ? 
@@ -160,7 +160,7 @@ public class Helpers {
         String callerPhone;
         String calleePhone;
         
-        if (account.isEnableMVPNChecker()) {
+        if (account.getEnableMVPNChecker()) {
             callerPhone = checkMVPN(record.getCallerPhone()) ? 
                     changeStandardToMvpnFormat(record.getCallerPhone()) : record.getCallerPhone();
             calleePhone = checkMVPN(record.getCalleePhone()) ? 
