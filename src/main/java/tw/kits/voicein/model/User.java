@@ -45,6 +45,7 @@ public class User {
     private float credit;
     private ArrayList<String> deletedQueue;
     private Date lastContactGet;
+    private boolean enableMVPNChecker;
 
     /**
      * @param uuid the uuid to set
@@ -329,5 +330,19 @@ public class User {
      */
     public void setDeletedQueue(ArrayList<String> deletedQueue) {
         this.deletedQueue = deletedQueue;
+    }
+
+    /**
+     * @return the enableMVPNChecker
+     */
+    public boolean isEnableMVPNChecker() {
+        return enableMVPNChecker;
+    }
+
+    /**
+     * @param enableMVPNChecker the enableMVPNChecker to set
+     */
+    public void setEnableMVPNChecker(boolean enableMVPNChecker) {
+        this.enableMVPNChecker = enableMVPNChecker;
     }
 }

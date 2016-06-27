@@ -95,7 +95,7 @@ public class IconResource {
             } else {
                 helper.pushNotification("#call#" + icon.getName() + "即將來電，請放心接聽", "android", target.get(0).getUser().getDeviceKey());
             }
-            return Response.status(Response.Status.CREATED).entity(res).build();
+            return Response.status(Response.Status.CREATED).build();
         } else {
             ErrorMessageBean erb = new ErrorMessageBean("Kits Main Server Error");
             LOGGER.severe(res.body().string());

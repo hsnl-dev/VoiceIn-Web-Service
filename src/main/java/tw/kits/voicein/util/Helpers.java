@@ -27,6 +27,7 @@ import okhttp3.Response;
 import org.mongodb.morphia.Datastore;
 import tw.kits.voicein.bean.GcmPayloadBean;
 import tw.kits.voicein.bean.InitPhoneCallBean;
+import tw.kits.voicein.bean.MvpnResBean;
 import tw.kits.voicein.model.Contact;
 import tw.kits.voicein.model.Icon;
 import tw.kits.voicein.model.Notification;
@@ -106,8 +107,21 @@ public class Helpers {
         cdr.setInitCall(caller, callee, contact);
         dsobj.save(cdr);
         InitPhoneCallBean ipcb = new InitPhoneCallBean();
-        ipcb.setCalleeNumber(cdr.getCalleePhone());
-        ipcb.setCallerNumber(cdr.getCallerPhone());
+        String callerPhone;
+        String calleePhone;
+        if (caller.isEnableMVPNChecker()) {
+            callerPhone = checkMVPN(cdr.getCallerPhone()) ? 
+                    changeStandardToMvpnFormat(cdr.getCallerPhone()) : cdr.getCallerPhone();
+            calleePhone = checkMVPN(cdr.getCalleePhone()) ? 
+                    changeStandardToMvpnFormat(cdr.getCalleePhone()) : cdr.getCalleePhone();
+        }else{
+            callerPhone = cdr.getCallerPhone();
+            calleePhone = cdr.getCalleePhone();
+        }
+        
+        
+        ipcb.setCalleeNumber(calleePhone);
+        ipcb.setCallerNumber(callerPhone);
         ipcb.setCallerid(Parameter.SIP_CALL_PREFIX + cdr.getId());
         ipcb.setHisuid(Parameter.SIP_CALL_PREFIX + cdr.getId());
 
@@ -119,13 +133,45 @@ public class Helpers {
 
     }
 
+    public static boolean checkMVPN(String phone) {
+        String caller = String.format("%s%smvpn/checkMvpnRequest/%s", Parameter.API_ROOT, Parameter.API_VER, phone);
+        Http http = new Http();
+        Headers headers = new Headers.Builder().add("apiKey", Parameter.API_KEY).build();
+        try {
+            Response res = http.getResponse(caller, headers);
+            if (res.isSuccessful()) {
+                String resStr = res.body().string();
+                ObjectMapper mapper = new ObjectMapper();
+                return mapper.readValue(resStr, MvpnResBean.class).isIsMvpn();
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Helpers.class.getName()).log(Level.SEVERE, null, ex);
+        }
+         return false;
+    }
+    public static String changeStandardToMvpnFormat(String phone){
+        return phone.replace("+8869", "*2809");
+    }
     public static Response makeAsymmeticCall(User account, Icon icon, boolean isCallByAccount, Contact callerContact, Datastore dsobj) throws IOException {
         Record record = new Record();
         record.setAsymetricCall(account, icon, isCallByAccount, callerContact);
         dsobj.save(record);
         InitPhoneCallBean ipcb = new InitPhoneCallBean();
-        ipcb.setCalleeNumber(record.getCalleePhone());
-        ipcb.setCallerNumber(record.getCallerPhone());
+        String callerPhone;
+        String calleePhone;
+        
+        if (account.isEnableMVPNChecker()) {
+            callerPhone = checkMVPN(record.getCallerPhone()) ? 
+                    changeStandardToMvpnFormat(record.getCallerPhone()) : record.getCallerPhone();
+            calleePhone = checkMVPN(record.getCalleePhone()) ? 
+                    changeStandardToMvpnFormat(record.getCalleePhone()) : record.getCalleePhone();
+        }else{
+            callerPhone = record.getCallerPhone();
+            calleePhone = record.getCalleePhone();
+        }
+       
+        ipcb.setCallerNumber(callerPhone);
+        ipcb.setCalleeNumber(calleePhone);
         ipcb.setCallerid(Parameter.SIP_CALL_PREFIX + record.getId());
         ipcb.setHisuid(Parameter.SIP_CALL_PREFIX + record.getId());
 
@@ -133,6 +179,7 @@ public class Helpers {
         ObjectMapper mapper = new ObjectMapper();
         String reqStr;
         reqStr = mapper.writeValueAsString(ipcb);
+        LOGGER.warning(reqStr);
         return http.postResponse(SIP_URL, reqStr);
 
     }
@@ -171,7 +218,7 @@ public class Helpers {
         notification.setUser(owner);
         notification.setNotificationContent(content);
         notification.setContactId(contactId);
-        
+
         return notification;
     }
 
