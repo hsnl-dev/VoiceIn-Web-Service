@@ -1,6 +1,5 @@
 package tw.kits.voicein.resource.ApiV2;
 
-import com.mongodb.operation.UpdateOperation;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -157,20 +156,34 @@ public class CallingServiceResource {
             }
 
             if (Helpers.isAllowedToCall(targets.get(0))) {
-                Helpers.makeCall(contact.getUser(), targets.get(0).getUser(),
-                        contact,
-                        dataStoreObject);
+                okhttp3.Response res= null ; 
+                try{
+                    res = Helpers.makeCall(contact.getUser(), targets.get(0).getUser(),
+                                contact,
+                                dataStoreObject);
+                    if(res.isSuccessful()){
+                       String name = contact.getNickName().equalsIgnoreCase("") ? contact.getUser().getUserName() : contact.getNickName();
+                       if ("ios".equalsIgnoreCase(targets.get(0).getUser().getDeviceOS())) {
 
-                String name = contact.getNickName().equalsIgnoreCase("") ? contact.getUser().getUserName() : contact.getNickName();
-                if ("ios".equalsIgnoreCase(targets.get(0).getUser().getDeviceOS())) {
+                           Helpers.pushNotification(name + "即將來電，請放心接聽", "ios", targets.get(0).getUser().getDeviceKey());
 
-                    Helpers.pushNotification(name + "即將來電，請放心接聽", "ios", targets.get(0).getUser().getDeviceKey());
-
-                } else {
-                    Helpers.pushNotification("#call#" + name + "即將來電，請放心接聽", "android", targets.get(0).getUser().getDeviceKey());
+                       } else {
+                           Helpers.pushNotification("#call#" + name + "即將來電，請放心接聽", "android", targets.get(0).getUser().getDeviceKey());
+                       }
+                        return Response.ok().build();
+                    }else{
+                        return Response.status(Response.Status.BAD_REQUEST).entity(res.body().string()).build();
+                    }
+                }catch(IOException e){
+                    LOGGER.log(Level.SEVERE, null, e);
+                    return Response.serverError().build();
+                
+                }finally{
+                    if(res != null){
+                        res.body().close();
+                    }
                 }
-
-                return Response.ok().build();
+                
             } else {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
@@ -178,8 +191,22 @@ public class CallingServiceResource {
             Icon icon = contact.getCustomerIcon();
 
             if (Helpers.isAllowedToCall(icon)) {
-                Helpers.makeAsymmeticCall(contact.getUser(), icon, true, contact, dataStoreObject);
-                return Response.ok().build();
+                okhttp3.Response res = null;
+                try{
+                    res = Helpers.makeAsymmeticCall(contact.getUser(), icon, true, contact, dataStoreObject);
+                    if(res.isSuccessful()){
+                        return Response.ok().build();
+                    }else{
+                        return Response.status(Response.Status.BAD_REQUEST).entity(res.body().string()).build();
+                    }
+                }catch(IOException e){
+                    if(res!=null){
+                        res.body().close();
+                    }
+                    LOGGER.log(Level.SEVERE, null, e);
+                    return Response.serverError().build();
+                }
+                
             } else {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }

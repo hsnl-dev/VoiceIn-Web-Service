@@ -137,8 +137,9 @@ public class Helpers {
         String caller = String.format("%s%smvpn/checkMvpnRequest/%s", Parameter.API_ROOT, Parameter.API_VER, phone);
         Http http = new Http();
         Headers headers = new Headers.Builder().add("apiKey", Parameter.API_KEY).build();
+        Response res = null;
         try {
-            Response res = http.getResponse(caller, headers);
+            res = http.getResponse(caller, headers);
             if (res.isSuccessful()) {
                 String resStr = res.body().string();
                 ObjectMapper mapper = new ObjectMapper();
@@ -146,6 +147,10 @@ public class Helpers {
             }
         } catch (IOException ex) {
             Logger.getLogger(Helpers.class.getName()).log(Level.SEVERE, null, ex);
+        } finally{
+            if(res!=null){
+                res.body().close();
+            }
         }
          return false;
     }
@@ -265,9 +270,15 @@ public class Helpers {
             ObjectMapper mapper = new ObjectMapper();
             String payloadStr = mapper.writeValueAsString(payload);
             LOGGER.warning(payloadStr);
-            Response res = http.postResponse("https://gcm-http.googleapis.com/gcm/send", payloadStr, headers);
-            LOGGER.log(Level.WARNING, "{0}", res.code());
+            Response res = null;
+            try{
+                res = http.postResponse("https://gcm-http.googleapis.com/gcm/send", payloadStr, headers);
+            }finally{
+                if(res!=null){
+                    LOGGER.log(Level.WARNING, "{0}", res.code());
+                    res.body().close();
+                }
+            }   
         }
-
     }
 }
