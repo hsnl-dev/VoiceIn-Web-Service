@@ -263,7 +263,7 @@ public class Helpers {
         } else {
             // GCM Part.
             Http http = new Http();
-            Headers headers = new Headers.Builder().add("Authorization", "key=AIzaSyAI-4ZELTey6llacUkj9-o99AOWjRFPKII").build();
+            Headers headers = new Headers.Builder().add("Authorization", "key=AIzaSyCEmatZnLFkVms_qEK-iNXsgg7C7zDKe0U").build();
             GcmPayloadBean payload = new GcmPayloadBean();
             payload.setTo(deviceToken);
             payload.getData().setMessage(content);
