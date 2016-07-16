@@ -131,10 +131,10 @@ public class ContactsResource {
                         userContactBean.setId(deletedContactId);
                         userList.add(userContactBean);
                     }
-                    user.setDeletedQueue(new ArrayList());
                 }
             }
-
+            
+            user.setDeletedQueue(new ArrayList());
             user.setLastContactGet(new Date());
             dataStoreObject.save(user);
         }
